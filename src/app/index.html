@@ -1,0 +1,157 @@
+<!doctype html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+	<meta name="description" content="">
+	<meta name="author" content="">
+
+	<title>Decred - Decentralized Governance Monitor</title>
+
+	<!-- Bootstrap CSS -->
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.0.0-beta.2/css/bootstrap.min.css" integrity="sha256-QUyqZrt5vIjBumoqQV0jM8CgGqscFfdGhN+nVCqX0vc=" crossorigin="anonymous" />
+
+	<!-- Local stylesheet -->
+	<link href="style.css" rel="stylesheet">
+</head>
+<body>
+
+	<!-- Navigation Bar -->
+	<nav class="navbar navbar-expand-md navbar-dark bg-dark fixed-top dcr-navbar-top">
+		<a class="navbar-brand" href="#">
+			<img src="./img/dcr.png" width=42 height=42 />
+		</a>
+		<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarTop" aria-controls="navbarTop" aria-expanded="false" aria-label="Toggle navigation">
+			<span class="navbar-toggler-icon"></span>
+		</button>
+
+		<div class="collapse navbar-collapse" id="navbarTop">
+			<ul class="navbar-nav mr-auto">
+				<li class="nav-item active">
+					<a class="nav-link page-toggle" href="#home">Top</a>
+				</li>
+				<li class="nav-item">
+					<a class="nav-link page-toggle" href="#dist">Distribution</a>
+				</li>
+				<!--<li class="nav-item dropdown">
+					<a class="nav-link dropdown-toggle" href="http://example.com" id="dropdown01" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Dropdown</a>
+					<div class="dropdown-menu" aria-labelledby="dropdown01">
+						<a class="dropdown-item" href="#">Action</a>
+						<a class="dropdown-item" href="#">Another action</a>
+						<a class="dropdown-item" href="#">Something else here</a>
+					</div>
+				</li>-->
+			</ul>
+			<form class="form-inline my-2 my-lg-0">
+				<input class="form-control mr-sm-2" type="text" placeholder="Enter Address" aria-label="Search">
+				<button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
+			</form>
+		</div>
+	</nav>
+
+	<!-- Primary Content -->
+	<main role="main" class="container">
+
+		<!-- Home Page -->
+		<div class="dcr-page dcr-page-home home-body">
+			<h1>Top Decred Addresses</h1>
+			<p class="lead">The top 10 DCR addresses by value.</p>
+
+			<table class="table table-hover table-addresses">
+				<thead>
+					<tr>
+						<th>#</th>
+						<th>Address</th>
+						<th>Balance</th>
+						<th>Staking</th>
+						<th>Liquid</th>
+						<th>% of Supply</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr>
+						<th scope="row">1</th>
+						<td><a class="page-toggle" href="#addr">DsZzo9A7Vp6paiEH2x6i4ghwtaW3J87Gt83</a></td>
+						<td>764,571.1 DCR</td>
+						<td>764,571.1 DCR</td>
+						<td>0.0 DCR</td>
+						<td>11.67%</td>
+					</tr>
+					<tr>
+						<th scope="row">2</th>
+						<td><a class="page-toggle" href="#addr">DsZqW3BVn6vytjKqonJN1hsKaHaxSvZypw6</a></td>
+						<td>488,040.6 DCR</td>
+						<td>488,040.6 DCR</td>
+						<td>0.0 DCR</td>
+						<td>7.4%</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+
+		<!-- Distribution Page -->
+		<div class="dcr-page dcr-page-dist dist-body" style="display:none;">
+			<h1>Decred Distribution</h1>
+			<p class="lead">The current Decred wealth distribution.</p>
+
+			<table class="table table-hover table-distribution">
+				<thead>
+					<tr>
+						<th>Balances</th>
+						<th>Addresses</th>
+						<th>% Addresses</th>
+						<th>Sum</th>
+						<th>$ Value</th>
+						<th>% of Supply</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr>
+						<th scope="row">0 to 1.0 DCR</th>
+						<td>143,905</td>
+						<td>5.2%</td>
+						<td>50,362.5 DCR</td>
+						<td>$1,662,466.13</td>
+						<td>0.7%</td>
+					</tr>
+					<tr>
+						<th scope="row">1.0 to 10.0 DCR</th>
+						<td>56,986</td>
+						<td>1.2%</td>
+						<td>275,735.7 DCR</td>
+						<td>$9,102,035.457</td>
+						<td>4.2%</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+
+	</main>
+
+	<footer class="footer">
+		<div class="container">
+			<span>&copy; 2017 Jumfuckers Gone Rogue LTD.</span>
+		</div>
+	</footer>
+
+	<!-- jQuery -->
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
+
+	<!-- Popper -->
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.6/umd/popper.min.js" integrity="sha256-/GXjBGBWRx8/y1Be190w3hrUOFXNs9qPhthi0tbNnG8=" crossorigin="anonymous"></script>
+
+	<!-- Bootstrap -->
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.0.0-beta.2/js/bootstrap.min.js" integrity="sha256-GIa8Vh3sfESnVB2CN3rYGkD/MklvMq0lmITweQxE1qU=" crossorigin="anonymous"></script>
+
+	<!-- Site JS -->
+	<script src="./js/index.js"></script>
+
+	<!-- Launch -->
+	<script type="text/javascript">
+		$(document).ready(function() {
+			setEvents();
+			handleNavigation(window.location.hash.substr(1));
+		});
+	</script>
+</body>
+</html>

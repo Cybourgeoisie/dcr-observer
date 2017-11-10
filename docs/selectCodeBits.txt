@@ -1,0 +1,50 @@
+type OutPoint struct {
+	Hash  chainhash.Hash
+	Index uint32
+	Tree  int8
+}
+
+// TxIn defines a decred transaction input.
+type TxIn struct {
+	// Non-witness
+	PreviousOutPoint OutPoint
+	Sequence         uint32
+
+	// Witness
+	ValueIn         int64
+	BlockHeight     uint32
+	BlockIndex      uint32
+	SignatureScript []byte
+}
+
+// TxOut defines a decred transaction output.
+type TxOut struct {
+	Value    int64
+	Version  uint16
+	PkScript []byte
+}
+
+
+type MsgBlock struct {
+	Header        BlockHeader
+	Transactions  []*MsgTx
+	STransactions []*MsgTx
+}
+
+type MsgTx struct {
+	CachedHash *chainhash.Hash
+	SerType    TxSerializeType
+	Version    uint16
+	TxIn       []*TxIn
+	TxOut      []*TxOut
+	LockTime   uint32
+	Expiry     uint32
+}
+
+// readScript reads a variable length byte array that represents a transaction
+// script.  It is encoded as a varInt containing the length of the array
+// followed by the bytes themselves.  An error is returned if the length is
+// greater than the passed maxAllowed parameter which helps protect against
+// memory exhuastion attacks and forced panics thorugh malformed messages.  The
+// fieldName parameter is only used for the error message so it provides more
+// context in the error.

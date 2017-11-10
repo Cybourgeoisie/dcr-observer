@@ -1,0 +1,16 @@
+Collector runtime, first pass: 1013 minutes and 43 seconds to scan the blockchain
+
+Branding: https://www.decred.org/brand/
+
+Colors used by DCR site:
+	body bg: 0c1e3e
+	font color: 13385e
+	link color: 525252
+	header color: 132f4b
+	blockquote color: 8997af
+	list item active: 69D5F7
+	list item current: 3d8ead
+	link current: 5cb0c7
+	navbar bg: 0c1e3e
+	navbar icon bar: 2ed7a2
+	main div: f4f7f9

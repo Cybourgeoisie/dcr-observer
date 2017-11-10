@@ -1,0 +1,68 @@
+html {
+	position: relative;
+	min-height: 100%;
+}
+
+body {
+	padding-top: 5rem;
+	background-color: #f4f7f9;
+	color: #13385e;
+	font-style: sans-serif;
+	margin-bottom: 60px;
+}
+
+.home-body,
+.dist-body {
+	padding: 2rem 1.5rem;
+	text-align: center;
+}
+
+.table-addresses td,
+.table-distribution td {
+	font-size:80%;
+}
+
+.bg-dark {
+	background-color: #0c1e3e !important;
+}
+
+.btn-success {
+	background-color: #2ed6a1;
+}
+
+.btn-outline-success {
+	color: #2ed6a1;
+	border-color: #2ed6a1;
+}
+
+.btn-outline-success:hover,
+.btn-outline-success:active {
+	background-color: #2ed6a1;
+}
+
+.footer {
+	position: absolute;
+	bottom: 0;
+	width: 100%;
+	height: 60px;
+	line-height: 60px; /* vertically center text */
+	background-color: #0c1e3e;
+	color: #fff;
+	text-align: center;
+	font-size: 80%;
+}
+
+.footer > .container {
+	padding-right: 15px;
+	padding-left: 15px;
+}
+
+.dcr-navbar-top {
+	padding-top:0;
+	padding-bottom:0;
+}
+
+#navbarTop li:hover {
+	background-color: #2ed6a1;
+}
+
