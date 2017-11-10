@@ -1,5 +1,5 @@
 // Configuration
-var valid_uri_hashes = ['home', 'dist'];
+var valid_uri_hashes = ['home', 'dist', 'addr'];
 
 // Show and hide page elements as we navigate the site
 function handleNavigation(uri_hash) {

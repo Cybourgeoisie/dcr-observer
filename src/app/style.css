@@ -12,14 +12,32 @@ body {
 }
 
 .home-body,
-.dist-body {
+.dist-body,
+.address-body {
 	padding: 2rem 1.5rem;
 	text-align: center;
 }
 
+@media (max-width: 576px) {
+	.address-body {
+		padding: 0rem 0rem;
+	}
+}
+
+
+.address-body .container {
+	max-width: unset !important;
+}
+
 .table-addresses td,
-.table-distribution td {
+.table-addresses th,
+.table-distribution td,
+.table-distribution th {
 	font-size:80%;
+}
+
+td {
+	color: rgba(0,0,0,.7);
 }
 
 .bg-dark {
