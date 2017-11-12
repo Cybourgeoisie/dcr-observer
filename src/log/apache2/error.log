@@ -55,3 +55,26 @@ AH00558: apache2: Could not reliably determine the server's fully qualified doma
 [Sat Nov 11 18:47:13.044315 2017] [authz_core:debug] [pid 9] mod_authz_core.c(809): [client 192.168.99.1:51658] AH01626: authorization result of Require all granted: granted, referer: http://192.168.99.100/
 [Sat Nov 11 18:47:13.044474 2017] [authz_core:debug] [pid 9] mod_authz_core.c(809): [client 192.168.99.1:51658] AH01626: authorization result of <RequireAny>: granted, referer: http://192.168.99.100/
 [Sat Nov 11 18:47:13.046515 2017] [deflate:debug] [pid 9] mod_deflate.c(855): [client 192.168.99.1:51658] AH01384: Zlib: Compressed 753 to 415 : URL /js/index.js, referer: http://192.168.99.100/
+AH00558: apache2: Could not reliably determine the server's fully qualified domain name, using 172.20.0.3. Set the 'ServerName' directive globally to suppress this message
+[Sun Nov 12 02:08:20.399345 2017] [mpm_prefork:notice] [pid 6] AH00163: Apache/2.4.10 (Debian) PHP/7.0.23 configured -- resuming normal operations
+[Sun Nov 12 02:08:20.399798 2017] [core:notice] [pid 6] AH00094: Command line: '/usr/sbin/apache2 -D FOREGROUND'
+[Sun Nov 12 02:08:23.634748 2017] [authz_core:debug] [pid 8] mod_authz_core.c(809): [client 192.168.99.1:51714] AH01626: authorization result of Require all granted: granted
+[Sun Nov 12 02:08:23.634824 2017] [authz_core:debug] [pid 8] mod_authz_core.c(809): [client 192.168.99.1:51714] AH01626: authorization result of <RequireAny>: granted
+[Sun Nov 12 02:08:23.635259 2017] [authz_core:debug] [pid 8] mod_authz_core.c(809): [client 192.168.99.1:51714] AH01626: authorization result of Require all granted: granted
+[Sun Nov 12 02:08:23.635321 2017] [authz_core:debug] [pid 8] mod_authz_core.c(809): [client 192.168.99.1:51714] AH01626: authorization result of <RequireAny>: granted
+[Sun Nov 12 02:08:23.636679 2017] [deflate:debug] [pid 8] mod_deflate.c(855): [client 192.168.99.1:51714] AH01384: Zlib: Compressed 7116 to 2216 : URL /index.html
+[Sun Nov 12 02:08:23.732542 2017] [authz_core:debug] [pid 8] mod_authz_core.c(809): [client 192.168.99.1:51714] AH01626: authorization result of Require all granted: granted, referer: http://192.168.99.100/
+[Sun Nov 12 02:08:23.732626 2017] [authz_core:debug] [pid 8] mod_authz_core.c(809): [client 192.168.99.1:51714] AH01626: authorization result of <RequireAny>: granted, referer: http://192.168.99.100/
+[Sun Nov 12 02:08:23.733413 2017] [deflate:debug] [pid 8] mod_deflate.c(855): [client 192.168.99.1:51714] AH01384: Zlib: Compressed 1172 to 482 : URL /style.css, referer: http://192.168.99.100/
+[Sun Nov 12 02:08:23.752046 2017] [authz_core:debug] [pid 8] mod_authz_core.c(809): [client 192.168.99.1:51714] AH01626: authorization result of Require all granted: granted, referer: http://192.168.99.100/
+[Sun Nov 12 02:08:23.752111 2017] [authz_core:debug] [pid 8] mod_authz_core.c(809): [client 192.168.99.1:51714] AH01626: authorization result of <RequireAny>: granted, referer: http://192.168.99.100/
+[Sun Nov 12 02:08:23.752810 2017] [deflate:debug] [pid 8] mod_deflate.c(855): [client 192.168.99.1:51714] AH01384: Zlib: Compressed 753 to 415 : URL /js/index.js, referer: http://192.168.99.100/
+[Sun Nov 12 02:08:23.760687 2017] [authz_core:debug] [pid 8] mod_authz_core.c(809): [client 192.168.99.1:51714] AH01626: authorization result of Require all granted: granted, referer: http://192.168.99.100/
+[Sun Nov 12 02:08:23.760794 2017] [authz_core:debug] [pid 8] mod_authz_core.c(809): [client 192.168.99.1:51714] AH01626: authorization result of <RequireAny>: granted, referer: http://192.168.99.100/
+[Sun Nov 12 02:08:24.185712 2017] [authz_core:debug] [pid 8] mod_authz_core.c(809): [client 192.168.99.1:51714] AH01626: authorization result of Require all granted: granted, referer: http://192.168.99.100/
+[Sun Nov 12 02:08:24.185885 2017] [authz_core:debug] [pid 8] mod_authz_core.c(809): [client 192.168.99.1:51714] AH01626: authorization result of <RequireAny>: granted, referer: http://192.168.99.100/
+[Sun Nov 12 02:08:24.186061 2017] [core:info] [pid 8] [client 192.168.99.1:51714] AH00128: File does not exist: /var/www/app/favicon.ico, referer: http://192.168.99.100/
+[Sun Nov 12 02:09:14.647174 2017] [reqtimeout:info] [pid 7] [client 192.168.99.1:51715] AH01382: Request header read timeout
+[Sun Nov 12 02:09:14.647334 2017] [reqtimeout:info] [pid 9] [client 192.168.99.1:51716] AH01382: Request header read timeout
+[Sun Nov 12 02:09:21.598948 2017] [reqtimeout:info] [pid 10] [client 192.168.99.1:51743] AH01382: Request header read timeout
+[Sun Nov 12 02:09:21.599032 2017] [reqtimeout:info] [pid 11] [client 192.168.99.1:51744] AH01382: Request header read timeout

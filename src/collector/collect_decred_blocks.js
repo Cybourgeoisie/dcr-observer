@@ -72,6 +72,8 @@ function processBlocks(height, next_block_hash) {
 	console.log("Reached end.");
 	saveProgress(height-1, current_block_hash);
 	// height-1 since we incremented before, prior to validating that the height was legitimate
+	// We want to redo the last block, since it'll have a new "nextblockhash" to take us to
+	// the following block
 }
 
 function saveProgress(height, next_block_hash) {

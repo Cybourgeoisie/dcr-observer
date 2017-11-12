@@ -2,7 +2,7 @@ var fs = require('fs');
 
 // Get all top addresses
 var addresses = [], addresses_over_x = [], address_map = {};
-var addr_file = '../../data/address_map.current.json';
+var addr_file = 'address_map.json';
 
 // If we have a save state, use it
 fs.exists(addr_file, function(exists) {
@@ -19,8 +19,8 @@ fs.exists(addr_file, function(exists) {
 				// Restore the addresses
 				for (var address in address_map) {
 					addresses.push(address)
-					if (address_map[address] > 50000) {
-						addresses_over_x.push([address, address_map[address]]);
+					if (address_map[address].val > 50000) {
+						addresses_over_x.push([address, address_map[address].val]);
 					}
 				}
 

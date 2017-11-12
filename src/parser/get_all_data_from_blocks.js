@@ -5,7 +5,7 @@ var fs = require('fs');
 var total_dcr = 0;
 var address_map = {};
 var blockdir  = './blocks/';
-var savefile  = 'address_map.full.json';
+var savefile  = 'address_map.all.json';
 
 // If we have a save state, use it
 fs.exists(savefile, function(exists) {
@@ -54,7 +54,13 @@ function collectCurrentAddressValues(next_block_height) {
 	}
 
 	console.log("Reached end. Total DCR in circulation: " + total_dcr);
-	saveProgress(current_block_height+1);
+
+	// First, calculate the rich list and wealth distribution at this snapshot
+	calculateRichListAndWealthDistribution();
+
+	// Then save the rest
+	// Doesn't work as intended, so don't bother right now
+	//saveProgress(current_block_height+1);
 }
 
 function saveProgress(next_height) {
@@ -289,3 +295,59 @@ function getVout(height, tree, tx, vout) {
 // blockindex = how many TXes into the block
 // vout = how many vouts into the TX <- that's all I need
 // HOWEVER - tickets are separate addresses. We need to link them to parent addresses.
+
+function calculateRichListAndWealthDistribution() {
+	// Notify
+	console.log("Building rich list and wealth distribution...");
+
+	// Set the addresses
+	var addresses = [];
+	for (var address in address_map) {
+		if (address_map[address].val < 0) { continue; }
+		addresses.push([address, address_map[address].val]);
+	}
+
+	// Notification
+	console.log("There are " + addresses.length + " addresses in total.");
+
+	// Order the list
+	console.log("Ordering rich list...");
+	addresses.sort(function(a, b) {return b[1] - a[1];});
+
+	// Now save the richest 500
+	var top_500 = addresses.slice(0,500);
+	fs.writeFileSync('top_500_list.json', JSON.stringify(top_500));
+
+	// Now get their full info
+	var top_500_info = [];
+	for (var i = 0; i < top_500.length; i++) {
+		top_500_info.push(address_map[addresses[i]]);
+	}
+
+	// And write that
+	fs.writeFileSync('top_500_info_list.json', JSON.stringify(top_500_info));
+
+	// And determine the wealth distribution
+	var bins   = [0, 1, 10, 100, 1000, 10000, 100000, 1000000];
+	var counts = [0, 0,  0,   0,    0,     0,      0,       0];
+	var value  = [0, 0,  0,   0,    0,     0,      0,       0];
+	for (var i = 0; i < addresses.length; i++) {
+		for (var j = 0; j < bins.length; j++) {
+			if (addresses[i][1] <= bins[j]) {
+				value[j] += addresses[i][1];
+				counts[j]++;
+				break;
+			}
+		}
+	}
+
+	fs.writeFileSync('wealth_distribution.json', JSON.stringify({
+		'bins' : bins,
+		'counts' : counts,
+		'value' : value
+	}));
+
+	console.log("Bins: " + bins);
+	console.log("Counts: " + counts);
+	console.log("Value: " + value);
+}
