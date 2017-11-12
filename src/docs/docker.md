@@ -1,0 +1,47 @@
+# Using Docker
+
+# Ways to debug:
+	docker logs [container]
+
+
+# Development Builds
+	# At root (/)
+	docker build -t dcraudit-dev .
+
+	# At /sql/
+	docker build -t dcraudit-db-dev .
+
+
+# Production Builds
+	# At root (/)
+	docker build -f Dockerfile-production -t dcraudit-prod .
+
+
+# Development Run
+
+# Instructions: Using Docker Compose
+	# Make sure that the data persistence container is running
+	docker run -i --name dcraudit-db-data dcraudit-db-dev /bin/echo "PostgreSQL data container"
+
+	# Run docker compose to set up the database container and web-accessible container
+	docker-compose up -d
+	docker-compose down
+
+
+# Pushing Production Docker Container
+	aws ecr get-login --no-include-email --region us-east-1
+
+	docker build -f Dockerfile-production -t dcraudit-prod .
+	docker tag X
+	docker push X
+
+
+# Then on prod:
+	aws ecr get-login --no-include-email --region us-east-1
+	docker pull X
+
+	# Stop the current containers
+	docker stop dcraudit-prod; docker rm dcraudit-prod; 
+	
+	# Boot up prod
+	

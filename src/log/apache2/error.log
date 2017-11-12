@@ -1,0 +1,57 @@
+AH00558: apache2: Could not reliably determine the server's fully qualified domain name, using 172.20.0.3. Set the 'ServerName' directive globally to suppress this message
+[Sat Nov 11 16:34:37.094498 2017] [mpm_prefork:notice] [pid 6] AH00163: Apache/2.4.10 (Debian) PHP/7.0.23 configured -- resuming normal operations
+[Sat Nov 11 16:34:37.095243 2017] [core:notice] [pid 6] AH00094: Command line: '/usr/sbin/apache2 -D FOREGROUND'
+AH00558: apache2: Could not reliably determine the server's fully qualified domain name, using 172.20.0.3. Set the 'ServerName' directive globally to suppress this message
+[Sat Nov 11 16:36:28.131006 2017] [mpm_prefork:notice] [pid 6] AH00163: Apache/2.4.10 (Debian) PHP/7.0.23 configured -- resuming normal operations
+[Sat Nov 11 16:36:28.131945 2017] [core:notice] [pid 6] AH00094: Command line: '/usr/sbin/apache2 -D FOREGROUND'
+[Sat Nov 11 16:36:30.570692 2017] [authz_core:debug] [pid 10] mod_authz_core.c(809): [client 192.168.99.1:50379] AH01626: authorization result of Require all granted: granted
+[Sat Nov 11 16:36:30.570806 2017] [authz_core:debug] [pid 10] mod_authz_core.c(809): [client 192.168.99.1:50379] AH01626: authorization result of <RequireAny>: granted
+[Sat Nov 11 16:36:30.571576 2017] [authz_core:debug] [pid 10] mod_authz_core.c(809): [client 192.168.99.1:50379] AH01626: authorization result of Require all granted: granted
+[Sat Nov 11 16:36:30.571647 2017] [authz_core:debug] [pid 10] mod_authz_core.c(809): [client 192.168.99.1:50379] AH01626: authorization result of <RequireAny>: granted
+[Sat Nov 11 16:36:30.573194 2017] [deflate:debug] [pid 10] mod_deflate.c(855): [client 192.168.99.1:50379] AH01384: Zlib: Compressed 7106 to 2209 : URL /index.html
+[Sat Nov 11 16:36:30.672811 2017] [authz_core:debug] [pid 10] mod_authz_core.c(809): [client 192.168.99.1:50379] AH01626: authorization result of Require all granted: granted, referer: http://192.168.99.100/
+[Sat Nov 11 16:36:30.672892 2017] [authz_core:debug] [pid 10] mod_authz_core.c(809): [client 192.168.99.1:50379] AH01626: authorization result of <RequireAny>: granted, referer: http://192.168.99.100/
+[Sat Nov 11 16:36:30.673717 2017] [deflate:debug] [pid 10] mod_deflate.c(855): [client 192.168.99.1:50379] AH01384: Zlib: Compressed 1172 to 482 : URL /style.css, referer: http://192.168.99.100/
+[Sat Nov 11 16:36:30.688825 2017] [authz_core:debug] [pid 10] mod_authz_core.c(809): [client 192.168.99.1:50379] AH01626: authorization result of Require all granted: granted, referer: http://192.168.99.100/
+[Sat Nov 11 16:36:30.688900 2017] [authz_core:debug] [pid 10] mod_authz_core.c(809): [client 192.168.99.1:50379] AH01626: authorization result of <RequireAny>: granted, referer: http://192.168.99.100/
+[Sat Nov 11 16:36:30.689631 2017] [deflate:debug] [pid 10] mod_deflate.c(855): [client 192.168.99.1:50379] AH01384: Zlib: Compressed 753 to 415 : URL /js/index.js, referer: http://192.168.99.100/
+[Sat Nov 11 16:36:30.701692 2017] [authz_core:debug] [pid 10] mod_authz_core.c(809): [client 192.168.99.1:50379] AH01626: authorization result of Require all granted: granted, referer: http://192.168.99.100/
+[Sat Nov 11 16:36:30.701787 2017] [authz_core:debug] [pid 10] mod_authz_core.c(809): [client 192.168.99.1:50379] AH01626: authorization result of <RequireAny>: granted, referer: http://192.168.99.100/
+[Sat Nov 11 16:36:31.134194 2017] [authz_core:debug] [pid 10] mod_authz_core.c(809): [client 192.168.99.1:50379] AH01626: authorization result of Require all granted: granted, referer: http://192.168.99.100/
+[Sat Nov 11 16:36:31.134310 2017] [authz_core:debug] [pid 10] mod_authz_core.c(809): [client 192.168.99.1:50379] AH01626: authorization result of <RequireAny>: granted, referer: http://192.168.99.100/
+[Sat Nov 11 16:36:31.134459 2017] [core:info] [pid 10] [client 192.168.99.1:50379] AH00128: File does not exist: /var/www/app/favicon.ico, referer: http://192.168.99.100/
+[Sat Nov 11 16:36:32.864813 2017] [authz_core:debug] [pid 10] mod_authz_core.c(809): [client 192.168.99.1:50379] AH01626: authorization result of Require all granted: granted
+[Sat Nov 11 16:36:32.864888 2017] [authz_core:debug] [pid 10] mod_authz_core.c(809): [client 192.168.99.1:50379] AH01626: authorization result of <RequireAny>: granted
+[Sat Nov 11 16:36:32.866573 2017] [authz_core:debug] [pid 10] mod_authz_core.c(809): [client 192.168.99.1:50379] AH01626: authorization result of Require all granted: granted
+[Sat Nov 11 16:36:32.866638 2017] [authz_core:debug] [pid 10] mod_authz_core.c(809): [client 192.168.99.1:50379] AH01626: authorization result of <RequireAny>: granted
+[Sat Nov 11 16:36:32.867429 2017] [deflate:debug] [pid 10] mod_deflate.c(855): [client 192.168.99.1:50379] AH01384: Zlib: Compressed 7106 to 2209 : URL /index.html
+[Sat Nov 11 16:37:23.872073 2017] [reqtimeout:info] [pid 9] [client 192.168.99.1:50381] AH01382: Request header read timeout
+[Sat Nov 11 16:37:23.872192 2017] [reqtimeout:info] [pid 8] [client 192.168.99.1:50382] AH01382: Request header read timeout
+[Sat Nov 11 16:37:23.872230 2017] [reqtimeout:info] [pid 7] [client 192.168.99.1:50383] AH01382: Request header read timeout
+AH00558: apache2: Could not reliably determine the server's fully qualified domain name, using 172.20.0.3. Set the 'ServerName' directive globally to suppress this message
+[Sat Nov 11 16:49:44.228303 2017] [mpm_prefork:notice] [pid 6] AH00163: Apache/2.4.10 (Debian) PHP/7.0.23 configured -- resuming normal operations
+[Sat Nov 11 16:49:44.232839 2017] [core:notice] [pid 6] AH00094: Command line: '/usr/sbin/apache2 -D FOREGROUND'
+[Sat Nov 11 16:52:13.024260 2017] [authz_core:debug] [pid 8] mod_authz_core.c(809): [client 192.168.99.1:50575] AH01626: authorization result of Require all granted: granted
+[Sat Nov 11 16:52:13.024600 2017] [authz_core:debug] [pid 8] mod_authz_core.c(809): [client 192.168.99.1:50575] AH01626: authorization result of <RequireAny>: granted
+[Sat Nov 11 16:52:13.025141 2017] [authz_core:debug] [pid 8] mod_authz_core.c(809): [client 192.168.99.1:50575] AH01626: authorization result of Require all granted: granted
+[Sat Nov 11 16:52:13.025233 2017] [authz_core:debug] [pid 8] mod_authz_core.c(809): [client 192.168.99.1:50575] AH01626: authorization result of <RequireAny>: granted
+[Sat Nov 11 16:52:13.026384 2017] [deflate:debug] [pid 8] mod_deflate.c(855): [client 192.168.99.1:50575] AH01384: Zlib: Compressed 7116 to 2216 : URL /index.html
+[Sat Nov 11 16:53:04.034108 2017] [reqtimeout:info] [pid 9] [client 192.168.99.1:50576] AH01382: Request header read timeout
+[Sat Nov 11 16:53:04.034203 2017] [reqtimeout:info] [pid 7] [client 192.168.99.1:50577] AH01382: Request header read timeout
+AH00558: apache2: Could not reliably determine the server's fully qualified domain name, using 172.20.0.3. Set the 'ServerName' directive globally to suppress this message
+[Sat Nov 11 16:57:25.202288 2017] [mpm_prefork:notice] [pid 6] AH00163: Apache/2.4.10 (Debian) PHP/7.0.23 configured -- resuming normal operations
+[Sat Nov 11 16:57:25.203512 2017] [core:notice] [pid 6] AH00094: Command line: '/usr/sbin/apache2 -D FOREGROUND'
+AH00558: apache2: Could not reliably determine the server's fully qualified domain name, using 172.20.0.3. Set the 'ServerName' directive globally to suppress this message
+[Sat Nov 11 18:39:44.859287 2017] [mpm_prefork:notice] [pid 6] AH00163: Apache/2.4.10 (Debian) PHP/7.0.23 configured -- resuming normal operations
+[Sat Nov 11 18:39:44.859794 2017] [core:notice] [pid 6] AH00094: Command line: '/usr/sbin/apache2 -D FOREGROUND'
+[Sat Nov 11 18:47:12.986656 2017] [authz_core:debug] [pid 10] mod_authz_core.c(809): [client 192.168.99.1:51656] AH01626: authorization result of Require all granted: granted
+[Sat Nov 11 18:47:12.986936 2017] [authz_core:debug] [pid 10] mod_authz_core.c(809): [client 192.168.99.1:51656] AH01626: authorization result of <RequireAny>: granted
+[Sat Nov 11 18:47:12.987830 2017] [authz_core:debug] [pid 10] mod_authz_core.c(809): [client 192.168.99.1:51656] AH01626: authorization result of Require all granted: granted
+[Sat Nov 11 18:47:12.987919 2017] [authz_core:debug] [pid 10] mod_authz_core.c(809): [client 192.168.99.1:51656] AH01626: authorization result of <RequireAny>: granted
+[Sat Nov 11 18:47:12.989121 2017] [deflate:debug] [pid 10] mod_deflate.c(855): [client 192.168.99.1:51656] AH01384: Zlib: Compressed 7116 to 2216 : URL /index.html
+[Sat Nov 11 18:47:13.019409 2017] [authz_core:debug] [pid 10] mod_authz_core.c(809): [client 192.168.99.1:51656] AH01626: authorization result of Require all granted: granted, referer: http://192.168.99.100/
+[Sat Nov 11 18:47:13.019583 2017] [authz_core:debug] [pid 10] mod_authz_core.c(809): [client 192.168.99.1:51656] AH01626: authorization result of <RequireAny>: granted, referer: http://192.168.99.100/
+[Sat Nov 11 18:47:13.020998 2017] [deflate:debug] [pid 10] mod_deflate.c(855): [client 192.168.99.1:51656] AH01384: Zlib: Compressed 1172 to 482 : URL /style.css, referer: http://192.168.99.100/
+[Sat Nov 11 18:47:13.044315 2017] [authz_core:debug] [pid 9] mod_authz_core.c(809): [client 192.168.99.1:51658] AH01626: authorization result of Require all granted: granted, referer: http://192.168.99.100/
+[Sat Nov 11 18:47:13.044474 2017] [authz_core:debug] [pid 9] mod_authz_core.c(809): [client 192.168.99.1:51658] AH01626: authorization result of <RequireAny>: granted, referer: http://192.168.99.100/
+[Sat Nov 11 18:47:13.046515 2017] [deflate:debug] [pid 9] mod_deflate.c(855): [client 192.168.99.1:51658] AH01384: Zlib: Compressed 753 to 415 : URL /js/index.js, referer: http://192.168.99.100/

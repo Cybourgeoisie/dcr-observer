@@ -1,0 +1,30 @@
+version: '2'
+services:
+  web:
+    image: dcraudit-dev
+    container_name: dcraudit
+    ports:
+    - "80:80"
+    volumes:
+    - ./app:/var/www/app
+    - ./api:/var/www/app/api
+    - ./config/config.php:/var/www/config/config.php
+    - ./server:/var/www/server
+    - ./scripts:/var/www/scripts
+    - ./vendor:/var/www/vendor
+    - ./log/apache2:/var/log/apache2
+    environment:
+        PROGRAM_ENVIRONMENT: '${PROGRAM_ENVIRONMENT}'
+        DCRAUDIT_DB_HOST:    '${DCRAUDIT_DB_HOST}'
+        DCRAUDIT_DB_NAME:    '${DCRAUDIT_DB_NAME}'
+        DCRAUDIT_DB_USER:    '${DCRAUDIT_DB_USER}'
+        DCRAUDIT_DB_PASS:    '${DCRAUDIT_DB_PASS}'
+    links:
+    - db:database
+  db:
+    image: dcraudit-db-dev
+    container_name: dcraudit-db
+    volumes:
+    - ./log/postgres:/var/log/postgresql
+    volumes_from:
+    - container:dcraudit-db-data

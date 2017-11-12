@@ -242,7 +242,7 @@
 	<script type="text/javascript">
 		$(document).ready(function() {
 			setEvents();
-			handleNavigation(window.location.hash.substr(1));
+			handleNavigation(window.location.hash.substr(1) || "home");
 		});
 	</script>
 </body>
