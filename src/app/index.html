@@ -18,7 +18,7 @@
 
 	<!-- Navigation Bar -->
 	<nav class="navbar navbar-expand-md navbar-dark bg-dark fixed-top dcr-navbar-top">
-		<a class="navbar-brand" href="#">
+		<a class="navbar-brand page-toggle" href="#home">
 			<img src="./img/dcr.png" width=42 height=42 />
 		</a>
 		<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarTop" aria-controls="navbarTop" aria-expanded="false" aria-label="Toggle navigation">
@@ -33,18 +33,11 @@
 				<li class="nav-item">
 					<a class="nav-link page-toggle" href="#dist">Distribution</a>
 				</li>
-				<!--<li class="nav-item dropdown">
-					<a class="nav-link dropdown-toggle" href="http://example.com" id="dropdown01" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Dropdown</a>
-					<div class="dropdown-menu" aria-labelledby="dropdown01">
-						<a class="dropdown-item" href="#">Action</a>
-						<a class="dropdown-item" href="#">Another action</a>
-						<a class="dropdown-item" href="#">Something else here</a>
-					</div>
-				</li>-->
 			</ul>
+
 			<form class="form-inline my-2 my-lg-0">
-				<input class="form-control mr-sm-2" type="text" placeholder="Enter Address" aria-label="Search">
-				<button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
+				<input disabled="disabled" class="form-control mr-sm-2" type="text" size="40" placeholder="Enter Address" aria-label="Search" style="font-size:90%">
+				<button disabled="disabled" class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
 			</form>
 		</div>
 	</nav>
@@ -54,8 +47,14 @@
 
 		<!-- Home Page -->
 		<div class="dcr-page dcr-page-home home-body">
-			<h1>Top Decred Addresses</h1>
-			<p class="lead">The top 10 DCR addresses by value.</p>
+			<h1>Top 500 Decred Addresses</h1>
+			<p class="lead">
+				<small>
+					<strong><span class="top-sum">X</span> DCR out of <span class="total-dcr">X</span> DCR</strong>
+					<br />
+					<span class="top-sum-percent">X%</span> of DCR supply
+				</small>
+			</p>
 
 			<table class="table table-hover table-addresses">
 				<thead>
@@ -63,36 +62,32 @@
 						<th>#</th>
 						<th>Address</th>
 						<th>Balance</th>
-						<th>Staking</th>
-						<th>Liquid</th>
-						<th>% of Supply</th>
+						<th>% DCR</th>
+						<th># TX</th>
+						<th>% STX</th>
 					</tr>
 				</thead>
 				<tbody>
 					<tr>
 						<th scope="row">1</th>
-						<td><a class="page-toggle" href="#addr">DsZzo9A7Vp6paiEH2x6i4ghwtaW3J87Gt83</a></td>
-						<td>764,571.1 DCR</td>
-						<td>764,571.1 DCR</td>
-						<td>0.0 DCR</td>
-						<td>11.67%</td>
-					</tr>
-					<tr>
-						<th scope="row">2</th>
-						<td><a class="page-toggle" href="#addr">DsZqW3BVn6vytjKqonJN1hsKaHaxSvZypw6</a></td>
-						<td>488,040.6 DCR</td>
-						<td>488,040.6 DCR</td>
-						<td>0.0 DCR</td>
-						<td>7.4%</td>
+						<td class="top-td-address"><a class="page-toggle" href="#addr">X</a></td>
+						<td class="top-td-balance">X DCR</td>
+						<td class="top-td-percent">X%</td>
+						<td class="top-td-num-tx">X</td>
+						<td class="top-td-pct-stx">X%</td>
 					</tr>
 				</tbody>
 			</table>
+
+			<p class="lead" style="text-align:center;">
+				<button class="btn btn-primary my-2 my-sm-0 show-all-500">Show All 500</button>
+			</p>
 		</div>
 
 		<!-- Distribution Page -->
 		<div class="dcr-page dcr-page-dist dist-body" style="display:none;">
 			<h1>Decred Distribution</h1>
-			<p class="lead">The current Decred wealth distribution.</p>
+			<p class="lead">The current Decred address wealth distribution.</p>
 
 			<table class="table table-hover table-distribution">
 				<thead>
@@ -101,26 +96,28 @@
 						<th>Addresses</th>
 						<th>% Addresses</th>
 						<th>Sum</th>
-						<th>$ Value</th>
+						<!--<th>$ Value</th>-->
 						<th>% of Supply</th>
 					</tr>
 				</thead>
 				<tbody>
 					<tr>
 						<th scope="row">0 to 1.0 DCR</th>
-						<td>143,905</td>
-						<td>5.2%</td>
-						<td>50,362.5 DCR</td>
-						<td>$1,662,466.13</td>
-						<td>0.7%</td>
-					</tr>
-					<tr>
-						<th scope="row">1.0 to 10.0 DCR</th>
-						<td>56,986</td>
-						<td>1.2%</td>
-						<td>275,735.7 DCR</td>
-						<td>$9,102,035.457</td>
-						<td>4.2%</td>
+						<td class="td-num-addrs">X</td>
+						<td class="td-pct-addrs">
+							<div class="progress" style="position:relative;top:1px;opacity:0.5;">
+								<div class="progress-bar bg-success" role="progressbar" style="width:25%"></div>
+							</div>
+							<span class="wealth-pct-addrs" style="position:relative;top:-16px;">X%</span>
+						</td>
+						<td class="td-sum">X DCR</td>
+						<!--<td class="td-sum-value">$X</td>-->
+						<td class="td-pct-supply">
+							<div class="progress" style="position:relative;top:1px;opacity:0.5;">
+								<div class="progress-bar bg-success" role="progressbar" style="width:25%"></div>
+							</div>
+							<span class="wealth-pct-supply" style="position:relative;top:-16px;">X%</span>
+						</td>
 					</tr>
 				</tbody>
 			</table>
@@ -129,26 +126,47 @@
 		<!-- Address Page -->
 		<div class="dcr-page dcr-page-addr address-body">
 			<h2 class="d-none d-md-block d-l-block d-xl-block">
-				DsZzo9A7Vp6paiEH2x6i4ghwtaW3J87Gt83
+				<span class="addr-address">Ds</span>
 			</h2>
 
 			<h6 class="d-block d-md-none d-l-none d-xl-none">
 				<big>Address:</big><br />
-				DsZzo9A7Vp6paiEH2x6i4ghwtaW3J87Gt83
+				<span class="addr-address">Ds</span>
 			</h6>
 
-			<p class="lead">Current Balance: 0.1 DCR</p>
-			<br />
+			<p class="lead">
+				Current Balance: <span class="addr-balance">X</span> DCR
+				<small><span class="badge badge-pill badge-primary" style="vertical-align:text-top">
+					Rank #<span class="addr-rank">X</span>
+				</span></small>
+			</p>
 
 			<h5>Account Overview</h5>
 
 			<div class="container">
 				<div class="row">
 					<div class="col-6 text-right" style="font-weight:bold;">
+						Current Balance
+					</div>
+					<div class="col-6 text-left" style="color:rgba(0,0,0,.5);">
+						<span class="addr-balance">X</span> DCR
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-6 text-right" style="font-weight:bold;">
+						USD Value
+					</div>
+					<div class="col-6 text-left" style="color:rgba(0,0,0,.5);">
+						<span class="addr-fiat-value"></span>
+					</div>
+				</div>
+
+				<div class="row">
+					<div class="col-6 text-right" style="font-weight:bold;">
 						Total Received
 					</div>
 					<div class="col-6 text-left" style="color:rgba(0,0,0,.5);">
-						1,005,789.2 DCR
+						<span class="addr-total-in">X</span> DCR
 					</div>
 				</div>
 				<div class="row">
@@ -156,23 +174,22 @@
 						Total Sent
 					</div>
 					<div class="col-6 text-left" style="color:rgba(0,0,0,.5);">
-						1,005,789.1 DCR
+						<span class="addr-total-out">X</span> DCR
 					</div>
 				</div>
-				<div class="row">
-					<div class="col-6 text-right" style="font-weight:bold;">
-						Current Balance
-					</div>
-					<div class="col-6 text-left" style="color:rgba(0,0,0,.5);">
-						0.1 DCR
-					</div>
-				</div>
+			</div>
+			<br />
+
+			<h5>Activity</h5>
+
+			<div class="container">
 				<div class="row">
 					<div class="col-6 text-right" style="font-weight:bold;">
 						First Activity
 					</div>
 					<div class="col-6 text-left" style="color:rgba(0,0,0,.5);">
-						11/02/2017 (#184650)
+						<span class="addr-first-date">11/02/2017</span>
+						(#<span class="addr-first-activity">X</span>)
 					</div>
 				</div>
 				<div class="row">
@@ -180,15 +197,60 @@
 						Last Activity
 					</div>
 					<div class="col-6 text-left" style="color:rgba(0,0,0,.5);">
-						11/10/2017 (#184902)
+						<span class="addr-last-date">11/02/2017</span>
+						(#<span class="addr-last-activity">X</span>)
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-6 text-right" style="font-weight:bold;">
+						Total Transactions
+					</div>
+					<div class="col-6 text-left" style="color:rgba(0,0,0,.5);">
+						<span class="addr-num-tx">X</span>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-6 text-right" style="font-weight:bold;">
+						Staking Transactions
+					</div>
+					<div class="col-6 text-left" style="color:rgba(0,0,0,.5);">
+						<span class="addr-num-stx">X</span>
+						(<span class="addr-pct-stx">X</span>%)
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-6 text-right" style="font-weight:bold;">
+						Staking Received
+					</div>
+					<div class="col-6 text-left" style="color:rgba(0,0,0,.5);">
+						<span class="addr-staked-in">X</span> DCR
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-6 text-right" style="font-weight:bold;">
+						Staking Out
+					</div>
+					<div class="col-6 text-left" style="color:rgba(0,0,0,.5);">
+						<span class="addr-staked-out">X</span> DCR
 					</div>
 				</div>
 			</div>
 			<br /><br />
 
+			<p class="lead" style="text-align:center;">
+				<a class="btn btn-success my-2 my-sm-0 page-toggle" role="button" href="#home">
+					Back to Ranking
+				</a>
+
+				<a class="btn btn-primary my-2 my-sm-0 addr-view-block-explorer" role="button" href="#" target="blank">
+					View on Block Explorer
+				</a>
+			</p>
+
+			<!--
 			<h5>Activity</h5>
 
-			<table class="table table-hover table-distribution">
+			<table class="table table-hover table-activity">
 				<thead>
 					<tr>
 						<th>Date</th>
@@ -215,6 +277,7 @@
 					</tr>
 				</tbody>
 			</table>
+			-->
 
 		</div>
 
@@ -243,6 +306,9 @@
 		$(document).ready(function() {
 			setEvents();
 			handleNavigation(window.location.hash.substr(1) || "home");
+			getDcrPrice();
+			pullTopAddresses();
+			pullWealthDistribution();
 		});
 	</script>
 </body>

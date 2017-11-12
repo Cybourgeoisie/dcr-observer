@@ -188,6 +188,7 @@ function balanceTransactionsAtBlock(height) {
 					address_map[address].tx   += 1;
 					address_map[address].stx  += (tree_branch === 1) ? 1 : 0;
 					address_map[address].last  = height;
+					address_map[address].end   = block.time;
 				} else {
 					console.log("ERROR: Could not find address (" + address + ") " + blockheight + "->" + blockindex + "->" + voutindex);
 					console.log("Currently on " + height + "->" + i);
@@ -216,7 +217,9 @@ function balanceTransactionsAtBlock(height) {
 								'tx'    : 0,
 								'stx'   : 0,
 								'first' : height,
-								'last'  : height
+								'start' : block.time,
+								'last'  : height,
+								'end'   : block.time
 							};
 							//address_map[address] = 0;
 						}
@@ -229,6 +232,7 @@ function balanceTransactionsAtBlock(height) {
 						address_map[address].tx   += 1;
 						address_map[address].stx  += (tree_branch === 1) ? 1 : 0;
 						address_map[address].last  = height;
+						address_map[address].end   = block.time;
 					}
 				}
 			}
@@ -316,21 +320,29 @@ function calculateRichListAndWealthDistribution() {
 
 	// Now save the richest 500
 	var top_500 = addresses.slice(0,500);
-	fs.writeFileSync('top_500_list.json', JSON.stringify(top_500));
+	var top_500_data = {
+		'top' : top_500,
+		'total_dcr' : total_dcr
+	};
+
+	fs.writeFileSync('top_500_list.json', JSON.stringify(top_500_data));
 
 	// Now get their full info
-	var top_500_info = [];
+	var top_500_info = {};
 	for (var i = 0; i < top_500.length; i++) {
-		top_500_info.push(address_map[addresses[i]]);
+		top_500_info[top_500[i][0]] = address_map[top_500[i][0]];
 	}
 
 	// And write that
-	fs.writeFileSync('top_500_info_list.json', JSON.stringify(top_500_info));
+	fs.writeFileSync('top_500_info_list.json', JSON.stringify({
+		'top' : top_500_info,
+		'total_dcr' : total_dcr
+	}));
 
 	// And determine the wealth distribution
-	var bins   = [0, 1, 10, 100, 1000, 10000, 100000, 1000000];
-	var counts = [0, 0,  0,   0,    0,     0,      0,       0];
-	var value  = [0, 0,  0,   0,    0,     0,      0,       0];
+	var bins   = [1, 10, 100, 1000, 10000, 100000, 1000000];
+	var counts = [0,  0,   0,    0,     0,      0,       0];
+	var value  = [0,  0,   0,    0,     0,      0,       0];
 	for (var i = 0; i < addresses.length; i++) {
 		for (var j = 0; j < bins.length; j++) {
 			if (addresses[i][1] <= bins[j]) {
@@ -344,7 +356,8 @@ function calculateRichListAndWealthDistribution() {
 	fs.writeFileSync('wealth_distribution.json', JSON.stringify({
 		'bins' : bins,
 		'counts' : counts,
-		'value' : value
+		'value' : value,
+		'total_dcr' : total_dcr
 	}));
 
 	console.log("Bins: " + bins);

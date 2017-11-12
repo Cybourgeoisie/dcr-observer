@@ -44,11 +44,11 @@ td {
 	background-color: #0c1e3e !important;
 }
 
-.btn-success {
+.btn-success, .bg-success {
 	background-color: #2ed6a1;
 }
 
-.btn-outline-success {
+.btn-outline-success, .bg-success {
 	color: #2ed6a1;
 	border-color: #2ed6a1;
 }
