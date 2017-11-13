@@ -3846,3 +3846,6 @@ AH00558: apache2: Could not reliably determine the server's fully qualified doma
 [Sun Nov 12 22:24:05.308381 2017] [authz_core:debug] [pid 10] mod_authz_core.c(809): [client 192.168.99.1:51412] AH01626: authorization result of Require all granted: granted, referer: http://192.168.99.100/
 [Sun Nov 12 22:24:05.308461 2017] [authz_core:debug] [pid 10] mod_authz_core.c(809): [client 192.168.99.1:51412] AH01626: authorization result of <RequireAny>: granted, referer: http://192.168.99.100/
 [Sun Nov 12 22:24:10.322536 2017] [reqtimeout:info] [pid 10] [client 192.168.99.1:51412] AH01382: Request header read timeout
+AH00558: apache2: Could not reliably determine the server's fully qualified domain name, using 172.20.0.3. Set the 'ServerName' directive globally to suppress this message
+[Mon Nov 13 12:45:43.707064 2017] [mpm_prefork:notice] [pid 6] AH00163: Apache/2.4.10 (Debian) PHP/7.0.23 configured -- resuming normal operations
+[Mon Nov 13 12:45:43.708289 2017] [core:notice] [pid 6] AH00094: Command line: '/usr/sbin/apache2 -D FOREGROUND'

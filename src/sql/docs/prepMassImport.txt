@@ -1,0 +1,75 @@
+-- First, insert 185.5k blocks
+INSERT INTO block
+("hash", "height", "version", "merkleroot", "stakeroot", "time", "stakeversion", "extradata", 
+"votebits", "finalstate", "voters", "freshstake", "revocations", "poolsize", "bits", "sbits")
+VALUES
+($1,$2,$3,$4,$5,TO_TIMESTAMP($6),$7,$8,$9,$10,$11,$12,$13,$14,$15,$16);
+
+
+-- Then add all txes
+WITH ins (block_height, txid_hash, tree, version, locktime, expiry, blockindex) AS
+(VALUES
+
+)
+INSERT INTO tx
+("block_id","txid_hash","tree","version","locktime","expiry","blockindex")
+SELECT
+block.block_id, ins.txid_hash, ins.tree, ins.version, ins.locktime, ins.expiry, ins.blockindex
+FROM
+	block JOIN ins
+		ON ins.block_height = block.height;
+
+
+-- Then add all vouts
+WITH ins (txid_hash, key, value, commitamt, n, version, type, asm, hex, reqSigs) AS
+(VALUES
+
+)
+INSERT INTO vout
+("tx_id","value","commitamt","n","version","type","asm","hex","reqSigs")
+SELECT
+tx.tx_id, ins.value, ins.commitamt, ins.n, ins.version, ins.type, ins.asm, ins.hex, ins.reqSigs
+FROM
+	tx JOIN ins
+		ON ins.txid_hash = tx.txid_hash;
+
+
+-- Then add all addresses
+INSERT INTO address("address")
+SELECT 'John' WHERE NOT EXISTS (SELECT address_id FROM address WHERE address = 'John');
+
+-- Don't want duplicate addresses
+
+
+-- Connect the addresses and vouts
+WITH ins (vout_key, address) AS
+(VALUES
+
+)
+INSERT INTO vout_address
+("vout_id", "address_id")
+SELECT
+vout.vout_id, address.address_id
+FROM
+	ins
+	JOIN vout
+		ON ins.vout_key = vout.key
+	JOIN address
+		ON ins.address = address.address;
+
+
+-- Then add all vins
+WITH ins (txid_hash, vout_key, amountin, coinbase, stakebase, sequence, asm, hex) AS
+(VALUES
+
+)
+INSERT INTO vin
+("tx_id", "vout_id", "amountin", "coinbase", "stakebase", "sequence", "asm", "hex")
+SELECT
+tx.tx_id, vout.vout_id, ins.amountin, ins.coinbase, ins.stakebase, ins.sequence, ins.asm, ins.hex
+FROM
+	ins
+	JOIN tx
+		ON ins.txid_hash = tx.txid_hash
+	LEFT JOIN vout
+		ON ins.vout_key = vout.key;

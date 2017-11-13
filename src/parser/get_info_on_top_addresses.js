@@ -2,9 +2,9 @@ var fs = require('fs');
 
 // Get all top addresses
 var address_whitelist = [], address_map = {};
-var blockdir = './blocks/';
-var top_list_file = 'top_500_list.json';
-var savefile = 'top_500_account_details.json';
+var blockdir = '../../../blocks/';
+var top_list_file = '../../../top_500_list.json';
+var savefile = '../../../top_500_account_details.json';
 
 fs.exists(top_list_file, function(exists) {
 	if (exists) {

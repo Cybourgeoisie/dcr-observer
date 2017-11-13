@@ -4,8 +4,8 @@ var fs = require('fs');
 // Get all top addresses
 var total_dcr = 0;
 var address_map = {};
-var blockdir  = './blocks/';
-var savefile  = 'address_map.full.json';
+var blockdir  = '../../../blocks/';
+var savefile  = '../../../address_map.full.json';
 
 // If we have a save state, use it
 fs.exists(savefile, function(exists) {

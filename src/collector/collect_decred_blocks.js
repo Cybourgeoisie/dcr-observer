@@ -10,8 +10,8 @@ if (!shell.which(dcrd) || !shell.which(dcrctl)) {
 }
 
 // Get all top addresses
-var savefile = "dcr_parser_save_file.json"
-var blockdir = './blocks/';
+var savefile = "../../../dcr_parser_save_file.json";
+var blockdir = '../../../blocks/';
 
 // If we have a save state, use it
 fs.exists(savefile, function(exists) {

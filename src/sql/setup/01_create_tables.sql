@@ -1,28 +1,28 @@
 BEGIN;
 
 CREATE TABLE "block" (
-	"block_idx"    BIGSERIAL PRIMARY KEY,
+	"block_id"     BIGSERIAL PRIMARY KEY,
 	"hash"         TEXT,
 	"height"       BIGINT,
-	"version"      INTEGER,
+	"time"         TIMESTAMP WITHOUT TIME ZONE,
+	"version"      BIGINT,
 	"merkleroot"   TEXT,
 	"stakeroot"    TEXT,
-	"time"         TIMESTAMP WITHOUT TIME ZONE,
-	"stakeversion" INTEGER,
+	"stakeversion" BIGINT,
 	"extradata"    TEXT,
-	"votebits"     INTEGER,
+	"votebits"     TEXT,
 	"finalstate"   TEXT,
 	"voters"       INTEGER,
 	"freshstake"   INTEGER,
 	"revocations"  INTEGER,
-	"poolsize"     INTEGER,
+	"poolsize"     BIGINT,
 	"bits"         TEXT,
 	"sbits"        TEXT
 );
 
 CREATE TABLE "tx" (
-	"tx_idx"     BIGSERIAL PRIMARY KEY,
-	"block_idx"  BIGINT REFERENCES "block" (block_idx),
+	"tx_id"      BIGSERIAL PRIMARY KEY,
+	"block_id"   BIGINT REFERENCES "block" (block_id),
 	"hash"       TEXT, -- This is "txid"
 	"tree"       INTEGER, -- Might want an index on this
 	"blockindex" INTEGER,
@@ -32,35 +32,39 @@ CREATE TABLE "tx" (
 );
 
 CREATE TABLE "vout" (
-	"vout_idx"    BIGSERIAL PRIMARY KEY,
-	"tx_idx"      BIGINT REFERENCES "tx" (tx_idx),
+	"vout_id"     BIGSERIAL PRIMARY KEY,
+	"tx_id"       BIGINT REFERENCES "tx" (tx_id),
 	"value"       NUMERIC,
 	"commitamt"   NUMERIC,
-	"n"           INTEGER,
-	"version"     INTEGER,
+	"n"           BIGINT,
+	"version"     BIGINT,
 	"type"        TEXT,
 	"asm"         TEXT,
 	"hex"         TEXT,
-	"reqSigs"     INTEGER
+	"reqSigs"     INTEGER,
+	"key"         VARCHAR(22) UNIQUE -- Used for definitive insert matching ("{blockheight}-{tree}-{blockindex}-{n}")
 );
 
 CREATE TABLE "address" (
-	"address_idx" BIGSERIAL PRIMARY KEY,
-	"address"     TEXT UNIQUE
+	"address_id"  BIGSERIAL PRIMARY KEY,
+	"address"     VARCHAR(80) UNIQUE
 );
 
 CREATE TABLE "vout_address" (
-	"vout_address_idx" BIGSERIAL PRIMARY KEY,
-	"vout_idx"         BIGINT REFERENCES "vout" (vout_idx),
-	"address_idx"      BIGINT REFERENCES "address" (address_idx)
+	"vout_address_id" BIGSERIAL PRIMARY KEY,
+	"vout_id"         BIGINT REFERENCES "vout" (vout_id),
+	"address_id"      BIGINT REFERENCES "address" (address_id)
 );
 
 CREATE TABLE "vin" (
-	"vin_idx"     BIGSERIAL PRIMARY KEY,
-	"tx_idx"      BIGINT REFERENCES "tx" (tx_idx),
-	"vout_idx"    BIGINT REFERENCES "vout" (vout_idx),
+	"vin_id"      BIGSERIAL PRIMARY KEY,
+	"tx_id"       BIGINT REFERENCES "tx" (tx_id),
+	"vout_id"     BIGINT REFERENCES "vout" (vout_id),
 	"amountin"    NUMERIC,
-	"blockindex"  BIGINT,
+	"blockheight" BIGINT,
+	"tree"        INTEGER,
+	"blockindex"  INTEGER,
+	"vout"        INTEGER,
 	"coinbase"    TEXT,
 	"stakebase"   TEXT,
 	"sequence"    BIGINT,

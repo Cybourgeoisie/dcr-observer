@@ -2,7 +2,7 @@ var fs = require('fs');
 
 // Get all top addresses
 var addresses = [], addresses_over_x = [], address_map = {};
-var addr_file = 'address_map.json';
+var addr_file = '../../../address_map.json';
 
 // If we have a save state, use it
 fs.exists(addr_file, function(exists) {

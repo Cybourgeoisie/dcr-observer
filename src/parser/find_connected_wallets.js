@@ -7,8 +7,8 @@ var all_address_count = 0;
 var network_count = 0;
 var addr_net_map = {};
 var network_map = {};
-var blockdir  = './blocks/';
-var savefile  = 'network_map.json';
+var blockdir  = '../../../blocks/';
+var savefile  = '../../../network_map.json';
 
 findNetworks();
 

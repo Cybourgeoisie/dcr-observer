@@ -1,7 +1,5 @@
 <?php
 
-ini_set('memory_limit', '1024M');
-
 // Include everything
 require_once(dirname(realpath(__FILE__)) . '/../server/gateway.php');
 
@@ -25,14 +23,14 @@ if (file_exists($block_directory)) {
 		}
 
 		// Add the block
-		$block_idx = addBlock($block);
+		$block_id = addBlock($block);
 
 		// Now add all transactions, vins, and vouts
-		addTransactions($block, $block_idx);
+		addTransactions($block, $block_id);
 	}
 }
 
-function addTransactions(array $block, int $block_idx)
+function addTransactions(array $block, int $block_id)
 {
 	// For both types of transactions..
 	$txes  = $block['rawtx'];
@@ -40,56 +38,56 @@ function addTransactions(array $block, int $block_idx)
 
 	// Iterate over all inputs and outputs
 	foreach ($txes as $count => $tx) {
-		addTransaction($tx, $block_idx, 0, $count);
+		addTransaction($tx, $block_id, 0, $count);
 	}
 
 	foreach ($stxes as $count => $stx) {
-		addTransaction($stx, $block_idx, 1, $count);
+		addTransaction($stx, $block_id, 1, $count);
 	}
 
 	return true;
 }
 
-function addTransaction(array $tx, int $block_idx, int $tree, int $blockindex)
+function addTransaction(array $tx, int $block_id, int $tree, int $blockindex)
 {
 	$sql = '
 		INSERT INTO
-			tx ("block_idx","hash","tree","version","locktime","expiry","blockindex")
+			tx ("block_id","hash","tree","version","locktime","expiry","blockindex")
 		VALUES
 			($1,$2,$3,$4,$5,$6,$7)
 		RETURNING
-			tx_idx;
+			tx_id;
 	';
 
 	$db_handler = \Geppetto\DatabaseHandler::init();
 	$res = $db_handler->query($sql, array(
-		$block_idx, $tx['txid'], intval($tree), intval($tx['version']), 
+		$block_id, $tx['txid'], intval($tree), intval($tx['version']), 
 		intval($tx['locktime']), intval($tx['expiry']), $blockindex
 	));
 
-	if (empty($res) || !array_key_exists(0, $res) || !array_key_exists('tx_idx', $res[0])) {
-		throw new Exception('Unable to create tx for block idx: ' . $block_idx);
+	if (empty($res) || !array_key_exists(0, $res) || !array_key_exists('tx_id', $res[0])) {
+		throw new Exception('Unable to create tx for block id: ' . $block_id);
 	}
 
 	// Now for the transaction, store all the outputs, then all the inputs
 	foreach ($tx['vout'] as $vout) {
-		addVout($vout, intval($res[0]['tx_idx']));
+		addVout($vout, intval($res[0]['tx_id']));
 	}
 
 	foreach ($tx['vin'] as $vin) {
-		addVin($vin, intval($res[0]['tx_idx']));
+		addVin($vin, intval($res[0]['tx_id']));
 	}
 
 	return true;
 }
 
-function addVin(array $vin, int $tx_idx)
+function addVin(array $vin, int $tx_id)
 {
 	// Find the corresponding vout
-	$vout_idx = null;
+	$vout_id = null;
 	if (array_key_exists('tree', $vin) && array_key_exists('vout', $vin))
 	{
-		$vout_idx = findVoutFromVin(intval($vin['blockheight']), intval($vin['tree']),
+		$vout_id = findVoutFromVin(intval($vin['blockheight']), intval($vin['tree']),
 			intval($vin['blockindex']), intval($vin['vout']));		
 	}
 
@@ -103,21 +101,21 @@ function addVin(array $vin, int $tx_idx)
 	if (!array_key_exists("hex", $vin["scriptSig"])) { $vin["scriptSig"]["hex"] = ''; }
 
 	// Coinbase, stakebase
-	if ($vout_idx && $vout_idx > 0)
+	if ($vout_id && $vout_id > 0)
 	{
 		$sql = '
 			INSERT INTO
-				vin ("tx_idx", "vout_idx", "amountin", "coinbase", "stakebase", 
+				vin ("tx_id", "vout_id", "amountin", "coinbase", "stakebase", 
 					"sequence", "asm", "hex")
 			VALUES
 				($1,$2,$3,$4,$5,$6,$7,$8)
 			RETURNING
-				vin_idx;
+				vin_id;
 		';
 
 		$db_handler = \Geppetto\DatabaseHandler::init();
 		$res = $db_handler->query($sql, array(
-			$tx_idx, $vout_idx, $vin["amountin"], $vin["coinbase"], $vin["stakebase"],
+			$tx_id, $vout_id, $vin["amountin"], $vin["coinbase"], $vin["stakebase"],
 			intval($vin["sequence"]), $vin["scriptSig"]["asm"], $vin["scriptSig"]["hex"]
 		));
 	}
@@ -125,26 +123,26 @@ function addVin(array $vin, int $tx_idx)
 	{
 		$sql = '
 			INSERT INTO
-				vin ("tx_idx", "amountin", "coinbase", "stakebase", 
+				vin ("tx_id", "amountin", "coinbase", "stakebase", 
 					"sequence", "asm", "hex")
 			VALUES
 				($1,$2,$3,$4,$5,$6,$7)
 			RETURNING
-				vin_idx;
+				vin_id;
 		';
 
 		$db_handler = \Geppetto\DatabaseHandler::init();
 		$res = $db_handler->query($sql, array(
-			$tx_idx, $vin["amountin"], $vin["coinbase"], $vin["stakebase"],
+			$tx_id, $vin["amountin"], $vin["coinbase"], $vin["stakebase"],
 			intval($vin["sequence"]), $vin["scriptSig"]["asm"], $vin["scriptSig"]["hex"]
 		));
 	}
 
-	if (empty($res) || !array_key_exists(0, $res) || !array_key_exists('vin_idx', $res[0])) {
-		throw new Exception('Unable to create vin for tx idx: ' . $tx_idx);
+	if (empty($res) || !array_key_exists(0, $res) || !array_key_exists('vin_id', $res[0])) {
+		throw new Exception('Unable to create vin for tx id: ' . $tx_id);
 	}
 
-	return intval($res[0]['vin_idx']);
+	return intval($res[0]['vin_id']);
 }
 
 function findVoutFromVin(int $blockheight, int $tree, int $blockindex, int $vout)
@@ -155,17 +153,17 @@ function findVoutFromVin(int $blockheight, int $tree, int $blockindex, int $vout
 
 	$sql = '
 		SELECT
-			v.vout_idx
+			v.vout_id
 		FROM
 			block b
 		JOIN
 			tx ON 
-				b.block_idx = tx.block_idx AND 
+				b.block_id = tx.block_id AND 
 				tx.tree = $2 AND 
 				tx.blockindex = $3
 		JOIN
 			vout v ON
-				v.tx_idx = tx.tx_idx AND
+				v.tx_id = tx.tx_id AND
 				v.n = $4
 		WHERE
 			b.height = $1;
@@ -174,22 +172,22 @@ function findVoutFromVin(int $blockheight, int $tree, int $blockindex, int $vout
 	$db_handler = \Geppetto\DatabaseHandler::init();
 	$res = $db_handler->query($sql, array($blockheight, $tree, $blockindex, $vout));
 
-	if (empty($res) || !array_key_exists(0, $res) || !array_key_exists('vout_idx', $res[0])) {
+	if (empty($res) || !array_key_exists(0, $res) || !array_key_exists('vout_id', $res[0])) {
 		throw new Exception('Unable to find vout from ' . $blockheight . ' -> ' . $tree . ' -> ' . $blockindex . ' -> ' . $vout);
 	}
 
-	return intval($res[0]['vout_idx']);
+	return intval($res[0]['vout_id']);
 }
 
-function addVout(array $vout, int $tx_idx)
+function addVout(array $vout, int $tx_id)
 {
 	$sql = '
 		INSERT INTO
-			vout ("tx_idx","value","commitamt","n","version","type","asm","hex","reqSigs")
+			vout ("tx_id","value","commitamt","n","version","type","asm","hex","reqSigs")
 		VALUES
 			($1,$2,$3,$4,$5,$6,$7,$8,$9)
 		RETURNING
-			vout_idx;
+			vout_id;
 	';
 
 	// Handle edge cases
@@ -204,32 +202,32 @@ function addVout(array $vout, int $tx_idx)
 
 	$db_handler = \Geppetto\DatabaseHandler::init();
 	$res = $db_handler->query($sql, array(
-		$tx_idx, $vout["value"], $vout["commitamt"], intval($vout["n"]), intval($vout["version"]),
+		$tx_id, $vout["value"], $vout["commitamt"], intval($vout["n"]), intval($vout["version"]),
 		$vout["scriptPubKey"]["type"], $vout["scriptPubKey"]["asm"], $vout["scriptPubKey"]["hex"], 
 		intval($vout["scriptPubKey"]["reqSigs"])
 	));
 
-	if (empty($res) || !array_key_exists(0, $res) || !array_key_exists('vout_idx', $res[0])) {
-		throw new Exception('Unable to create vout for tx idx: ' . $tx_idx);
+	if (empty($res) || !array_key_exists(0, $res) || !array_key_exists('vout_id', $res[0])) {
+		throw new Exception('Unable to create vout for tx id: ' . $tx_id);
 	}
 
 	// Add the addresses & link them to vouts
 	if (array_key_exists('addresses', $vout["scriptPubKey"])) {
 		foreach ($vout['scriptPubKey']['addresses'] as $address) {
-			addAddress($address, intval($res[0]['vout_idx']));
+			addAddress($address, intval($res[0]['vout_id']));
 		}
 	}
 
 	return true;
 }
 
-function addAddress(string $address, int $vout_idx)
+function addAddress(string $address, int $vout_id)
 {
 	// Make sure we don't already have this address
-	$address_idx = addressExists($address);
-	if ($address_idx !== false) {
+	$address_id = addressExists($address);
+	if ($address_id !== false) {
 		// Just add the link then
-		return addAddressVoutLink($address_idx, $vout_idx);
+		return addAddressVoutLink($address_id, $vout_id);
 	}
 
 	$sql = '
@@ -238,54 +236,54 @@ function addAddress(string $address, int $vout_idx)
 		VALUES
 			($1)
 		RETURNING
-			address_idx;
+			address_id;
 	';
 
 	$db_handler = \Geppetto\DatabaseHandler::init();
 	$res = $db_handler->query($sql, array($address));
 
-	if (empty($res) || !array_key_exists(0, $res) || !array_key_exists('address_idx', $res[0])) {
-		throw new Exception('Unable to create address for vout idx: ' . $vout_idx);
+	if (empty($res) || !array_key_exists(0, $res) || !array_key_exists('address_id', $res[0])) {
+		throw new Exception('Unable to create address for vout id: ' . $vout_id);
 	}
 
 	// Now add the link
-	return addAddressVoutLink(intval($res[0]['address_idx']), $vout_idx);
+	return addAddressVoutLink(intval($res[0]['address_id']), $vout_id);
 }
 
-function addAddressVoutLink(int $address_idx, int $vout_idx)
+function addAddressVoutLink(int $address_id, int $vout_id)
 {
 	$sql = '
 		INSERT INTO
-			vout_address ("vout_idx", "address_idx")
+			vout_address ("vout_id", "address_id")
 		VALUES
 			($1, $2)
 		RETURNING
-			vout_address_idx;
+			vout_address_id;
 	';
 
 	$db_handler = \Geppetto\DatabaseHandler::init();
-	$res = $db_handler->query($sql, array($vout_idx, $address_idx));
+	$res = $db_handler->query($sql, array($vout_id, $address_id));
 
-	if (empty($res) || !array_key_exists(0, $res) || !array_key_exists('vout_address_idx', $res[0])) {
-		throw new Exception('Unable to create address-to-vout idx: ' . $address_idx . ' & ' . $vout_idx);
+	if (empty($res) || !array_key_exists(0, $res) || !array_key_exists('vout_address_id', $res[0])) {
+		throw new Exception('Unable to create address-to-vout id: ' . $address_id . ' & ' . $vout_id);
 	}
 
 	// Now add the link
-	return intval($res[0]['vout_address_idx']);
+	return intval($res[0]['vout_address_id']);
 }
 
 function addressExists(string $address)
 {
-	$sql = 'SELECT address_idx FROM address WHERE address = $1;';
+	$sql = 'SELECT address_id FROM address WHERE address = $1;';
 
 	$db_handler = \Geppetto\DatabaseHandler::init();
 	$res = $db_handler->query($sql, array($address));
 
-	if (empty($res) || !array_key_exists(0, $res) || !array_key_exists('address_idx', $res[0])) {
+	if (empty($res) || !array_key_exists(0, $res) || !array_key_exists('address_id', $res[0])) {
 		return false;
 	}
 
-	return intval($res[0]['address_idx']);
+	return intval($res[0]['address_id']);
 }
 
 function addBlock(array $block)
@@ -297,7 +295,7 @@ function addBlock(array $block)
 		VALUES
 			($1,$2,$3,$4,$5,TO_TIMESTAMP($6),$7,$8,$9,$10,$11,$12,$13,$14,$15,$16)
 		RETURNING
-			block_idx;
+			block_id;
 	';
 
 	$db_handler = \Geppetto\DatabaseHandler::init();
@@ -308,21 +306,21 @@ function addBlock(array $block)
 			intval($block["revocations"]), intval($block["poolsize"]), $block["bits"], $block["sbits"])
 	);
 
-	if (empty($res) || !array_key_exists(0, $res) || !array_key_exists('block_idx', $res[0])) {
+	if (empty($res) || !array_key_exists(0, $res) || !array_key_exists('block_id', $res[0])) {
 		throw new Exception('Unable to create block #' . $block["height"]);
 	}
 
-	return intval($res[0]['block_idx']);
+	return intval($res[0]['block_id']);
 }
 
 function isBlockStored(int $height)
 {
-	$sql = 'SELECT block_idx FROM block WHERE height = $1;';
+	$sql = 'SELECT block_id FROM block WHERE height = $1;';
 
 	$db_handler = \Geppetto\DatabaseHandler::init();
 	$res = $db_handler->query($sql, array($height));
 
-	if (empty($res) || !array_key_exists(0, $res) || !array_key_exists('block_idx', $res[0])) {
+	if (empty($res) || !array_key_exists(0, $res) || !array_key_exists('block_id', $res[0])) {
 		return false;
 	}
 
