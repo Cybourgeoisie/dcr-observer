@@ -12,11 +12,6 @@
 	docker build -t dcraudit-db-dev .
 
 
-# Production Builds
-	# At root (/)
-	docker build -f Dockerfile-production -t dcraudit-prod .
-
-
 # Development Run
 
 # Instructions: Using Docker Compose
@@ -26,22 +21,3 @@
 	# Run docker compose to set up the database container and web-accessible container
 	docker-compose up -d
 	docker-compose down
-
-
-# Pushing Production Docker Container
-	aws ecr get-login --no-include-email --region us-east-1
-
-	docker build -f Dockerfile-production -t dcraudit-prod .
-	docker tag X
-	docker push X
-
-
-# Then on prod:
-	aws ecr get-login --no-include-email --region us-east-1
-	docker pull X
-
-	# Stop the current containers
-	docker stop dcraudit-prod; docker rm dcraudit-prod; 
-	
-	# Boot up prod
-	

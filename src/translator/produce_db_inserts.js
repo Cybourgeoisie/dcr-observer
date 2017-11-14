@@ -31,7 +31,7 @@ function processBlocks(height) {
 	var next_height = height;
 	while (next_height) {
 		height = next_height;
-		if (height%2==0) {
+		if (height%400==0) {
 			console.log("hrtbt@" + next_height);
 			process.exit();
 		}
@@ -66,10 +66,10 @@ function produceDbInserts(height) {
 	block_json = null; delete block_json;
 
 	// Prep for the inserts
-	var db_inserts;
+	var db_inserts = 'BEGIN;';
 
 	// Insert the block
-	db_inserts  = 'INSERT INTO block("hash", "height", "time", "version", "merkleroot", "stakeroot", ';
+	db_inserts += 'INSERT INTO block("hash", "height", "time", "version", "merkleroot", "stakeroot", ';
 	db_inserts += '"stakeversion", "extradata", "votebits", "finalstate", "voters", "freshstake", ';
 	db_inserts += '"revocations", "poolsize", "bits", "sbits") VALUES (';
 	db_inserts += '\'' + block.hash + '\',' + block.height + ',' + 'TO_TIMESTAMP(' + block.time + '), ';
@@ -98,20 +98,15 @@ function produceDbInserts(height) {
 			var tx = rawtxes[i];
 
 			// Add the transaction
-			db_inserts += 'WITH ins (block_height, txid_hash, tree, blockindex, version, locktime, expiry) AS ';
-			db_inserts += '(VALUES (' + block.height + ',\'' + tx.txid + '\',' + tree_branch + ',';
-			db_inserts += i + ',' + tx.version + ',' + tx.locktime + ',' + tx.expiry + ')) ';
 			db_inserts += 'INSERT INTO tx ("block_id","hash","tree","blockindex","version","locktime","expiry") ';
-			db_inserts += 'SELECT block.block_id, ins.txid_hash, ins.tree, ins.blockindex, ins.version, ins.locktime, ins.expiry ';
-			db_inserts += 'FROM block JOIN ins ON ins.block_height = block.height; ';
+			db_inserts += 'SELECT block.block_id, \'' + tx.txid + '\',' + tree_branch + ',' + i + ',' + tx.version + ',' + tx.locktime + ',' + tx.expiry + ' ';
+			db_inserts += 'FROM block WHERE block.height = ' + block.height + ';';
 
 			// Get the incoming amounts
 			for (var j = 0; j < tx.vin.length; j++) {
 				var vin = tx.vin[j];
 
 				// Set defaults if not provided
-				if (!vin.hasOwnProperty('coinbase')) vin.coinbase = '';
-				if (!vin.hasOwnProperty('stakebase')) vin.stakebase = '';
 				if (!vin.hasOwnProperty('tree')) vin.tree = 'NULL';
 				if (!vin.hasOwnProperty('vout')) vin.vout = 'NULL';
 				if (!vin.hasOwnProperty('scriptSig')) { vin.scriptSig = {asm : '', hex : ''}; }
@@ -121,24 +116,21 @@ function produceDbInserts(height) {
 					// Craft the vout key -- ("{blockheight}-{tree}-{blockindex}-{n}")
 					var vout_key = vin.blockheight + '-' + vin.tree + '-' + vin.blockindex + '-' + vin.vout;
 
-					db_inserts += 'WITH ins (txid_hash, vout_key, amountin, blockheight, tree, blockindex, vout, coinbase, stakebase, sequence, asm, hex) ';
-					db_inserts += 'AS (VALUES (\'' + tx.txid + '\', \'' + vout_key + '\'';
-					db_inserts += vin.amountin + ',' + vin.blockheight + ',' + vin.tree + ',' + vin.blockindex + ',' + vin.vout + ',';
-					db_inserts += '\'' + vin.coinbase + '\',\'' + vin.stakebase + '\',' + vin.sequence + ',';
-					db_inserts += '\'' + vin.scriptSig.asm + '\',\'' + vin.scriptSig.hex + '\')) ';
-					db_inserts += 'INSERT INTO vin ("tx_id", "vout_id", "amountin", "blockheight", "tree", "blockindex", "coinbase", "stakebase", "sequence", "asm", "hex") ';
-					db_inserts += 'SELECT tx.tx_id, vout.vout_id, ins.amountin, ins.blockheight, ins.tree, ins.blockindex, ins.coinbase, ins.stakebase, ins.sequence, ins.asm, ins.hex ';
-					db_inserts += 'FROM ins JOIN tx ON ins.txid_hash = tx.hash';
-					db_inserts += 'JOIN vout ON ins.vout_key = vout.key;';
+					// Defaults following the coinbase / stakebase check
+					if (!vin.hasOwnProperty('coinbase')) vin.coinbase = '';
+					if (!vin.hasOwnProperty('stakebase')) vin.stakebase = '';
+
+					db_inserts += 'INSERT INTO vin ("tx_id", "vout_id", "amountin", "blockheight", "tree", "blockindex", "vout", "coinbase", "stakebase", "sequence", "asm", "hex") ';
+					db_inserts += 'SELECT tx.tx_id, vout.vout_id, ' + vin.amountin + ',' + vin.blockheight + ',' + vin.tree + ',' + vin.blockindex + ',' + vin.vout + ',\'' + vin.coinbase + '\',\'' + vin.stakebase + '\',' + vin.sequence + ',\'' + vin.scriptSig.asm + '\',\'' + vin.scriptSig.hex + '\' ';
+					db_inserts += 'FROM tx JOIN vout ON vout.key = \'' + vout_key + '\' WHERE tx.hash = \'' + tx.txid + '\';';
 				} else {
-					db_inserts += 'WITH ins (txid_hash, amountin, blockheight, tree, blockindex, vout, coinbase, stakebase, sequence, asm, hex) ';
-					db_inserts += 'AS (VALUES (\'' + tx.txid + '\',';
-					db_inserts += vin.amountin + ',' + vin.blockheight + ',' + vin.tree + ',' + vin.blockindex + ',' + vin.vout + ',';
-					db_inserts += '\'' + vin.coinbase + '\',\'' + vin.stakebase + '\',' + vin.sequence + ',';
-					db_inserts += '\'' + vin.scriptSig.asm + '\',\'' + vin.scriptSig.hex + '\')) ';
-					db_inserts += 'INSERT INTO vin ("tx_id", "amountin", "blockheight", "tree", "blockindex", "coinbase", "stakebase", "sequence", "asm", "hex") ';
-					db_inserts += 'SELECT tx.tx_id, vout.vout_id, ins.amountin, ins.blockheight, ins.tree, ins.blockindex, ins.coinbase, ins.stakebase, ins.sequence, ins.asm, ins.hex ';
-					db_inserts += 'FROM ins JOIN tx ON ins.txid_hash = tx.hash;';
+					// Defaults following the coinbase / stakebase check
+					if (!vin.hasOwnProperty('coinbase')) vin.coinbase = '';
+					if (!vin.hasOwnProperty('stakebase')) vin.stakebase = '';
+
+					db_inserts += 'INSERT INTO vin ("tx_id", "amountin", "blockheight", "tree", "blockindex", "vout", "coinbase", "stakebase", "sequence", "asm", "hex") ';
+					db_inserts += 'SELECT tx.tx_id, ' + vin.amountin + ',' + vin.blockheight + ',' + vin.tree + ',' + vin.blockindex + ',' + vin.vout + ',\'' + vin.coinbase + '\',\'' + vin.stakebase + '\',' + vin.sequence + ',\'' + vin.scriptSig.asm + '\',\'' + vin.scriptSig.hex + '\' ';
+					db_inserts += 'FROM tx WHERE tx.hash = \'' + tx.txid + '\';';
 				}
 			}
 
@@ -148,21 +140,18 @@ function produceDbInserts(height) {
 
 				// Set defaults if not provided
 				if (!vout.hasOwnProperty('commitamt')) vout.commitamt = 'NULL';
-				if (!vin.hasOwnProperty('scriptPubKey')) { 
-					vin.scriptPubKey = {asm : '', hex : '', type : '', reqSigs : 'NULL'};
+				if (!vout.hasOwnProperty('scriptPubKey')) { 
+					vout.scriptPubKey = {asm : '', hex : '', type : '', reqSigs : 'NULL'};
 				}
+				if (!vout.scriptPubKey.hasOwnProperty('reqSigs')) vout.scriptPubKey.reqSigs = 'NULL';
 
 				// Craft the vout key -- ("{blockheight}-{tree}-{blockindex}-{n}")
 				var vout_key = block.height + '-' + tree_branch + '-' + i + '-' + vout.n;
 
 				// Add the insert
-				db_inserts += 'WITH ins (txid_hash, value, commitamt, n, version, type, asm, hex, reqSigs, key) AS ';
-				db_inserts += '(VALUES (\'' + tx.txid + '\',' + vout.value + ',' + vout.commitamt + ',';
-				db_inserts += vout.n + ',' + vout.version + ',\'' + vout.scriptPubKey.type + '\',\'' + vout.scriptPubKey.asm + '\',';
-				db_inserts += '\'' + vout.scriptPubKey.hex + '\',' + vout.scriptPubKey.reqSigs + ',\'' + vout_key + '\')) ';
 				db_inserts += 'INSERT INTO vout ("tx_id","value","commitamt","n","version","type","asm","hex","reqSigs", "key") ';
-				db_inserts += 'SELECT tx.tx_id, ins.value, ins.commitamt, ins.n, ins.version, ins.type, ins.asm, ins.hex, ins.reqSigs, ins.key ';
-				db_inserts += 'FROM tx JOIN ins ON ins.txid_hash = tx.hash; ';
+				db_inserts += 'SELECT tx.tx_id,' + vout.value + ',' + vout.commitamt + ',' + vout.n + ',' + vout.version + ',\'' + vout.scriptPubKey.type + '\',\'' + vout.scriptPubKey.asm + '\',\'' + vout.scriptPubKey.hex + '\',' + vout.scriptPubKey.reqSigs + ',\'' + vout_key + '\' ';
+				db_inserts += 'FROM tx WHERE tx.hash = \'' + tx.txid + '\';';
 
 				if (tx.vout[j].scriptPubKey.hasOwnProperty('addresses')) {
 					for (var k = 0; k < tx.vout[j].scriptPubKey.addresses.length; k++) {
@@ -173,21 +162,21 @@ function produceDbInserts(height) {
 						db_inserts += 'INSERT INTO address("address") VALUES (\'' + address + '\') ON CONFLICT DO NOTHING;';
 
 						// Add the connection to vout insert
-						db_inserts += 'WITH ins (vout_key, address) AS ';
-						db_inserts += '(VALUES (\'' + vout_key + '\', \'' + address + '\')) ';
 						db_inserts += 'INSERT INTO vout_address ("vout_id", "address_id") ';
-						db_inserts += 'SELECT vout.vout_id, address.address_id FROM ins ';
-						db_inserts += 'JOIN vout ON ins.vout_key = vout.key ';
-						db_inserts += 'JOIN address ON ins.address = address.address; ';
+						db_inserts += 'SELECT vout.vout_id, address.address_id ';
+						db_inserts += 'FROM vout JOIN address ON address.address = \'' + address + '\' ';
+						db_inserts += 'WHERE vout.key = \'' + vout_key + '\';';
 					}
 				}
 			}
 		}
 	}
 
+	db_inserts += 'COMMIT;';
+
 	// Write the insert file
-	var insert_location = './blocks_' + height + '_' + height + '.sql';
-	fs.writeFileSync(insert_location, db_inserts);
+	var insert_location = './sql_data/blocks_' + Math.trunc(height/2500)*2500 + '_' + (Math.trunc(height/2500)*2500+2499) + '.sql';
+	fs.appendFileSync(insert_location, db_inserts);
 
 	return (height + 1);
 

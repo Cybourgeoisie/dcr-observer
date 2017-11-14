@@ -25,7 +25,7 @@ CREATE TABLE "tx" (
 	"block_id"   BIGINT REFERENCES "block" (block_id),
 	"hash"       TEXT, -- This is "txid"
 	"tree"       INTEGER, -- Might want an index on this
-	"blockindex" INTEGER,
+	"blockindex" BIGINT,
 	"version"    BIGINT,
 	"locktime"   BIGINT,
 	"expiry"     BIGINT
@@ -63,7 +63,7 @@ CREATE TABLE "vin" (
 	"amountin"    NUMERIC,
 	"blockheight" BIGINT,
 	"tree"        INTEGER,
-	"blockindex"  INTEGER,
+	"blockindex"  BIGINT,
 	"vout"        INTEGER,
 	"coinbase"    TEXT,
 	"stakebase"   TEXT,
