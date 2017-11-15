@@ -31,8 +31,12 @@ body {
 
 .table-addresses td,
 .table-addresses th,
+.table-networks td,
+.table-networks th,
 .table-distribution td,
-.table-distribution th {
+.table-distribution th,
+.table-distribution-hd td,
+.table-distribution-hd th {
 	font-size:80%;
 }
 

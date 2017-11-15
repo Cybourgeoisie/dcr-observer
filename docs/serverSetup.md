@@ -107,7 +107,7 @@ Using a mix of sources:
 
 ```
 sudo yum update –y
-sudo yum install -y httpd24 php70 postgresql postgresql-server postgresql-devel postgresql-contrib postgresql-docs php70-pgsql
+sudo yum install -y httpd24 php70  postgresql96 postgresql96-server postgresql96-devel postgresql96-contrib postgresql96-docs php70-pgsql
 ```
 
 Turn on Apache httpd, make sure it runs all the time.

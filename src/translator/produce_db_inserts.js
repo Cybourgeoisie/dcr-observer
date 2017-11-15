@@ -151,7 +151,7 @@ function produceDbInserts(height) {
 				// Add the insert
 				db_inserts += 'INSERT INTO vout ("tx_id","value","commitamt","n","version","type","asm","hex","reqSigs", "key") ';
 				db_inserts += 'SELECT tx.tx_id,' + vout.value + ',' + vout.commitamt + ',' + vout.n + ',' + vout.version + ',\'' + vout.scriptPubKey.type + '\',\'' + vout.scriptPubKey.asm + '\',\'' + vout.scriptPubKey.hex + '\',' + vout.scriptPubKey.reqSigs + ',\'' + vout_key + '\' ';
-				db_inserts += 'FROM tx WHERE tx.hash = \'' + tx.txid + '\';';
+				db_inserts += 'FROM tx WHERE tx.hash = \'' + tx.txid + '\' ORDER BY tx.tx_id DESC LIMIT 1;';
 
 				if (tx.vout[j].scriptPubKey.hasOwnProperty('addresses')) {
 					for (var k = 0; k < tx.vout[j].scriptPubKey.addresses.length; k++) {
@@ -172,10 +172,11 @@ function produceDbInserts(height) {
 		}
 	}
 
-	db_inserts += 'COMMIT;';
+	db_inserts += 'COMMIT;\r\n';
 
 	// Write the insert file
-	var insert_location = './sql_data/blocks_' + Math.trunc(height/2500)*2500 + '_' + (Math.trunc(height/2500)*2500+2499) + '.sql';
+	var filesize = 5000;
+	var insert_location = './sql_data/blocks_' + Math.trunc(height/filesize)*filesize + '_' + (Math.trunc(height/filesize)*filesize+filesize-1) + '.sql';
 	fs.appendFileSync(insert_location, db_inserts);
 
 	return (height + 1);

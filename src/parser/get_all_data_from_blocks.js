@@ -4,6 +4,8 @@ var fs = require('fs');
 // Get all top addresses
 var total_dcr = 0;
 var address_map = {};
+//var blockdir = './blocks/';
+//var savefile  = 'address_map.all.json';
 var blockdir  = '../../../blocks/';
 var savefile  = '../../../address_map.all.json';
 
@@ -120,30 +122,15 @@ function balanceTransactionsAtBlock(height) {
 				}
 
 				if (tx.vin[j].hasOwnProperty('stakebase')) {
-					if (tx.vin[j].hasOwnProperty('tree') || tx.vin[j].hasOwnProperty('scriptSig')) {
-						console.log("STAKEBASE FOUND, but potentially valid inputs");
-						console.log("Requested block height: " + (blockheight+1) + ", tree: " + tree + ", TX: " + blockindex + ", Vout: " + voutindex);
-						console.log("Current Block height: " + (height) + ", tree: " + tree_branch + ", TX: " + i + ", Vin: " + j);
-					}
 					total_dcr += tx.vin[j].amountin;
 					continue;
 				}
 
 				// Find the origin vout and deduct from the address
 				var blockheight = tx.vin[j].blockheight;
+				var tree        = tx.vin[j].tree;
 				var blockindex  = tx.vin[j].blockindex;
 				var voutindex   = tx.vin[j].vout;
-
-				// Choose the correct tree
-				var tree = parseInt(tx.vin[j].tree);
-				if (isNaN(tree)) {
-					console.log("isNaN is true");
-					console.log("Requested block height: " + blockheight + ", tree: " + tree + ", TX: " + blockindex + ", Vout: " + voutindex);
-					console.log("Current Block height: " + height + ", tree: " + tree_branch + ", TX: " + i + ", Vin: " + j);
-					console.log(tx.vin[j]);
-					console.log(tx.vin[j].tree);
-					process.exit();
-				}
 
 				// See if the vout already exists
 				var cached_origin_vout = null;
@@ -178,13 +165,12 @@ function balanceTransactionsAtBlock(height) {
 				}
 
 				var address = vout[0];
-				var amount = vout[1];
+				//var amount = vout[1];
 
 				if (address_map.hasOwnProperty(address)) {
-					//address_map[address] -= amount;
-					address_map[address].val  -= amount;
-					address_map[address].out  += amount;
-					address_map[address].sout += (tree_branch === 1) ? amount : 0;
+					address_map[address].val  -= tx.vin[j].amountin;
+					address_map[address].out  += tx.vin[j].amountin;
+					address_map[address].sout += (tree_branch === 1) ? tx.vin[j].amountin : 0;
 					address_map[address].tx   += 1;
 					address_map[address].stx  += (tree_branch === 1) ? 1 : 0;
 					address_map[address].last  = height;
@@ -198,10 +184,7 @@ function balanceTransactionsAtBlock(height) {
 
 			// Get the outgoing amounts & addresses
 			for (var j = 0; j < tx.vout.length; j++) {
-				if (!tx.vout[j].scriptPubKey.hasOwnProperty('addresses')) {
-					//block_map[block_map_idx][i][j] = ['OP_RETURN', tx.vout[j].value];
-				}
-				else {
+				if (tx.vout[j].scriptPubKey.hasOwnProperty('addresses')) {
 					for (var k = 0; k < tx.vout[j].scriptPubKey.addresses.length; k++) {
 						// Get the address
 						var address = tx.vout[j].scriptPubKey.addresses[k];
@@ -221,11 +204,9 @@ function balanceTransactionsAtBlock(height) {
 								'last'  : height,
 								'end'   : block.time
 							};
-							//address_map[address] = 0;
 						}
 
 						// Add the value sent to the address
-						//address_map[address] += tx.vout[j].value;
 						address_map[address].val  += tx.vout[j].value;
 						address_map[address].in   += tx.vout[j].value;
 						address_map[address].sin  += (tree_branch === 1) ? tx.vout[j].value : 0;
@@ -264,9 +245,9 @@ function getVout(height, tree, tx, vout) {
 
 	// Get the correct tree
 	var txes;
-	if (tree === 0) {
+	if (tree == 0) {
 		txes = block['rawtx'];
-	} else if (tree === 1) {
+	} else if (tree == 1) {
 		txes = block['rawstx'];
 	} else {
 		throw "getVout() could not find the requested tree: " + tree;
@@ -307,7 +288,8 @@ function calculateRichListAndWealthDistribution() {
 	// Set the addresses
 	var addresses = [];
 	for (var address in address_map) {
-		if (address_map[address].val < 0) { continue; }
+		// Ignore all 0 and dust wallets
+		if (address_map[address].val <= 0.00000001) { continue; }
 		addresses.push([address, address_map[address].val]);
 	}
 

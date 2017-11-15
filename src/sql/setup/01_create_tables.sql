@@ -31,6 +31,10 @@ CREATE TABLE "tx" (
 	"expiry"     BIGINT
 );
 
+-- Can't be unique, apparently
+-- DROP INDEX tx_hash_idx;
+CREATE INDEX tx_hash_idx ON tx (hash);
+
 CREATE TABLE "vout" (
 	"vout_id"     BIGSERIAL PRIMARY KEY,
 	"tx_id"       BIGINT REFERENCES "tx" (tx_id),
@@ -44,6 +48,11 @@ CREATE TABLE "vout" (
 	"reqSigs"     INTEGER,
 	"key"         VARCHAR(22) UNIQUE -- Used for definitive insert matching ("{blockheight}-{tree}-{blockindex}-{n}")
 );
+
+-- ALTER TABLE vout DROP CONSTRAINT vout_key_key;
+-- CREATE INDEX vout_key_key ON vout (key);
+-- NOPE. Put it back.
+-- ALTER TABLE vout ADD CONSTRAINT vout_key_key UNIQUE (key);
 
 CREATE TABLE "address" (
 	"address_id"  BIGSERIAL PRIMARY KEY,

@@ -27,16 +27,27 @@
 
 		<div class="collapse navbar-collapse" id="navbarTop">
 			<ul class="navbar-nav mr-auto">
-				<li class="nav-item active">
-					<a class="nav-link page-toggle" href="#home">Top</a>
+				<li class="nav-item dropdown">
+					<a class="nav-link dropdown-toggle" href="#" id="dcr-top-dropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Top</a>
+					<div class="dropdown-menu" aria-labelledby="dcr-top-dropdown">
+						<a class="dropdown-item page-toggle" href="#home">Top Addresses</a>
+						<a class="dropdown-item page-toggle" href="#top-hd">Top HD Wallets</a>
+					</div>
 				</li>
-				<li class="nav-item">
+				<!--<li class="nav-item">
 					<a class="nav-link page-toggle" href="#dist">Distribution</a>
+				</li>-->
+				<li class="nav-item dropdown">
+					<a class="nav-link dropdown-toggle" href="#" id="dcr-dist-dropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Distribution</a>
+					<div class="dropdown-menu" aria-labelledby="dcr-dist-dropdown">
+						<a class="dropdown-item page-toggle" href="#dist">Wealth By Address</a>
+						<a class="dropdown-item page-toggle" href="#dist-hd">Wealth By HD Wallet</a>
+					</div>
 				</li>
 			</ul>
 
-			<form class="form-inline my-2 my-lg-0">
-				<input disabled="disabled" class="form-control mr-sm-2" type="text" size="40" placeholder="Enter Address" aria-label="Search" style="font-size:90%">
+			<form id="dcr-address-search" class="form-inline my-2 my-lg-0">
+				<input id="dcr-address-input" disabled="disabled" class="form-control mr-sm-2" type="text" size="42" placeholder="Enter Address" aria-label="Search" style="font-size:90%">
 				<button disabled="disabled" class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
 			</form>
 		</div>
@@ -84,9 +95,45 @@
 			</p>
 		</div>
 
+		<div class="dcr-page dcr-page-top-hd home-body">
+			<h1>Top 500 Known HD Wallets</h1>
+			<p class="lead">
+				<small>
+					<strong><span class="top-hd-sum">X</span> DCR out of <span class="total-dcr">X</span> DCR</strong>
+					<br />
+					<span class="top-hd-sum-percent">X%</span> of DCR supply
+				</small>
+			</p>
+
+			<table class="table table-hover table-networks">
+				<thead>
+					<tr>
+						<th>#</th>
+						<th>Top Address</th>
+						<th>Balance</th>
+						<th>% DCR</th>
+						<th># Addresses</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr>
+						<th scope="row">1</th>
+						<td class="top-hd-td-top-address"><a class="page-toggle" href="#addr">X</a></td>
+						<td class="top-hd-td-balance">X DCR</td>
+						<td class="top-hd-td-percent">X%</td>
+						<td class="top-hd-td-num-addrs">X</td>
+					</tr>
+				</tbody>
+			</table>
+
+			<p class="lead" style="text-align:center;">
+				<button class="btn btn-primary my-2 my-sm-0 show-all-500-hd">Show All 500</button>
+			</p>
+		</div>
+
 		<!-- Distribution Page -->
 		<div class="dcr-page dcr-page-dist dist-body" style="display:none;">
-			<h1>Decred Distribution</h1>
+			<h1>Distribution By Address</h1>
 			<p class="lead">The current Decred address wealth distribution.</p>
 
 			<table class="table table-hover table-distribution">
@@ -121,6 +168,47 @@
 					</tr>
 				</tbody>
 			</table>
+			<p><small>(*) Zero-balance addresses are not included.</small></p>
+		</div>
+
+		<!-- HD Distribution Page -->
+		<div class="dcr-page dcr-page-dist-hd dist-body" style="display:none;">
+			<h1>Distribution By Known HD Wallets</h1>
+			<p class="lead">The current Decred wealth distribution by connected addresses.</p>
+
+			<table class="table table-hover table-distribution-hd">
+				<thead>
+					<tr>
+						<th>Balances</th>
+						<th>HD Wallets</th>
+						<th>% Wallets</th>
+						<th>Sum</th>
+						<!--<th>$ Value</th>-->
+						<th>% of Supply</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr>
+						<th scope="row">0 to 1.0 DCR</th>
+						<td class="td-hd-num-wallets">X</td>
+						<td class="td-hd-pct-wallets">
+							<div class="progress" style="position:relative;top:1px;opacity:0.5;">
+								<div class="progress-bar bg-success" role="progressbar" style="width:25%"></div>
+							</div>
+							<span class="wealth-hd-pct-wallets" style="position:relative;top:-16px;">X%</span>
+						</td>
+						<td class="td-hd-sum">X DCR</td>
+						<!--<td class="td-sum-value">$X</td>-->
+						<td class="td-hd-pct-supply">
+							<div class="progress" style="position:relative;top:1px;opacity:0.5;">
+								<div class="progress-bar bg-success" role="progressbar" style="width:25%"></div>
+							</div>
+							<span class="wealth-hd-pct-supply" style="position:relative;top:-16px;">X%</span>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+			<p><small>(*) Zero-balance addresses are not included.</small></p>
 		</div>
 
 		<!-- Address Page -->
@@ -299,6 +387,8 @@
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.0.0-beta.2/js/bootstrap.min.js" integrity="sha256-GIa8Vh3sfESnVB2CN3rYGkD/MklvMq0lmITweQxE1qU=" crossorigin="anonymous"></script>
 
 	<!-- Site JS -->
+	<script src="./js/wealth-distribution.js"></script>
+	<script src="./js/top-accounts.js"></script>
 	<script src="./js/index.js"></script>
 
 	<!-- Launch -->
@@ -308,7 +398,9 @@
 			handleNavigation(window.location.hash.substr(1) || "home");
 			getDcrPrice();
 			pullTopAddresses();
+			pullTopNetworks();
 			pullWealthDistribution();
+			pullWealthDistributionNetworks();
 		});
 	</script>
 </body>
