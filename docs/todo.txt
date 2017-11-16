@@ -1,0 +1,15 @@
+TODO:
+- Top 500 addresses
+- Wealth distribution by address
+- Top 500 HD wallets
+- Wealth distribution by HD wallet
+- Address details page: rank, balance, in/out, staking, first & last activity
+- Voting Distribution Page: show distribution of voters' tickets & relative influence that their tickets have on vote outcome (onchain)
+- Historical snapshots of rich list & wealth distribution (slider)
+- Server & Database for longevity, maintenance, & realtime updating
+- Search by address
+- Mobile-friendly UI
+- Add identifiers to addresses for developer fund, exchanges, miners, & stakepools
+- Additional address details: Map portion of inputs from mining, genesis block, exchange, or staking
+- Additional address details: List all addresses linked together, and from which transactions (HD)
+- Flag addresses that are actively staking

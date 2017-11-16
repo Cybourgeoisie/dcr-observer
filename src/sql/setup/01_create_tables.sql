@@ -65,6 +65,9 @@ CREATE TABLE "vout_address" (
 	"address_id"      BIGINT REFERENCES "address" (address_id)
 );
 
+-- CREATE INDEX vout_address_address_id_key ON vout_address (address_id);
+-- CREATE INDEX vout_address_vout_id_key ON vout_address (vout_id);
+
 CREATE TABLE "vin" (
 	"vin_id"      BIGSERIAL PRIMARY KEY,
 	"tx_id"       BIGINT REFERENCES "tx" (tx_id),
@@ -80,5 +83,7 @@ CREATE TABLE "vin" (
 	"asm"         TEXT,
 	"hex"         TEXT
 );
+
+-- CREATE INDEX vin_vout_id_key ON vin (vout_id);
 
 COMMIT;

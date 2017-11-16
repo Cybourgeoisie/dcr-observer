@@ -26,7 +26,7 @@ function findNetworks() {
 
 	console.log("Reached end.");
 	collectNetworks();
-	calculateRichListAndWealthDistribution();
+	calculateNetworkRichListAndWealthDistribution();
 	saveProgress();
 }
 
@@ -112,7 +112,11 @@ function findNetworksAtBlock(height) {
 				}
 
 				// If we're committing to staking, then include the future addresses
-				if (tx.vout[j].scriptPubKey.type == 'sstxcommitment')
+				// IT TURNS OUT that I'm not certain about this anymore.
+				// I think that some staking pools might split the amounts, in which case
+				// this would wrongly associate pools with user accounts and user accounts
+				// with pools.
+				/*if (tx.vout[j].scriptPubKey.type == 'sstxcommitment')
 				{
 					// We MUST have a first_network provided, or else we're staking from a non-existent address
 					if (!first_network) {
@@ -135,7 +139,7 @@ function findNetworksAtBlock(height) {
 							addr_net_map[address].nw = first_network;
 						}
 					}
-				}/*
+				}
 				else if (tx.vout[j].scriptPubKey.type == 'stakesubmission')
 				{
 					// We MUST have a first_network provided, or else we're staking from a non-existent address
@@ -159,8 +163,8 @@ function findNetworksAtBlock(height) {
 					// Need to save to the vin addresses
 					// Don't want to assume that this address is owned by the prior, 
 					// just want to keep track of the stake balance
-				}*/
-				else
+				}
+				else*/
 				{
 					for (var k = 0; k < tx.vout[j].scriptPubKey.addresses.length; k++) {
 						// Get the address
@@ -208,13 +212,12 @@ function collectNetworks() {
 	}
 }
 
-function calculateRichListAndWealthDistribution() {
+function calculateNetworkRichListAndWealthDistribution() {
 	// Notify
-	console.log("Building rich list and wealth distribution...");
+	console.log("Building network rich list and wealth distribution...");
 
 	// Notification
-	console.log("Total address count: " + all_address_count);
-	console.log("Total network count: " + network_count);
+	console.log("Total address count: " + all_address_count + " - Total network count: " + network_count);
 
 	var networks = [];
 	for (var network_id in network_map) {

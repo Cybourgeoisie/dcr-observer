@@ -3,7 +3,8 @@ var fs = require('fs');
 
 // Get all top addresses
 var total_dcr = 0;
-var address_map = {};
+var address_count = 0, network_count = 0;
+var address_map = {}, network_map = {};
 //var blockdir = './blocks/';
 //var savefile  = 'address_map.all.json';
 var blockdir  = '../../../blocks/';
@@ -49,7 +50,7 @@ function collectCurrentAddressValues(next_block_height) {
 		current_block_height = next_block_height;
 		next_block_height = balanceTransactionsAtBlock(next_block_height);
 		if (next_block_height%10000==0) {
-			console.log("hrtbt@" + next_block_height);
+			console.log("hrtbt@" + next_block_height + " & " + current_block_height);
 			//saveProgress(next_block_height);
 			//process.exit();
 		}
@@ -59,6 +60,8 @@ function collectCurrentAddressValues(next_block_height) {
 
 	// First, calculate the rich list and wealth distribution at this snapshot
 	calculateRichListAndWealthDistribution();
+	collectNetworks();
+	calculateNetworkRichListAndWealthDistribution();
 
 	// Then save the rest
 	// Doesn't work as intended, so don't bother right now
@@ -114,6 +117,7 @@ function balanceTransactionsAtBlock(height) {
 			var tx = rawtxes[i];
 
 			// Get the incoming amounts
+			var connected_addresses = [];
 			for (var j = 0; j < tx.vin.length; j++) {
 				// If this is not a coinbase or a stakebase, it has an origin vout
 				if (tx.vin.length == 1 && tx.vin[j].hasOwnProperty('coinbase')) {
@@ -168,6 +172,8 @@ function balanceTransactionsAtBlock(height) {
 				//var amount = vout[1];
 
 				if (address_map.hasOwnProperty(address)) {
+					// Keep track of HD wallet connections
+					connected_addresses.push(address);
 					address_map[address].val  -= tx.vin[j].amountin;
 					address_map[address].out  += tx.vin[j].amountin;
 					address_map[address].sout += (tree_branch === 1) ? tx.vin[j].amountin : 0;
@@ -179,6 +185,16 @@ function balanceTransactionsAtBlock(height) {
 					console.log("ERROR: Could not find address (" + address + ") " + blockheight + "->" + blockindex + "->" + voutindex);
 					console.log("Currently on " + height + "->" + i);
 					process.exit();
+				}
+			}
+
+			// For all incoming addresses, connect them by the first one
+			var first_network;
+			if (connected_addresses.length > 0) {
+				first_network = address_map[connected_addresses[0]].nw;
+
+				for (var ca_idx = 1; ca_idx < connected_addresses.length; ca_idx++) {
+					address_map[connected_addresses[ca_idx]].nw = first_network;
 				}
 			}
 
@@ -202,7 +218,8 @@ function balanceTransactionsAtBlock(height) {
 								'first' : height,
 								'start' : block.time,
 								'last'  : height,
-								'end'   : block.time
+								'end'   : block.time,
+								'nw'    : ++address_count // Network
 							};
 						}
 
@@ -336,6 +353,81 @@ function calculateRichListAndWealthDistribution() {
 	}
 
 	fs.writeFileSync('wealth_distribution.json', JSON.stringify({
+		'bins' : bins,
+		'counts' : counts,
+		'value' : value,
+		'total_dcr' : total_dcr
+	}));
+
+	console.log("Bins: " + bins);
+	console.log("Counts: " + counts);
+	console.log("Value: " + value);
+}
+
+function collectNetworks() {
+	network_map = {};
+	network_count = 0;
+	for (var address in address_map) {
+		var network_id = address_map[address].nw;
+		if (!network_map.hasOwnProperty(network_id)) {
+			network_count++;
+			network_map[network_id] = {
+				'addr_count' : 0,
+				'val' : 0.0,
+				'lgst_val' : 0.0,
+				'lgst_addr' : 'NULL'
+			};
+		}
+		network_map[network_id].addr_count++;
+		network_map[network_id].val += (address_map[address].val > 0) ? address_map[address].val : 0;
+		if (parseFloat(address_map[address].val) > parseFloat(network_map[network_id].lgst_val)) {
+			network_map[network_id].lgst_val  = address_map[address].val;
+			network_map[network_id].lgst_addr = address;
+		}
+	}
+}
+
+function calculateNetworkRichListAndWealthDistribution() {
+	// Notify
+	console.log("Building network rich list and wealth distribution...");
+	console.log("Total network count: " + network_count);
+
+	var networks = [];
+	for (var network_id in network_map) {
+		// Ignore all 0 and dust wallets
+		if (network_map[network_id].val > 0.00000001) {
+			networks.push([network_id, network_map[network_id].val, network_map[network_id].addr_count, network_map[network_id].lgst_addr]);			
+		}
+	}
+
+	// Order the list
+	console.log("Ordering rich list...");
+	networks.sort(function(a, b) {return b[1] - a[1];});
+
+	// Now save the richest 500
+	var top_500 = networks.slice(0,500);
+	var top_500_data = {
+		'top' : top_500,
+		'total_dcr' : total_dcr
+	};
+
+	fs.writeFileSync('top_500_networks_list.json', JSON.stringify(top_500_data));
+
+	// And determine the wealth distribution
+	var bins   = [1, 10, 100, 1000, 10000, 100000, 1000000];
+	var counts = [0,  0,   0,    0,     0,      0,       0];
+	var value  = [0,  0,   0,    0,     0,      0,       0];
+	for (var i = 0; i < networks.length; i++) {
+		for (var j = 0; j < bins.length; j++) {
+			if (networks[i][1] <= bins[j]) {
+				value[j] += networks[i][1];
+				counts[j]++;
+				break;
+			}
+		}
+	}
+
+	fs.writeFileSync('wealth_distribution_networks.json', JSON.stringify({
 		'bins' : bins,
 		'counts' : counts,
 		'value' : value,

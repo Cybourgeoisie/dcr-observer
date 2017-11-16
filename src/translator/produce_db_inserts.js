@@ -31,7 +31,7 @@ function processBlocks(height) {
 	var next_height = height;
 	while (next_height) {
 		height = next_height;
-		if (height%400==0) {
+		if (height%5000==0) {
 			console.log("hrtbt@" + next_height);
 			process.exit();
 		}
