@@ -3,7 +3,7 @@ BEGIN;
 CREATE TABLE "block" (
 	"block_id"     BIGSERIAL PRIMARY KEY,
 	"hash"         TEXT,
-	"height"       BIGINT,
+	"height"       BIGINT UNIQUE, -- If this fails on a mass import, then we're safe from duplicate data.
 	"time"         TIMESTAMP WITHOUT TIME ZONE,
 	"version"      BIGINT,
 	"merkleroot"   TEXT,
@@ -20,6 +20,8 @@ CREATE TABLE "block" (
 	"sbits"        TEXT
 );
 
+-- ALTER TABLE block ADD CONSTRAINT block_height_unique UNIQUE (height);
+
 CREATE TABLE "tx" (
 	"tx_id"      BIGSERIAL PRIMARY KEY,
 	"block_id"   BIGINT REFERENCES "block" (block_id),
@@ -30,6 +32,8 @@ CREATE TABLE "tx" (
 	"locktime"   BIGINT,
 	"expiry"     BIGINT
 );
+
+-- CREATE INDEX tx_block_id_key ON tx (block_id);
 
 -- Can't be unique, apparently
 -- DROP INDEX tx_hash_idx;
@@ -46,8 +50,10 @@ CREATE TABLE "vout" (
 	"asm"         TEXT,
 	"hex"         TEXT,
 	"reqSigs"     INTEGER,
-	"key"         VARCHAR(22) UNIQUE -- Used for definitive insert matching ("{blockheight}-{tree}-{blockindex}-{n}")
+	"key"         VARCHAR(22) -- Used for definitive insert matching ("{blockheight}-{tree}-{blockindex}-{n}")
 );
+
+-- CREATE INDEX vout_tx_id_key ON vout (tx_id);
 
 -- ALTER TABLE vout DROP CONSTRAINT vout_key_key;
 -- CREATE INDEX vout_key_key ON vout (key);
@@ -84,6 +90,7 @@ CREATE TABLE "vin" (
 	"hex"         TEXT
 );
 
+-- CREATE INDEX vin_tx_id_key ON vin (tx_id);
 -- CREATE INDEX vin_vout_id_key ON vin (vout_id);
 
 COMMIT;

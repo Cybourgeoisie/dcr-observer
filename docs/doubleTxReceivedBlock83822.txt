@@ -1,3 +1,17 @@
+Data from block 186,837:
+   dcr-audit=# select count(hash) from tx;
+     count  
+   ---------
+    3331077
+   (1 row)
+
+   dcr-audit=# select count(distinct hash) from tx;
+     count  
+   ---------
+    3331067
+
+
+
 Broadcast on two blocks:
 752db9a8fa003bb7fbacad57627001973b6b95500cb0aab0dfe406483467ac10 (73.18675798 total)
 

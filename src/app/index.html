@@ -11,8 +11,11 @@
 	<!-- Bootstrap CSS -->
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.0.0-beta.2/css/bootstrap.min.css" integrity="sha256-QUyqZrt5vIjBumoqQV0jM8CgGqscFfdGhN+nVCqX0vc=" crossorigin="anonymous" />
 
+	<!-- Font Awesome -->
+	<link rel="stylesheet" href="css/font-awesome.min.css" integrity="sha256-eZrrJcwDc/3uDhsdt61sL2oOBY362qM3lon1gyExkL0=" crossorigin="anonymous" />
+
 	<!-- Local stylesheet -->
-	<link href="style.css" rel="stylesheet">
+	<link href="css/style.css" rel="stylesheet">
 </head>
 <body>
 
@@ -47,8 +50,8 @@
 			</ul>
 
 			<form id="dcr-address-search" class="form-inline my-2 my-lg-0">
-				<input id="dcr-address-input" disabled="disabled" class="form-control mr-sm-2" type="text" size="42" placeholder="Enter Address" aria-label="Search" style="font-size:90%">
-				<button disabled="disabled" class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
+				<input id="dcr-address-input" class="form-control mr-sm-2" type="text" size="42" placeholder="Enter Address" aria-label="Search" style="font-size:90%">
+				<button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
 			</form>
 		</div>
 	</nav>
@@ -56,8 +59,14 @@
 	<!-- Primary Content -->
 	<main role="main" class="container">
 
+		<!-- Page Loader -->
+		<div class="dcr-page dcr-page-loader home-body" style="height:auto;text-align:center;">
+			<i class="fa fa-cog fa-spin fa-3x fa-fw"></i>
+			<p class="lead">Loading...</p>
+		</div>
+
 		<!-- Home Page -->
-		<div class="dcr-page dcr-page-home home-body">
+		<div class="dcr-page dcr-page-home home-body" style="display:none;">
 			<h1>Top 500 Decred Addresses</h1>
 			<p class="lead">
 				<small>
@@ -95,7 +104,7 @@
 			</p>
 		</div>
 
-		<div class="dcr-page dcr-page-top-hd home-body">
+		<div class="dcr-page dcr-page-top-hd home-body" style="display:none;">
 			<h1>Top 500 Known HD Wallets</h1>
 			<p class="lead">
 				<small>
@@ -212,7 +221,7 @@
 		</div>
 
 		<!-- Address Page -->
-		<div class="dcr-page dcr-page-addr address-body">
+		<div class="dcr-page dcr-page-addr address-body" style="display:none;">
 			<h2 class="d-none d-md-block d-l-block d-xl-block">
 				<span class="addr-address">Ds</span>
 			</h2>
@@ -373,7 +382,7 @@
 
 	<footer class="footer">
 		<div class="container">
-			<span>&copy; 2017 Jumfuckers Gone Rogue LTD.</span>
+			<span>&copy; 2017 JGR LTD.</span>
 		</div>
 	</footer>
 
@@ -394,12 +403,8 @@
 	<!-- Launch -->
 	<script type="text/javascript">
 		$(document).ready(function() {
-			setEvents();
-			handleNavigation(window.location.hash.substr(1) || "home");
-			getDcrPrice();
-			pullTopAddresses();
+			boot();
 			pullTopNetworks();
-			pullWealthDistribution();
 			pullWealthDistributionNetworks();
 		});
 	</script>

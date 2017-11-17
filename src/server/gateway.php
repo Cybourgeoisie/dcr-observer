@@ -12,4 +12,5 @@ require_once(dirname(realpath(__FILE__)) . '/../config/config.php');
 
 // For now, just require certain files directly
 require_once(SERVER_PATH . 'api/RestApi.php');
+require_once(SERVER_PATH . 'service/State.php');
 require_once(SERVER_PATH . 'service/Address.php');

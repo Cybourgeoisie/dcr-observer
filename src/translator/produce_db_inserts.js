@@ -33,7 +33,6 @@ function processBlocks(height) {
 		height = next_height;
 		if (height%5000==0) {
 			console.log("hrtbt@" + next_height);
-			process.exit();
 		}
 		next_height = produceDbInserts(height);
 	}
@@ -175,8 +174,9 @@ function produceDbInserts(height) {
 	db_inserts += 'COMMIT;\r\n';
 
 	// Write the insert file
-	var filesize = 5000;
-	var insert_location = './sql_data/blocks_' + Math.trunc(height/filesize)*filesize + '_' + (Math.trunc(height/filesize)*filesize+filesize-1) + '.sql';
+	//var filesize = 5000;
+	//var insert_location = './sql_data/blocks_' + Math.trunc(height/filesize)*filesize + '_' + (Math.trunc(height/filesize)*filesize+filesize-1) + '.sql';
+	var insert_location = './sql_data/latest_blocks.sql';
 	fs.appendFileSync(insert_location, db_inserts);
 
 	return (height + 1);
