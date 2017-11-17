@@ -8301,3 +8301,149 @@ AH00558: apache2: Could not reliably determine the server's fully qualified doma
 [Fri Nov 17 18:40:53.821052 2017] [authz_core:debug] [pid 11] mod_authz_core.c(809): [client 192.168.99.1:58430] AH01626: authorization result of <RequireAny>: granted, referer: http://192.168.99.100/
 [Fri Nov 17 18:40:53.822490 2017] [authz_core:debug] [pid 11] mod_authz_core.c(809): [client 192.168.99.1:58430] AH01626: authorization result of Require all granted: granted, referer: http://192.168.99.100/
 [Fri Nov 17 18:40:53.822785 2017] [authz_core:debug] [pid 11] mod_authz_core.c(809): [client 192.168.99.1:58430] AH01626: authorization result of <RequireAny>: granted, referer: http://192.168.99.100/
+[Fri Nov 17 19:29:19.753525 2017] [authz_core:debug] [pid 8] mod_authz_core.c(809): [client 192.168.99.1:52220] AH01626: authorization result of Require all granted: granted
+[Fri Nov 17 19:29:19.753996 2017] [authz_core:debug] [pid 8] mod_authz_core.c(809): [client 192.168.99.1:52220] AH01626: authorization result of <RequireAny>: granted
+[Fri Nov 17 19:29:19.754548 2017] [authz_core:debug] [pid 8] mod_authz_core.c(809): [client 192.168.99.1:52220] AH01626: authorization result of Require all granted: granted
+[Fri Nov 17 19:29:19.754613 2017] [authz_core:debug] [pid 8] mod_authz_core.c(809): [client 192.168.99.1:52220] AH01626: authorization result of <RequireAny>: granted
+[Fri Nov 17 19:29:19.756090 2017] [deflate:debug] [pid 8] mod_deflate.c(855): [client 192.168.99.1:52220] AH01384: Zlib: Compressed 13227 to 2964 : URL /index.html
+[Fri Nov 17 19:29:20.093703 2017] [authz_core:debug] [pid 10] mod_authz_core.c(809): [client 192.168.99.1:52222] AH01626: authorization result of Require all granted: granted, referer: http://192.168.99.100/
+[Fri Nov 17 19:29:20.094005 2017] [authz_core:debug] [pid 10] mod_authz_core.c(809): [client 192.168.99.1:52222] AH01626: authorization result of <RequireAny>: granted, referer: http://192.168.99.100/
+[Fri Nov 17 19:29:20.094064 2017] [authz_core:debug] [pid 8] mod_authz_core.c(809): [client 192.168.99.1:52220] AH01626: authorization result of Require all granted: granted, referer: http://192.168.99.100/
+[Fri Nov 17 19:29:20.094678 2017] [authz_core:debug] [pid 8] mod_authz_core.c(809): [client 192.168.99.1:52220] AH01626: authorization result of <RequireAny>: granted, referer: http://192.168.99.100/
+[Fri Nov 17 19:29:20.096716 2017] [deflate:debug] [pid 10] mod_deflate.c(855): [client 192.168.99.1:52222] AH01384: Zlib: Compressed 4273 to 1448 : URL /js/index.js, referer: http://192.168.99.100/
+[Fri Nov 17 19:29:20.098104 2017] [deflate:debug] [pid 8] mod_deflate.c(855): [client 192.168.99.1:52220] AH01384: Zlib: Compressed 3878 to 985 : URL /js/wealth-distribution.js, referer: http://192.168.99.100/
+[Fri Nov 17 19:29:20.098326 2017] [authz_core:debug] [pid 14] mod_authz_core.c(809): [client 192.168.99.1:52221] AH01626: authorization result of Require all granted: granted, referer: http://192.168.99.100/
+[Fri Nov 17 19:29:20.099585 2017] [authz_core:debug] [pid 14] mod_authz_core.c(809): [client 192.168.99.1:52221] AH01626: authorization result of <RequireAny>: granted, referer: http://192.168.99.100/
+[Fri Nov 17 19:29:20.102477 2017] [deflate:debug] [pid 14] mod_deflate.c(855): [client 192.168.99.1:52221] AH01384: Zlib: Compressed 4487 to 1261 : URL /js/top-accounts.js, referer: http://192.168.99.100/
+[Fri Nov 17 19:29:20.332137 2017] [authz_core:debug] [pid 14] mod_authz_core.c(809): [client 192.168.99.1:52221] AH01626: authorization result of Require all granted: granted, referer: http://192.168.99.100/
+[Fri Nov 17 19:29:20.332294 2017] [authz_core:debug] [pid 14] mod_authz_core.c(809): [client 192.168.99.1:52221] AH01626: authorization result of <RequireAny>: granted, referer: http://192.168.99.100/
+[Fri Nov 17 19:29:20.333312 2017] [authz_core:debug] [pid 14] mod_authz_core.c(809): [client 192.168.99.1:52221] AH01626: authorization result of Require all granted: granted, referer: http://192.168.99.100/
+[Fri Nov 17 19:29:20.333438 2017] [authz_core:debug] [pid 14] mod_authz_core.c(809): [client 192.168.99.1:52221] AH01626: authorization result of <RequireAny>: granted, referer: http://192.168.99.100/
+[Fri Nov 17 19:29:20.586483 2017] [authz_core:debug] [pid 14] mod_authz_core.c(809): [client 192.168.99.1:52221] AH01626: authorization result of Require all granted: granted, referer: http://192.168.99.100/
+[Fri Nov 17 19:29:20.586610 2017] [authz_core:debug] [pid 14] mod_authz_core.c(809): [client 192.168.99.1:52221] AH01626: authorization result of <RequireAny>: granted, referer: http://192.168.99.100/
+[Fri Nov 17 19:29:20.587120 2017] [authz_core:debug] [pid 14] mod_authz_core.c(809): [client 192.168.99.1:52221] AH01626: authorization result of Require all granted: granted, referer: http://192.168.99.100/
+[Fri Nov 17 19:29:20.587176 2017] [authz_core:debug] [pid 14] mod_authz_core.c(809): [client 192.168.99.1:52221] AH01626: authorization result of <RequireAny>: granted, referer: http://192.168.99.100/
+[Fri Nov 17 19:29:31.191830 2017] [authz_core:debug] [pid 17] mod_authz_core.c(809): [client 192.168.99.1:52274] AH01626: authorization result of Require all granted: granted
+[Fri Nov 17 19:29:31.192166 2017] [authz_core:debug] [pid 17] mod_authz_core.c(809): [client 192.168.99.1:52274] AH01626: authorization result of <RequireAny>: granted
+[Fri Nov 17 19:29:31.192675 2017] [authz_core:debug] [pid 17] mod_authz_core.c(809): [client 192.168.99.1:52274] AH01626: authorization result of Require all granted: granted
+[Fri Nov 17 19:29:31.192793 2017] [authz_core:debug] [pid 17] mod_authz_core.c(809): [client 192.168.99.1:52274] AH01626: authorization result of <RequireAny>: granted
+[Fri Nov 17 19:29:31.195405 2017] [deflate:debug] [pid 17] mod_deflate.c(855): [client 192.168.99.1:52274] AH01384: Zlib: Compressed 13227 to 2964 : URL /index.html
+[Fri Nov 17 19:29:31.229154 2017] [authz_core:debug] [pid 17] mod_authz_core.c(809): [client 192.168.99.1:52274] AH01626: authorization result of Require all granted: granted, referer: http://192.168.99.100/
+[Fri Nov 17 19:29:31.229227 2017] [authz_core:debug] [pid 17] mod_authz_core.c(809): [client 192.168.99.1:52274] AH01626: authorization result of <RequireAny>: granted, referer: http://192.168.99.100/
+[Fri Nov 17 19:29:31.229733 2017] [deflate:debug] [pid 17] mod_deflate.c(855): [client 192.168.99.1:52274] AH01384: Zlib: Compressed 3885 to 996 : URL /js/wealth-distribution.js, referer: http://192.168.99.100/
+[Fri Nov 17 19:29:31.233988 2017] [authz_core:debug] [pid 17] mod_authz_core.c(809): [client 192.168.99.1:52274] AH01626: authorization result of Require all granted: granted, referer: http://192.168.99.100/
+[Fri Nov 17 19:29:31.234063 2017] [authz_core:debug] [pid 17] mod_authz_core.c(809): [client 192.168.99.1:52274] AH01626: authorization result of <RequireAny>: granted, referer: http://192.168.99.100/
+[Fri Nov 17 19:29:31.235079 2017] [deflate:debug] [pid 17] mod_deflate.c(855): [client 192.168.99.1:52274] AH01384: Zlib: Compressed 4273 to 1448 : URL /js/index.js, referer: http://192.168.99.100/
+[Fri Nov 17 19:29:31.369591 2017] [authz_core:debug] [pid 17] mod_authz_core.c(809): [client 192.168.99.1:52274] AH01626: authorization result of Require all granted: granted, referer: http://192.168.99.100/
+[Fri Nov 17 19:29:31.370008 2017] [authz_core:debug] [pid 17] mod_authz_core.c(809): [client 192.168.99.1:52274] AH01626: authorization result of <RequireAny>: granted, referer: http://192.168.99.100/
+[Fri Nov 17 19:29:31.371536 2017] [authz_core:debug] [pid 17] mod_authz_core.c(809): [client 192.168.99.1:52274] AH01626: authorization result of Require all granted: granted, referer: http://192.168.99.100/
+[Fri Nov 17 19:29:31.371736 2017] [authz_core:debug] [pid 17] mod_authz_core.c(809): [client 192.168.99.1:52274] AH01626: authorization result of <RequireAny>: granted, referer: http://192.168.99.100/
+[Fri Nov 17 19:29:53.789378 2017] [authz_core:debug] [pid 14] mod_authz_core.c(809): [client 192.168.99.1:52369] AH01626: authorization result of Require all granted: granted
+[Fri Nov 17 19:29:53.789510 2017] [authz_core:debug] [pid 14] mod_authz_core.c(809): [client 192.168.99.1:52369] AH01626: authorization result of <RequireAny>: granted
+[Fri Nov 17 19:29:53.790057 2017] [authz_core:debug] [pid 14] mod_authz_core.c(809): [client 192.168.99.1:52369] AH01626: authorization result of Require all granted: granted
+[Fri Nov 17 19:29:53.790143 2017] [authz_core:debug] [pid 14] mod_authz_core.c(809): [client 192.168.99.1:52369] AH01626: authorization result of <RequireAny>: granted
+[Fri Nov 17 19:29:53.791003 2017] [deflate:debug] [pid 14] mod_deflate.c(855): [client 192.168.99.1:52369] AH01384: Zlib: Compressed 13227 to 2964 : URL /index.html
+[Fri Nov 17 19:29:53.814925 2017] [authz_core:debug] [pid 14] mod_authz_core.c(809): [client 192.168.99.1:52369] AH01626: authorization result of Require all granted: granted, referer: http://192.168.99.100/
+[Fri Nov 17 19:29:53.815114 2017] [authz_core:debug] [pid 14] mod_authz_core.c(809): [client 192.168.99.1:52369] AH01626: authorization result of <RequireAny>: granted, referer: http://192.168.99.100/
+[Fri Nov 17 19:29:53.816117 2017] [deflate:debug] [pid 14] mod_deflate.c(855): [client 192.168.99.1:52369] AH01384: Zlib: Compressed 3885 to 996 : URL /js/wealth-distribution.js, referer: http://192.168.99.100/
+[Fri Nov 17 19:29:53.823885 2017] [authz_core:debug] [pid 14] mod_authz_core.c(809): [client 192.168.99.1:52369] AH01626: authorization result of Require all granted: granted, referer: http://192.168.99.100/
+[Fri Nov 17 19:29:53.823959 2017] [authz_core:debug] [pid 14] mod_authz_core.c(809): [client 192.168.99.1:52369] AH01626: authorization result of <RequireAny>: granted, referer: http://192.168.99.100/
+[Fri Nov 17 19:29:53.825815 2017] [deflate:debug] [pid 14] mod_deflate.c(855): [client 192.168.99.1:52369] AH01384: Zlib: Compressed 4487 to 1261 : URL /js/top-accounts.js, referer: http://192.168.99.100/
+[Fri Nov 17 19:29:53.830439 2017] [authz_core:debug] [pid 14] mod_authz_core.c(809): [client 192.168.99.1:52369] AH01626: authorization result of Require all granted: granted, referer: http://192.168.99.100/
+[Fri Nov 17 19:29:53.830549 2017] [authz_core:debug] [pid 14] mod_authz_core.c(809): [client 192.168.99.1:52369] AH01626: authorization result of <RequireAny>: granted, referer: http://192.168.99.100/
+[Fri Nov 17 19:29:53.831362 2017] [deflate:debug] [pid 14] mod_deflate.c(855): [client 192.168.99.1:52369] AH01384: Zlib: Compressed 4273 to 1448 : URL /js/index.js, referer: http://192.168.99.100/
+[Fri Nov 17 19:29:53.960119 2017] [authz_core:debug] [pid 14] mod_authz_core.c(809): [client 192.168.99.1:52369] AH01626: authorization result of Require all granted: granted, referer: http://192.168.99.100/
+[Fri Nov 17 19:29:53.960306 2017] [authz_core:debug] [pid 14] mod_authz_core.c(809): [client 192.168.99.1:52369] AH01626: authorization result of <RequireAny>: granted, referer: http://192.168.99.100/
+[Fri Nov 17 19:29:53.961713 2017] [authz_core:debug] [pid 14] mod_authz_core.c(809): [client 192.168.99.1:52369] AH01626: authorization result of Require all granted: granted, referer: http://192.168.99.100/
+[Fri Nov 17 19:29:53.961883 2017] [authz_core:debug] [pid 14] mod_authz_core.c(809): [client 192.168.99.1:52369] AH01626: authorization result of <RequireAny>: granted, referer: http://192.168.99.100/
+[Fri Nov 17 19:30:01.075591 2017] [authz_core:debug] [pid 18] mod_authz_core.c(809): [client 192.168.99.1:52370] AH01626: authorization result of Require all granted: granted, referer: http://192.168.99.100/
+[Fri Nov 17 19:30:01.077458 2017] [authz_core:debug] [pid 18] mod_authz_core.c(809): [client 192.168.99.1:52370] AH01626: authorization result of <RequireAny>: granted, referer: http://192.168.99.100/
+[Fri Nov 17 19:30:01.078897 2017] [authz_core:debug] [pid 18] mod_authz_core.c(809): [client 192.168.99.1:52370] AH01626: authorization result of Require all granted: granted, referer: http://192.168.99.100/
+[Fri Nov 17 19:30:01.079999 2017] [authz_core:debug] [pid 18] mod_authz_core.c(809): [client 192.168.99.1:52370] AH01626: authorization result of <RequireAny>: granted, referer: http://192.168.99.100/
+[Fri Nov 17 19:30:01.101845 2017] [authz_core:debug] [pid 9] mod_authz_core.c(809): [client 192.168.99.1:52371] AH01626: authorization result of Require all granted: granted, referer: http://192.168.99.100/
+[Fri Nov 17 19:30:01.102047 2017] [authz_core:debug] [pid 9] mod_authz_core.c(809): [client 192.168.99.1:52371] AH01626: authorization result of <RequireAny>: granted, referer: http://192.168.99.100/
+[Fri Nov 17 19:30:01.104385 2017] [authz_core:debug] [pid 9] mod_authz_core.c(809): [client 192.168.99.1:52371] AH01626: authorization result of Require all granted: granted, referer: http://192.168.99.100/
+[Fri Nov 17 19:30:01.104532 2017] [authz_core:debug] [pid 9] mod_authz_core.c(809): [client 192.168.99.1:52371] AH01626: authorization result of <RequireAny>: granted, referer: http://192.168.99.100/
+[Fri Nov 17 19:30:31.561160 2017] [authz_core:debug] [pid 16] mod_authz_core.c(809): [client 192.168.99.1:52531] AH01626: authorization result of Require all granted: granted
+[Fri Nov 17 19:30:31.561506 2017] [authz_core:debug] [pid 16] mod_authz_core.c(809): [client 192.168.99.1:52531] AH01626: authorization result of <RequireAny>: granted
+[Fri Nov 17 19:30:31.561935 2017] [authz_core:debug] [pid 16] mod_authz_core.c(809): [client 192.168.99.1:52531] AH01626: authorization result of Require all granted: granted
+[Fri Nov 17 19:30:31.561994 2017] [authz_core:debug] [pid 16] mod_authz_core.c(809): [client 192.168.99.1:52531] AH01626: authorization result of <RequireAny>: granted
+[Fri Nov 17 19:30:31.564294 2017] [deflate:debug] [pid 16] mod_deflate.c(855): [client 192.168.99.1:52531] AH01384: Zlib: Compressed 13227 to 2964 : URL /index.html
+[Fri Nov 17 19:30:31.597217 2017] [authz_core:debug] [pid 16] mod_authz_core.c(809): [client 192.168.99.1:52531] AH01626: authorization result of Require all granted: granted, referer: http://192.168.99.100/
+[Fri Nov 17 19:30:31.597615 2017] [authz_core:debug] [pid 16] mod_authz_core.c(809): [client 192.168.99.1:52531] AH01626: authorization result of <RequireAny>: granted, referer: http://192.168.99.100/
+[Fri Nov 17 19:30:31.599143 2017] [deflate:debug] [pid 16] mod_deflate.c(855): [client 192.168.99.1:52531] AH01384: Zlib: Compressed 3878 to 985 : URL /js/wealth-distribution.js, referer: http://192.168.99.100/
+[Fri Nov 17 19:30:31.605165 2017] [authz_core:debug] [pid 16] mod_authz_core.c(809): [client 192.168.99.1:52531] AH01626: authorization result of Require all granted: granted, referer: http://192.168.99.100/
+[Fri Nov 17 19:30:31.605239 2017] [authz_core:debug] [pid 16] mod_authz_core.c(809): [client 192.168.99.1:52531] AH01626: authorization result of <RequireAny>: granted, referer: http://192.168.99.100/
+[Fri Nov 17 19:30:31.605935 2017] [deflate:debug] [pid 16] mod_deflate.c(855): [client 192.168.99.1:52531] AH01384: Zlib: Compressed 4492 to 1256 : URL /js/top-accounts.js, referer: http://192.168.99.100/
+[Fri Nov 17 19:30:31.610463 2017] [authz_core:debug] [pid 16] mod_authz_core.c(809): [client 192.168.99.1:52531] AH01626: authorization result of Require all granted: granted, referer: http://192.168.99.100/
+[Fri Nov 17 19:30:31.610545 2017] [authz_core:debug] [pid 16] mod_authz_core.c(809): [client 192.168.99.1:52531] AH01626: authorization result of <RequireAny>: granted, referer: http://192.168.99.100/
+[Fri Nov 17 19:30:31.611995 2017] [deflate:debug] [pid 16] mod_deflate.c(855): [client 192.168.99.1:52531] AH01384: Zlib: Compressed 4273 to 1448 : URL /js/index.js, referer: http://192.168.99.100/
+[Fri Nov 17 19:30:31.756525 2017] [authz_core:debug] [pid 16] mod_authz_core.c(809): [client 192.168.99.1:52531] AH01626: authorization result of Require all granted: granted, referer: http://192.168.99.100/
+[Fri Nov 17 19:30:31.756667 2017] [authz_core:debug] [pid 16] mod_authz_core.c(809): [client 192.168.99.1:52531] AH01626: authorization result of <RequireAny>: granted, referer: http://192.168.99.100/
+[Fri Nov 17 19:30:31.757871 2017] [authz_core:debug] [pid 16] mod_authz_core.c(809): [client 192.168.99.1:52531] AH01626: authorization result of Require all granted: granted, referer: http://192.168.99.100/
+[Fri Nov 17 19:30:31.757964 2017] [authz_core:debug] [pid 16] mod_authz_core.c(809): [client 192.168.99.1:52531] AH01626: authorization result of <RequireAny>: granted, referer: http://192.168.99.100/
+[Fri Nov 17 19:30:32.001256 2017] [authz_core:debug] [pid 16] mod_authz_core.c(809): [client 192.168.99.1:52531] AH01626: authorization result of Require all granted: granted, referer: http://192.168.99.100/
+[Fri Nov 17 19:30:32.001396 2017] [authz_core:debug] [pid 16] mod_authz_core.c(809): [client 192.168.99.1:52531] AH01626: authorization result of <RequireAny>: granted, referer: http://192.168.99.100/
+[Fri Nov 17 19:30:32.002009 2017] [authz_core:debug] [pid 16] mod_authz_core.c(809): [client 192.168.99.1:52531] AH01626: authorization result of Require all granted: granted, referer: http://192.168.99.100/
+[Fri Nov 17 19:30:32.002072 2017] [authz_core:debug] [pid 16] mod_authz_core.c(809): [client 192.168.99.1:52531] AH01626: authorization result of <RequireAny>: granted, referer: http://192.168.99.100/
+[Fri Nov 17 19:30:34.771436 2017] [authz_core:debug] [pid 16] mod_authz_core.c(809): [client 192.168.99.1:52531] AH01626: authorization result of Require all granted: granted
+[Fri Nov 17 19:30:34.771510 2017] [authz_core:debug] [pid 16] mod_authz_core.c(809): [client 192.168.99.1:52531] AH01626: authorization result of <RequireAny>: granted
+[Fri Nov 17 19:30:34.771784 2017] [authz_core:debug] [pid 16] mod_authz_core.c(809): [client 192.168.99.1:52531] AH01626: authorization result of Require all granted: granted
+[Fri Nov 17 19:30:34.771929 2017] [authz_core:debug] [pid 16] mod_authz_core.c(809): [client 192.168.99.1:52531] AH01626: authorization result of <RequireAny>: granted
+[Fri Nov 17 19:30:34.772880 2017] [deflate:debug] [pid 16] mod_deflate.c(855): [client 192.168.99.1:52531] AH01384: Zlib: Compressed 13227 to 2964 : URL /index.html
+[Fri Nov 17 19:30:34.798416 2017] [authz_core:debug] [pid 16] mod_authz_core.c(809): [client 192.168.99.1:52531] AH01626: authorization result of Require all granted: granted, referer: http://192.168.99.100/
+[Fri Nov 17 19:30:34.798555 2017] [authz_core:debug] [pid 16] mod_authz_core.c(809): [client 192.168.99.1:52531] AH01626: authorization result of <RequireAny>: granted, referer: http://192.168.99.100/
+[Fri Nov 17 19:30:34.799394 2017] [deflate:debug] [pid 16] mod_deflate.c(855): [client 192.168.99.1:52531] AH01384: Zlib: Compressed 3878 to 985 : URL /js/wealth-distribution.js, referer: http://192.168.99.100/
+[Fri Nov 17 19:30:34.819224 2017] [authz_core:debug] [pid 16] mod_authz_core.c(809): [client 192.168.99.1:52531] AH01626: authorization result of Require all granted: granted, referer: http://192.168.99.100/
+[Fri Nov 17 19:30:34.819391 2017] [authz_core:debug] [pid 16] mod_authz_core.c(809): [client 192.168.99.1:52531] AH01626: authorization result of <RequireAny>: granted, referer: http://192.168.99.100/
+[Fri Nov 17 19:30:34.820049 2017] [deflate:debug] [pid 16] mod_deflate.c(855): [client 192.168.99.1:52531] AH01384: Zlib: Compressed 4492 to 1256 : URL /js/top-accounts.js, referer: http://192.168.99.100/
+[Fri Nov 17 19:30:34.903201 2017] [authz_core:debug] [pid 16] mod_authz_core.c(809): [client 192.168.99.1:52531] AH01626: authorization result of Require all granted: granted, referer: http://192.168.99.100/
+[Fri Nov 17 19:30:34.903392 2017] [authz_core:debug] [pid 16] mod_authz_core.c(809): [client 192.168.99.1:52531] AH01626: authorization result of <RequireAny>: granted, referer: http://192.168.99.100/
+[Fri Nov 17 19:30:34.904758 2017] [authz_core:debug] [pid 16] mod_authz_core.c(809): [client 192.168.99.1:52531] AH01626: authorization result of Require all granted: granted, referer: http://192.168.99.100/
+[Fri Nov 17 19:30:34.904906 2017] [authz_core:debug] [pid 16] mod_authz_core.c(809): [client 192.168.99.1:52531] AH01626: authorization result of <RequireAny>: granted, referer: http://192.168.99.100/
+[Fri Nov 17 19:30:41.978179 2017] [authz_core:debug] [pid 11] mod_authz_core.c(809): [client 192.168.99.1:52584] AH01626: authorization result of Require all granted: granted, referer: http://192.168.99.100/
+[Fri Nov 17 19:30:41.979433 2017] [authz_core:debug] [pid 11] mod_authz_core.c(809): [client 192.168.99.1:52584] AH01626: authorization result of <RequireAny>: granted, referer: http://192.168.99.100/
+[Fri Nov 17 19:30:41.980717 2017] [authz_core:debug] [pid 11] mod_authz_core.c(809): [client 192.168.99.1:52584] AH01626: authorization result of Require all granted: granted, referer: http://192.168.99.100/
+[Fri Nov 17 19:30:41.980884 2017] [authz_core:debug] [pid 11] mod_authz_core.c(809): [client 192.168.99.1:52584] AH01626: authorization result of <RequireAny>: granted, referer: http://192.168.99.100/
+[Fri Nov 17 19:30:42.005259 2017] [authz_core:debug] [pid 13] mod_authz_core.c(809): [client 192.168.99.1:52585] AH01626: authorization result of Require all granted: granted, referer: http://192.168.99.100/
+[Fri Nov 17 19:30:42.005452 2017] [authz_core:debug] [pid 13] mod_authz_core.c(809): [client 192.168.99.1:52585] AH01626: authorization result of <RequireAny>: granted, referer: http://192.168.99.100/
+[Fri Nov 17 19:30:42.007523 2017] [authz_core:debug] [pid 13] mod_authz_core.c(809): [client 192.168.99.1:52585] AH01626: authorization result of Require all granted: granted, referer: http://192.168.99.100/
+[Fri Nov 17 19:30:42.007676 2017] [authz_core:debug] [pid 13] mod_authz_core.c(809): [client 192.168.99.1:52585] AH01626: authorization result of <RequireAny>: granted, referer: http://192.168.99.100/
+[Fri Nov 17 19:30:43.012470 2017] [authz_core:debug] [pid 13] mod_authz_core.c(809): [client 192.168.99.1:52585] AH01626: authorization result of Require all granted: granted, referer: http://192.168.99.100/
+[Fri Nov 17 19:30:43.012566 2017] [authz_core:debug] [pid 13] mod_authz_core.c(809): [client 192.168.99.1:52585] AH01626: authorization result of <RequireAny>: granted, referer: http://192.168.99.100/
+[Fri Nov 17 19:30:43.013042 2017] [authz_core:debug] [pid 13] mod_authz_core.c(809): [client 192.168.99.1:52585] AH01626: authorization result of Require all granted: granted, referer: http://192.168.99.100/
+[Fri Nov 17 19:30:43.013098 2017] [authz_core:debug] [pid 13] mod_authz_core.c(809): [client 192.168.99.1:52585] AH01626: authorization result of <RequireAny>: granted, referer: http://192.168.99.100/
+[Fri Nov 17 19:30:43.039305 2017] [authz_core:debug] [pid 11] mod_authz_core.c(809): [client 192.168.99.1:52584] AH01626: authorization result of Require all granted: granted, referer: http://192.168.99.100/
+[Fri Nov 17 19:30:43.039462 2017] [authz_core:debug] [pid 11] mod_authz_core.c(809): [client 192.168.99.1:52584] AH01626: authorization result of <RequireAny>: granted, referer: http://192.168.99.100/
+[Fri Nov 17 19:30:43.040893 2017] [authz_core:debug] [pid 11] mod_authz_core.c(809): [client 192.168.99.1:52584] AH01626: authorization result of Require all granted: granted, referer: http://192.168.99.100/
+[Fri Nov 17 19:30:43.041400 2017] [authz_core:debug] [pid 11] mod_authz_core.c(809): [client 192.168.99.1:52584] AH01626: authorization result of <RequireAny>: granted, referer: http://192.168.99.100/
+[Fri Nov 17 19:30:52.871903 2017] [authz_core:debug] [pid 17] mod_authz_core.c(809): [client 192.168.99.1:52626] AH01626: authorization result of Require all granted: granted, referer: http://192.168.99.100/
+[Fri Nov 17 19:30:52.871972 2017] [authz_core:debug] [pid 17] mod_authz_core.c(809): [client 192.168.99.1:52626] AH01626: authorization result of <RequireAny>: granted, referer: http://192.168.99.100/
+[Fri Nov 17 19:30:52.872458 2017] [authz_core:debug] [pid 17] mod_authz_core.c(809): [client 192.168.99.1:52626] AH01626: authorization result of Require all granted: granted, referer: http://192.168.99.100/
+[Fri Nov 17 19:30:52.872514 2017] [authz_core:debug] [pid 17] mod_authz_core.c(809): [client 192.168.99.1:52626] AH01626: authorization result of <RequireAny>: granted, referer: http://192.168.99.100/
+[Fri Nov 17 19:30:52.901941 2017] [authz_core:debug] [pid 12] mod_authz_core.c(809): [client 192.168.99.1:52627] AH01626: authorization result of Require all granted: granted, referer: http://192.168.99.100/
+[Fri Nov 17 19:30:52.902561 2017] [authz_core:debug] [pid 12] mod_authz_core.c(809): [client 192.168.99.1:52627] AH01626: authorization result of <RequireAny>: granted, referer: http://192.168.99.100/
+[Fri Nov 17 19:30:52.904979 2017] [authz_core:debug] [pid 12] mod_authz_core.c(809): [client 192.168.99.1:52627] AH01626: authorization result of Require all granted: granted, referer: http://192.168.99.100/
+[Fri Nov 17 19:30:52.905327 2017] [authz_core:debug] [pid 12] mod_authz_core.c(809): [client 192.168.99.1:52627] AH01626: authorization result of <RequireAny>: granted, referer: http://192.168.99.100/
+[Fri Nov 17 19:31:32.561248 2017] [authz_core:debug] [pid 16] mod_authz_core.c(809): [client 192.168.99.1:52790] AH01626: authorization result of Require all granted: granted
+[Fri Nov 17 19:31:32.561385 2017] [authz_core:debug] [pid 16] mod_authz_core.c(809): [client 192.168.99.1:52790] AH01626: authorization result of <RequireAny>: granted
+[Fri Nov 17 19:31:32.561912 2017] [authz_core:debug] [pid 16] mod_authz_core.c(809): [client 192.168.99.1:52790] AH01626: authorization result of Require all granted: granted
+[Fri Nov 17 19:31:32.562028 2017] [authz_core:debug] [pid 16] mod_authz_core.c(809): [client 192.168.99.1:52790] AH01626: authorization result of <RequireAny>: granted
+[Fri Nov 17 19:31:32.563123 2017] [deflate:debug] [pid 16] mod_deflate.c(855): [client 192.168.99.1:52790] AH01384: Zlib: Compressed 13168 to 2945 : URL /index.html
+[Fri Nov 17 19:31:32.599560 2017] [authz_core:debug] [pid 16] mod_authz_core.c(809): [client 192.168.99.1:52790] AH01626: authorization result of Require all granted: granted, referer: http://192.168.99.100/
+[Fri Nov 17 19:31:32.599676 2017] [authz_core:debug] [pid 16] mod_authz_core.c(809): [client 192.168.99.1:52790] AH01626: authorization result of <RequireAny>: granted, referer: http://192.168.99.100/
+[Fri Nov 17 19:31:32.600467 2017] [deflate:debug] [pid 16] mod_deflate.c(855): [client 192.168.99.1:52790] AH01384: Zlib: Compressed 3878 to 985 : URL /js/wealth-distribution.js, referer: http://192.168.99.100/
+[Fri Nov 17 19:31:32.606304 2017] [authz_core:debug] [pid 16] mod_authz_core.c(809): [client 192.168.99.1:52790] AH01626: authorization result of Require all granted: granted, referer: http://192.168.99.100/
+[Fri Nov 17 19:31:32.606547 2017] [authz_core:debug] [pid 16] mod_authz_core.c(809): [client 192.168.99.1:52790] AH01626: authorization result of <RequireAny>: granted, referer: http://192.168.99.100/
+[Fri Nov 17 19:31:32.608031 2017] [deflate:debug] [pid 16] mod_deflate.c(855): [client 192.168.99.1:52790] AH01384: Zlib: Compressed 4492 to 1256 : URL /js/top-accounts.js, referer: http://192.168.99.100/
+[Fri Nov 17 19:31:32.612495 2017] [authz_core:debug] [pid 16] mod_authz_core.c(809): [client 192.168.99.1:52790] AH01626: authorization result of Require all granted: granted, referer: http://192.168.99.100/
+[Fri Nov 17 19:31:32.612562 2017] [authz_core:debug] [pid 16] mod_authz_core.c(809): [client 192.168.99.1:52790] AH01626: authorization result of <RequireAny>: granted, referer: http://192.168.99.100/
+[Fri Nov 17 19:31:32.613923 2017] [deflate:debug] [pid 16] mod_deflate.c(855): [client 192.168.99.1:52790] AH01384: Zlib: Compressed 4273 to 1448 : URL /js/index.js, referer: http://192.168.99.100/
+[Fri Nov 17 19:31:32.747235 2017] [authz_core:debug] [pid 16] mod_authz_core.c(809): [client 192.168.99.1:52790] AH01626: authorization result of Require all granted: granted, referer: http://192.168.99.100/
+[Fri Nov 17 19:31:32.747362 2017] [authz_core:debug] [pid 16] mod_authz_core.c(809): [client 192.168.99.1:52790] AH01626: authorization result of <RequireAny>: granted, referer: http://192.168.99.100/
+[Fri Nov 17 19:31:32.748276 2017] [authz_core:debug] [pid 16] mod_authz_core.c(809): [client 192.168.99.1:52790] AH01626: authorization result of Require all granted: granted, referer: http://192.168.99.100/
+[Fri Nov 17 19:31:32.748390 2017] [authz_core:debug] [pid 16] mod_authz_core.c(809): [client 192.168.99.1:52790] AH01626: authorization result of <RequireAny>: granted, referer: http://192.168.99.100/
+[Fri Nov 17 19:31:32.789631 2017] [authz_core:debug] [pid 16] mod_authz_core.c(809): [client 192.168.99.1:52790] AH01626: authorization result of Require all granted: granted, referer: http://192.168.99.100/
+[Fri Nov 17 19:31:32.789695 2017] [authz_core:debug] [pid 16] mod_authz_core.c(809): [client 192.168.99.1:52790] AH01626: authorization result of <RequireAny>: granted, referer: http://192.168.99.100/
+[Fri Nov 17 19:31:32.790077 2017] [authz_core:debug] [pid 16] mod_authz_core.c(809): [client 192.168.99.1:52790] AH01626: authorization result of Require all granted: granted, referer: http://192.168.99.100/
+[Fri Nov 17 19:31:32.790122 2017] [authz_core:debug] [pid 16] mod_authz_core.c(809): [client 192.168.99.1:52790] AH01626: authorization result of <RequireAny>: granted, referer: http://192.168.99.100/

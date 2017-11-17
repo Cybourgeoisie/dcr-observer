@@ -50,15 +50,20 @@ function pullWealthDistribution(callback) {
 	});
 }
 
-function pullWealthDistributionNetworks() {
-	var $distrib_table = $('.table-distribution-hd');
-	var $distrib_tbody = $distrib_table.find('tbody');
-	var $distrib_row = $distrib_table.find('tr:last').clone(false);
-
-	// Clear the existing data
-	$distrib_tbody.html('');
-
+function pullWealthDistributionNetworks(callback) {
 	$.getJSON("./data/wealth_distribution_networks.json", function(data) {
+		// Handle callbacks
+		if (callback && typeof callback === 'function') {
+			callback.call(this);
+		}
+
+		var $distrib_table = $('.table-distribution-hd');
+		var $distrib_tbody = $distrib_table.find('tbody');
+		var $distrib_row = $distrib_table.find('tr:last').clone(false);
+
+		// Clear the existing data
+		$distrib_tbody.html('');
+
 		// Pull the total supply
 		var bins      = data.bins;
 		var counts    = data.counts;

@@ -66,15 +66,20 @@ function pullTopAddresses(callback) {
 	});
 }
 
-function pullTopNetworks() {
-	var $top_networks_table = $('.table-networks');
-	var $top_networks_tbody = $top_networks_table.find('tbody');
-	var $top_networks_row = $top_networks_table.find('tr:last').clone(true);
-
-	// Clear the existing data
-	$top_networks_tbody.html('');
-
+function pullTopNetworks(callback) {
 	$.getJSON("./data/top_500_networks_list.json", function(data) {
+		// Handle callbacks
+		if (callback && typeof callback === 'function') {
+			callback.call(this);
+		}
+
+		var $top_networks_table = $('.table-networks');
+		var $top_networks_tbody = $top_networks_table.find('tbody');
+		var $top_networks_row = $top_networks_table.find('tr:last').clone(true).show();
+
+		// Clear the existing data
+		$top_networks_tbody.html('');
+
 		// Pull the total supply
 		var total_dcr = data.total_dcr;
 

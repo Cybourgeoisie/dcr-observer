@@ -47,6 +47,10 @@ function handleNavigation(uri_hash) {
 		pullTopAddresses(function() { showPage('home'); });
 	} else if (uri == 'dist') {
 		pullWealthDistribution(function() { showPage('dist'); });
+	} else if (uri == 'top-hd') {
+		pullTopNetworks(function() { showPage('top-hd'); });
+	} else if (uri == 'dist-hd') {
+		pullWealthDistributionNetworks(function() { showPage('dist-hd'); });
 	} else {
 		showPage(uri);
 	}
