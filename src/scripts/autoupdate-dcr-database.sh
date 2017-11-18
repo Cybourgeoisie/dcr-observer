@@ -15,5 +15,5 @@ rm /home/ec2-user/dcr-rich-list/src/translator/sql_data/latest_blocks.sql;
 # Import the blocks into postgres
 /usr/bin/psql -d dcr-audit -U r9e43vzs5efe32gm -f /home/ec2-user/dcr-rich-list/src/translator/sql_data/latest_blocks.sql -q;
 
-# Now we update the balance
-
+# Now we update the database balances
+/usr/bin/psql -d dcr-audit -U r9e43vzs5efe32gm -f /home/ec2-user/dcr-rich-list/src/sql/scripts/update_with_latest_blocks.sql -q;

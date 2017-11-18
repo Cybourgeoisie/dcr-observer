@@ -20,6 +20,7 @@ CREATE TABLE "balance" (
 );
 
 CREATE INDEX balance_rank_idx ON balance (rank);
+CREATE INDEX balance_balance_idx ON balance (balance);
 CREATE INDEX balance_address_id_idx ON balance (address_id);
 CREATE INDEX balance_first_block_id_idx ON balance (first_block_id);
 CREATE INDEX balance_last_block_id_idx ON balance (last_block_id);
