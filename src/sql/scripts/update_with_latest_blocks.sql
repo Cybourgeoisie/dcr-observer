@@ -202,10 +202,13 @@ SET
   rank = sq.rank
 FROM (
   SELECT
-    address_id,
-    RANK() OVER(ORDER BY "balance" DESC) AS rank
+    b.address_id,
+    RANK() OVER(ORDER BY b.balance DESC) AS rank
   FROM
-    balance
+    balance b, database_blockchain_state dbs
+  WHERE
+    dbs.database_blockchain_state_id = 1 AND
+    (b.balance > 0 OR b.last_block_id > dbs.last_block_id)
 ) AS sq
 WHERE
   balance.address_id = sq.address_id;

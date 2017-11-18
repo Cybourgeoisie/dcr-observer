@@ -9,9 +9,9 @@ X Top 500 addresses
 X Wealth distribution by address
 X Address details page: rank, balance, in/out, staking, first & last activity
 X Update database with new block information
-- Perform safe database updates on new blocks
-- Top 500 HD wallets
-- Wealth distribution by HD wallet
+X Perform safe database updates on new blocks
+- Top 500 HD wallets from DB
+- Wealth distribution by HD wallet from DB
 - Additional address details: List all addresses linked together, and from which transactions (HD)
 - Add identifiers to addresses for developer fund, exchanges, miners, & stakepools
 - Historical snapshots of rich list & wealth distribution (slider)
@@ -19,3 +19,4 @@ X Update database with new block information
 - Flag addresses that are actively staking
 - Voting Distribution Page: show distribution of voters' tickets & relative influence that their tickets have on vote outcome (onchain)
 - Mobile-friendly UI
+- Optimize database updates
