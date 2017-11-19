@@ -36,7 +36,9 @@ body {
 .table-distribution td,
 .table-distribution th,
 .table-distribution-hd td,
-.table-distribution-hd th {
+.table-distribution-hd th,
+.table-hd-addresses td,
+.table-hd-addresses th {
 	font-size:80%;
 }
 

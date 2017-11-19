@@ -54,6 +54,122 @@ class Address extends \Scrollio\Service\AbstractService
 		);
 	}
 
+	public function getHdDetails(string $address) {
+		// Validate the address
+		$address = preg_replace("/[^A-Za-z0-9]/", '', $address);
+		if (strlen($address) < 34 || strlen($address) > 36 || $address[0] != 'D')
+		{
+			throw new \Exception('Invalid address provided.');
+		}
+
+		$sql = '
+			SELECT 
+				a.address,
+				a.identifier,
+				ba.balance,
+				tx.hash AS tx_hash,
+				COALESCE(ba.tx, 0)    AS "tx",
+				COALESCE(ba.stx, 0)   AS "stx",
+				COALESCE(ba.vout, 0)  AS "vout",
+				COALESCE(ba.vin, 0)   AS "vin",
+				COALESCE(ba.svout, 0) AS "svout",
+				COALESCE(ba.svin, 0)  AS "svin",
+				EXTRACT(EPOCH FROM bs.time) AS "start",
+				EXTRACT(EPOCH FROM be.time) AS "end",
+				bs.height AS first,
+				be.height AS last
+			FROM (
+				SELECT
+					DISTINCT va_other.address_id,
+					MIN(vin.tx_id) AS tx_id
+				FROM
+					vout_address va_this
+				JOIN
+					vin ON vin.vout_id = va_this.vout_id
+				JOIN
+					vin vin_other ON vin_other.tx_id = vin.tx_id
+				JOIN
+					vout_address va_other ON 
+						va_other.vout_id = vin_other.vout_id
+				JOIN
+					address a ON a.address_id = va_this.address_id
+				WHERE
+					a.address = $1
+				GROUP BY
+					va_other.address_id
+			) AS sq
+			JOIN
+				balance ba ON ba.address_id = sq.address_id
+			JOIN
+				address a ON a.address_id = ba.address_id
+			JOIN
+				block bs ON bs.block_id = ba.first_block_id
+			JOIN
+				block be ON be.block_id = ba.last_block_id
+			JOIN
+				tx ON tx.tx_id = sq.tx_id
+			ORDER BY
+				balance DESC;
+		';
+		$db_handler = \Geppetto\DatabaseHandler::init();
+		$res = $db_handler->query($sql, array($address));
+
+		if (empty($res) || !array_key_exists(0, $res) || !array_key_exists('address', $res[0])) {
+			$lone_address_info = self::getDetails($address);
+			return array(
+				'count' => 1,
+				'addresses' => array($lone_address_info['addr_info'])
+			);
+		}
+
+		return array(
+			'count' => count($res),
+			'addresses' => $res
+		);
+	}
+
+	public function getImmediateNetwork(string $address) {
+		// Validate the address
+		$address = preg_replace("/[^A-Za-z0-9]/", '', $address);
+		if (strlen($address) < 34 || strlen($address) > 36 || $address[0] != 'D')
+		{
+			throw new \Exception('Invalid address provided.');
+		}
+
+		$sql = '
+			SELECT
+				DISTINCT va_other.address_id
+			FROM
+				vout_address va_this
+			JOIN
+				vin ON vin.vout_id = va_this.vout_id
+			JOIN
+				vin vin_other ON vin_other.tx_id = vin.tx_id
+			JOIN
+				vout_address va_other ON 
+					va_other.vout_id = vin_other.vout_id
+			JOIN
+				address a ON a.address_id = va_this.address_id
+			WHERE
+				a.address = $1
+			GROUP BY
+				va_other.address_id;
+		';
+		$db_handler = \Geppetto\DatabaseHandler::init();
+		$res = $db_handler->query($sql, array($address));
+
+		if (empty($res) || !array_key_exists(0, $res) || !array_key_exists('address_id', $res[0])) {
+			return array(
+				'network_size' => 0
+			);
+		}
+
+		return array(
+			'network_size' => count($res),
+			'network' => $res
+		);
+	}
+
 	public function getTop()
 	{
 		$sql = '

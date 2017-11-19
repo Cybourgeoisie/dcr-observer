@@ -9,6 +9,7 @@ var address_map = {}, network_map = {};
 //var savefile  = 'address_map.all.json';
 var blockdir  = '../../../blocks/';
 var savefile  = '../../../address_map.all.json';
+var network_savefile  = '../../../address_network.json';
 
 // If we have a save state, use it
 fs.exists(savefile, function(exists) {
@@ -62,6 +63,7 @@ function collectCurrentAddressValues(next_block_height) {
 	calculateRichListAndWealthDistribution();
 	collectNetworks();
 	calculateNetworkRichListAndWealthDistribution();
+	saveNetworks();
 
 	// Then save the rest
 	// Doesn't work as intended, so don't bother right now
@@ -385,6 +387,17 @@ function collectNetworks() {
 			network_map[network_id].lgst_addr = address;
 		}
 	}
+}
+
+function saveNetworks() {
+	// Reduce the address map to networks
+	// We use the same array to save space
+	for (var address in address_map) {
+		address_map[address] = address_map[address].nw;
+	}
+
+	// Save the file
+	fs.writeFileSync(network_savefile, JSON.stringify(address_map));
 }
 
 function calculateNetworkRichListAndWealthDistribution() {

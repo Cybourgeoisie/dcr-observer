@@ -288,6 +288,18 @@
 						<span class="addr-total-out">X</span> DCR
 					</div>
 				</div>
+				<div class="row">
+					<div class="col-6 text-right" style="font-weight:bold;">
+						Address Network
+					</div>
+					<div class="col-6 text-left" style="color:rgba(0,0,0,.5);">
+						<span class="addr-est-wallet-loading"><i class="fa fa-spinner fa-spin fa-fw"></i></span>
+						<span class="addr-est-wallet-none">None found</span>
+						<span class="addr-est-wallet" style="display:none;">
+							<a class="page-toggle" href="#hd-addr">X addresses</a>
+						</span>
+					</div>
+				</div>
 			</div>
 			<br />
 
@@ -389,6 +401,98 @@
 				</tbody>
 			</table>
 			-->
+
+		</div>
+
+		<!-- HD Wallet Page -->
+		<div class="dcr-page dcr-page-hd-addr address-body" style="display:none;">
+			<h2 class="d-none d-md-block d-l-block d-xl-block">
+				<small>HD Wallet:</small><br />
+				<span class="hd-top-address">Ds</span>
+			</h2>
+
+			<h6 class="d-block d-md-none d-l-none d-xl-none">
+				<big>HD Wallet:</big><br />
+				<span class="hd-top-address">Ds</span>
+			</h6>
+
+			<p class="lead">
+				Current Balance: <span class="hd-balance">X</span> DCR
+			</p>
+
+			<h5>Wallet Overview</h5>
+
+			<div class="container">
+				<div class="row">
+					<div class="col-6 text-right" style="font-weight:bold;">
+						Current Balance
+					</div>
+					<div class="col-6 text-left" style="color:rgba(0,0,0,.5);">
+						<span class="hd-balance">X</span> DCR
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-6 text-right" style="font-weight:bold;">
+						USD Value
+					</div>
+					<div class="col-6 text-left" style="color:rgba(0,0,0,.5);">
+						<span class="hd-fiat-value"></span>
+					</div>
+				</div>
+
+				<div class="row">
+					<div class="col-6 text-right" style="font-weight:bold;">
+						Total Received
+					</div>
+					<div class="col-6 text-left" style="color:rgba(0,0,0,.5);">
+						<span class="hd-total-in">X</span> DCR
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-6 text-right" style="font-weight:bold;">
+						Total Sent
+					</div>
+					<div class="col-6 text-left" style="color:rgba(0,0,0,.5);">
+						<span class="hd-total-out">X</span> DCR
+					</div>
+				</div>
+			</div>
+			<br />
+
+
+			<h5>Addresses</h5>
+
+			<table class="table table-hover table-hd-addresses">
+				<thead>
+					<tr>
+						<th>Row</th>
+						<th>Address</th>
+						<th>Balance</th>
+						<th>Shared TX</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr>
+						<th scope="row"></th>
+						<td class="hd-addr-address">
+							<a class="page-toggle" href="#addr">X</a>
+							<small>
+								<span class="badge badge-pill badge-info hd-badge-address-identifier" style="vertical-align:text-top;display:none;">
+									<span class="hd-addr-identifier"></span>
+								</span>
+							</small>
+						</td>
+						<td class="hd-addr-balance">X</td>
+						<td class="hd-addr-tx-link"><a href="#" target="blank">View</a></td>
+					</tr>
+				</tbody>
+			</table>
+
+			<p class="lead" style="text-align:center;">
+				<a class="btn btn-success my-2 my-sm-0 page-toggle" role="button" href="#home">
+					Back to Ranking
+				</a>
+			</p>
 
 		</div>
 

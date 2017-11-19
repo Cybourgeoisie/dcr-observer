@@ -1,5 +1,5 @@
 // Configuration
-var valid_uri_hashes = ['home', 'top-hd', 'dist', 'dist-hd', 'addr'];
+var valid_uri_hashes = ['home', 'top-hd', 'dist', 'dist-hd', 'addr', 'hd-addr'];
 var dcr_price = 30.0;
 var total_dcr = 7000000;
 var current_block_height = 190000;
@@ -49,6 +49,8 @@ function handleNavigation(uri_hash) {
 	// If we're viewing an address, pass along to the address page
 	if (uri == 'addr' && uri_param && uri_param.length) {
 		loadAddressInfo(uri_param, function() { showPage('addr'); });
+	} else if (uri == 'hd-addr' && uri_param && uri_param.length) {
+		loadHdAddressInfo(uri_param, function() { showPage('hd-addr'); });
 	} else if (uri == 'home') {
 		pullTopAddresses(function() { showPage('home'); });
 	} else if (uri == 'dist') {
@@ -101,6 +103,16 @@ function loadAddressInfo(address, callback) {
 	$.post('api/Address/getDetails', { 'address' : address })
 	 .done(function(data) {
 	 	if (data.hasOwnProperty('success') && data.success) {
+			$('span.addr-est-wallet-loading').show();
+			$('span.addr-est-wallet-none').hide();
+			$('span.addr-est-wallet').hide();
+	 		$.post('api/Address/getImmediateNetwork', { 'address' : address })
+	 		.done(function(data) {
+	 			if (data.hasOwnProperty('success') && data.success) {
+	 				setAddressNetwork(data, address);
+				}
+			});
+
 	 		setAddressInfo(data.addr_info);
 	 		if (callback && typeof callback === 'function') {
 	 			callback.call(this, data.addr_info);	 			
@@ -138,4 +150,90 @@ function setAddressInfo(addr_info) {
 		$('.dcr-badge-address-identifier').show();
 		$('span.addr-identifier').html(addr_info.identifier);
 	}
+}
+
+function setAddressNetwork(network_info, address) {
+	$('span.addr-est-wallet-loading').hide();
+	$('span.addr-est-wallet-none').hide();
+	$('span.addr-est-wallet').hide();
+
+	// Report the count
+	if (network_info && network_info.network_size && parseInt(network_info.network_size) > 1) {
+		$('span.addr-est-wallet').show();
+		$('span.addr-est-wallet > a').attr('href', '#hd-addr=' + address).html(parseInt(network_info.network_size) + '+ addresses');
+	} else {
+		$('span.addr-est-wallet-none').show();
+	}
+}
+
+function loadHdAddressInfo(address, callback) {
+	$.post('api/Address/getHdDetails', { 'address' : address })
+	 .done(function(data) {
+	 	if (data.hasOwnProperty('success') && data.success) {
+	 		setHdAddressInfo(data.addresses, address);
+	 		if (callback && typeof callback === 'function') {
+	 			callback.call(this, data.addresses);	 			
+	 		}
+	 	}
+	});
+}
+
+function setHdAddressInfo(hd_addresses, req_address) {
+	// Set the current requested address
+	$('.hd-top-address').html(req_address);
+
+	// Get the DOM elements we're modifying
+	var $hd_address_table = $('.table-hd-addresses');
+	var $hd_address_tbody = $hd_address_table.find('tbody');
+	var $hd_address_row = $hd_address_table.find('tr:last').clone(true).show();
+
+	// Clear the existing data
+	$hd_address_tbody.html('');
+
+	// Collect the cumulative information
+	var total_balance = 0, total_received = 0, total_sent = 0
+	for (var i = 0; i < hd_addresses.length; i++) {
+		total_balance  += parseFloat(hd_addresses[i].balance);
+		total_received += parseFloat(hd_addresses[i].vout);
+		total_sent     += parseFloat(hd_addresses[i].vin);
+
+		// Get local information
+		var address    = hd_addresses[i].address;
+		var balance    = hd_addresses[i].balance;
+		var identifier = hd_addresses[i].identifier;
+		var tx_hash    = hd_addresses[i].tx_hash;
+
+		// Add a row
+		var $new_row = $hd_address_row.clone(true);
+		$new_row.find('th').html(i+1);
+		$new_row.find('td.hd-addr-address > a').html(address).data('address', address).attr('href', '#addr=' + address);
+		$new_row.find('td.hd-addr-balance').html(parseInt(balance).toLocaleString() + ' DCR');
+
+		if (req_address != address) {
+			$new_row.find('td.hd-addr-tx-link > a').attr('href', 'https://explorer.dcrdata.org/explorer/tx/' + tx_hash).html('View');
+		} else {
+			$new_row.find('td.hd-addr-tx-link > a').html('');
+		}
+
+		// If the address has an identifier, display it
+		$new_row.find('.hd-badge-address-identifier').hide();
+		$new_row.find('.hd-addr-identifier').html('');
+		if (hd_addresses[i].hasOwnProperty('identifier') && identifier) {
+			$new_row.find('.hd-badge-address-identifier').show();
+			$new_row.find('.hd-addr-identifier').html(identifier);
+		}
+
+		// Only display first 10 addresses by default
+		//if (i >= 10) {
+		//	$new_row.hide();
+		//}
+
+		$hd_address_tbody.append($new_row);
+	}
+
+	// Set cumulative information
+	$('.hd-balance').html(total_balance.toLocaleString());
+	$('.hd-fiat-value').html('$' + parseInt(parseFloat(total_balance)*dcr_price).toLocaleString());
+	$('.hd-total-in').html(total_received.toLocaleString());
+	$('.hd-total-out').html(total_sent.toLocaleString());
 }

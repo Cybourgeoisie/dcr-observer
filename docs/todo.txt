@@ -24,3 +24,4 @@ X Perform safe database updates on new blocks
 - Voting Distribution Page: show distribution of voters' tickets & relative influence that their tickets have on vote outcome (onchain)
 - Mobile-friendly UI
 - Optimize database updates
+- Fix bug with balance calculations
