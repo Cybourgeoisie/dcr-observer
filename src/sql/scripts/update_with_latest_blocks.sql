@@ -219,6 +219,19 @@ WHERE
 
 COMMIT;
 
+-- Now the fat boy
+BEGIN;
+
+UPDATE database_blockchain_state SET total_dcr = total_dcr + COALESCE(sq.sum, 0)
+FROM (
+  SELECT SUM(COALESCE(amountin, 0))
+  FROM database_blockchain_state dbs
+  JOIN vin ON vin.vin_id > dbs.last_vin_id
+  WHERE (coinbase != '' OR stakebase != '') AND dbs.database_blockchain_state_id = 1
+) AS sq;
+
+COMMIT;
+
 
 -- Lastly, update the state
 BEGIN;
@@ -240,18 +253,5 @@ FROM (SELECT address_id FROM address ORDER BY address_id DESC LIMIT 1) AS sq;
 
 UPDATE database_blockchain_state SET last_vout_address_id = sq.vout_address_id
 FROM (SELECT vout_address_id FROM vout_address ORDER BY vout_address_id DESC LIMIT 1) AS sq;
-
-COMMIT;
-
-BEGIN;
-
--- Now the fat boy
-UPDATE database_blockchain_state SET total_dcr = total_dcr + COALESCE(sq.sum, 0)
-FROM (
-  SELECT SUM(COALESCE(amountin, 0))
-  FROM database_blockchain_state dbs
-  JOIN vin ON vin.vin_id > dbs.last_vin_id
-  WHERE (coinbase != '' OR stakebase != '') AND dbs.database_blockchain_state_id = 1
-) AS sq;
 
 COMMIT;

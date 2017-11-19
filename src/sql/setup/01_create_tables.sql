@@ -54,6 +54,7 @@ CREATE TABLE "vout" (
 );
 
 -- CREATE INDEX vout_tx_id_key ON vout (tx_id);
+-- CREATE INDEX vout_type_key ON vout (type);
 
 -- ALTER TABLE vout DROP CONSTRAINT vout_key_key;
 -- CREATE INDEX vout_key_key ON vout (key);

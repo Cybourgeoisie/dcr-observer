@@ -9,7 +9,7 @@ var address_map = {}, network_map = {};
 //var savefile  = 'address_map.all.json';
 var blockdir  = '../../../blocks/';
 var savefile  = '../../../address_map.all.json';
-var network_savefile  = '../../../address_network.json';
+//var network_savefile  = '../../../address_network.json';
 
 // If we have a save state, use it
 fs.exists(savefile, function(exists) {
@@ -63,7 +63,7 @@ function collectCurrentAddressValues(next_block_height) {
 	calculateRichListAndWealthDistribution();
 	collectNetworks();
 	calculateNetworkRichListAndWealthDistribution();
-	saveNetworks();
+	//saveNetworks();
 
 	// Then save the rest
 	// Doesn't work as intended, so don't bother right now
@@ -117,6 +117,9 @@ function balanceTransactionsAtBlock(height) {
 		for (var i = 0; i < rawtxes.length; i++) {
 			// Get information about the transaction
 			var tx = rawtxes[i];
+
+			// Make sure we only add new txes once
+			var this_tx_address_updates = [];
 
 			// Get the incoming amounts
 			var connected_addresses = [];
@@ -179,10 +182,15 @@ function balanceTransactionsAtBlock(height) {
 					address_map[address].val  -= tx.vin[j].amountin;
 					address_map[address].out  += tx.vin[j].amountin;
 					address_map[address].sout += (tree_branch === 1) ? tx.vin[j].amountin : 0;
-					address_map[address].tx   += 1;
-					address_map[address].stx  += (tree_branch === 1) ? 1 : 0;
 					address_map[address].last  = height;
 					address_map[address].end   = block.time;
+
+					// See if we already updated the address for this TX
+					if (this_tx_address_updates.indexOf(address) === -1) {
+						address_map[address].tx   += 1;
+						address_map[address].stx  += (tree_branch === 1) ? 1 : 0;
+						this_tx_address_updates.push(address);
+					}
 				} else {
 					console.log("ERROR: Could not find address (" + address + ") " + blockheight + "->" + blockindex + "->" + voutindex);
 					console.log("Currently on " + height + "->" + i);
@@ -190,12 +198,20 @@ function balanceTransactionsAtBlock(height) {
 				}
 			}
 
-			// For all incoming addresses, connect them by the first one
+			// For all incoming addresses, connect them by the minimum network
 			var first_network;
 			if (connected_addresses.length > 0) {
 				first_network = address_map[connected_addresses[0]].nw;
 
+				// Pick the lowest network ID
 				for (var ca_idx = 1; ca_idx < connected_addresses.length; ca_idx++) {
+					if (first_network > address_map[connected_addresses[ca_idx]].nw) {
+						first_network = address_map[connected_addresses[ca_idx]].nw;
+					}
+				}
+
+				// Now set them all to the primary network
+				for (var ca_idx = 0; ca_idx < connected_addresses.length; ca_idx++) {
 					address_map[connected_addresses[ca_idx]].nw = first_network;
 				}
 			}
@@ -229,10 +245,15 @@ function balanceTransactionsAtBlock(height) {
 						address_map[address].val  += tx.vout[j].value;
 						address_map[address].in   += tx.vout[j].value;
 						address_map[address].sin  += (tree_branch === 1) ? tx.vout[j].value : 0;
-						address_map[address].tx   += 1;
-						address_map[address].stx  += (tree_branch === 1) ? 1 : 0;
 						address_map[address].last  = height;
 						address_map[address].end   = block.time;
+
+						// See if we already updated the address for this TX
+						if (this_tx_address_updates.indexOf(address) === -1) {
+							address_map[address].tx   += 1;
+							address_map[address].stx  += (tree_branch === 1) ? 1 : 0;
+							this_tx_address_updates.push(address);
+						}
 					}
 				}
 			}

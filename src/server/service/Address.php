@@ -138,7 +138,7 @@ class Address extends \Scrollio\Service\AbstractService
 
 		$sql = '
 			SELECT
-				DISTINCT va_other.address_id
+				COUNT(DISTINCT va_other.address_id)
 			FROM
 				vout_address va_this
 			JOIN
@@ -151,22 +151,19 @@ class Address extends \Scrollio\Service\AbstractService
 			JOIN
 				address a ON a.address_id = va_this.address_id
 			WHERE
-				a.address = $1
-			GROUP BY
-				va_other.address_id;
+				a.address = $1;
 		';
 		$db_handler = \Geppetto\DatabaseHandler::init();
 		$res = $db_handler->query($sql, array($address));
 
-		if (empty($res) || !array_key_exists(0, $res) || !array_key_exists('address_id', $res[0])) {
+		if (empty($res) || !array_key_exists(0, $res) || !array_key_exists('count', $res[0])) {
 			return array(
-				'network_size' => 0
+				'network_size' => 1
 			);
 		}
 
 		return array(
-			'network_size' => count($res),
-			'network' => $res
+			'network_size' => $res[0]['count']
 		);
 	}
 

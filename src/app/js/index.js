@@ -81,8 +81,8 @@ function setEvents() {
 	// Find all internal links, bind to handle navigation
 	$('a.page-toggle').click(function(event) {
 		//event.preventDefault();
-		var uri_hash = $(this).attr('href').substr(1);
-		handleNavigation.call(this, uri_hash);
+		//var uri_hash = $(this).attr('href').substr(1);
+		//handleNavigation.call(this, uri_hash);
 	});
 
 	// Hash change - change page
