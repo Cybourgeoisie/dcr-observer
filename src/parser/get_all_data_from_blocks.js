@@ -4,14 +4,16 @@ var fs = require('fs');
 // Get all top addresses
 var total_dcr = 0;
 var address_count = 0, network_count = 0;
-var address_map = {}, network_map = {};
+var address_map = {}, network_map = {}, identifiers = {};
 //var blockdir = './blocks/';
 //var savefile  = 'address_map.all.json';
 var blockdir  = '../../../blocks/';
 var savefile  = '../../../address_map.all.json';
+var identifier_file = './data/identifiers.json';
 //var network_savefile  = '../../../address_network.json';
 
-var b_create_historical_snapshots = true;
+var b_create_historical_snapshots = false;
+var b_testing_only = false;
 
 // If we have a save state, use it
 fs.exists(savefile, function(exists) {
@@ -27,29 +29,48 @@ fs.exists(savefile, function(exists) {
 				// Pull the save state and restore
 				address_map = JSON.parse(data);
 
-				// Pull the height
-				var next_height = 1;
-				if (address_map.hasOwnProperty('next_height')) {
-					next_height = address_map.next_height;
+				// Pull the last height that we visited, total_dcr, account counts
+				var last_height = 0;
+				if (address_map.hasOwnProperty('last_height')) {
+					last_height = address_map.last_height;
+				}
+
+				if (address_map.hasOwnProperty('total_dcr')) {
+					total_dcr = address_map.total_dcr;
+				}
+
+				if (address_map.hasOwnProperty('address_count')) {
+					address_count = address_map.address_count;
 				}
 
 				// Report save information
-				console.log("Starting at height " + next_height + ".");
+				console.log("Starting at height " + (last_height+1) + ".");
 
 				// Now collect current address values
-				collectCurrentAddressValues(next_height);
+				collectCurrentAddressValues(last_height+1);
 			}
 		});
 	}
 });
 
 function collectCurrentAddressValues(next_block_height) {
+	// First get the identifiers for various addresses
+	if (!fs.existsSync(identifier_file)) {
+		return null;
+	}
+
+	// Collect all transactions
+	var identifiers_json = fs.readFileSync(identifier_file);
+	identifiers = JSON.parse(identifiers_json);
+
 	if (!next_block_height) {
 		next_block_height = 1;
 	}
 
 	var current_block_height = next_block_height;
 	while (next_block_height) {
+		current_block_height = next_block_height;
+
 		if (next_block_height%10000==0) {
 			console.log("hrtbt@" + next_block_height + " & " + current_block_height);
 			if (b_create_historical_snapshots) {
@@ -62,11 +83,17 @@ function collectCurrentAddressValues(next_block_height) {
 			//process.exit();
 		}
 
-		current_block_height = next_block_height;
 		next_block_height = balanceTransactionsAtBlock(next_block_height);
+
+		if (b_testing_only) {
+			if (current_block_height%1000==0 || current_block_height%6199==0) {
+				console.log("Testing save files for valid states.")
+				break;
+			}
+		}
 	}
 
-	console.log("Reached end. Total DCR in circulation: " + total_dcr);
+	console.log("Reached end at block " + current_block_height + ". Total DCR in circulation: " + total_dcr);
 
 	// First, calculate the rich list and wealth distribution at this snapshot
 	calculateRichListAndWealthDistribution();
@@ -74,17 +101,18 @@ function collectCurrentAddressValues(next_block_height) {
 	calculateNetworkRichListAndWealthDistribution();
 	//saveNetworks();
 
-	// Then save the rest
-	// Doesn't work as intended, so don't bother right now
-	//saveProgress(current_block_height+1);
+	// Save the current address state
+	saveProgress(current_block_height);
 }
 
-function saveProgress(next_height) {
-	// Store the height to the map
+function saveProgress(last_height) {
+	// Store the incremented variables to the savefile
 	// We save directly to the map for two reasons:
 	// (1) Guarantee of no collision
 	// (2) address_map is too large to copy into another object
-	address_map.next_height = next_height;
+	address_map.last_height   = last_height;
+	address_map.total_dcr     = total_dcr;
+	address_map.address_count = address_count;
 
 	// Save our current state
 	fs.writeFileSync(savefile, JSON.stringify(address_map));
@@ -248,6 +276,11 @@ function balanceTransactionsAtBlock(height) {
 								'end'   : block.time,
 								'nw'    : ++address_count // Network
 							};
+
+							// If this address has a known identifier, attach it
+							if (identifiers.hasOwnProperty(address)) {
+								address_map[address].identifier = identifiers[address];
+							}
 						}
 
 						// Add the value sent to the address
@@ -344,6 +377,9 @@ function calculateRichListAndWealthDistribution(height) {
 		// Ignore all 0 and dust wallets
 		if (address_map[address].val <= 0.00000001) { continue; }
 		addresses.push([address, address_map[address].val]);
+		if (address_map[address].hasOwnProperty('identifier')) {
+			addresses[addresses.length-1].push(address_map[address].identifier);
+		}
 	}
 
 	// Notification
@@ -449,7 +485,11 @@ function calculateNetworkRichListAndWealthDistribution(height) {
 	for (var network_id in network_map) {
 		// Ignore all 0 and dust wallets
 		if (network_map[network_id].val > 0.00000001) {
-			networks.push([network_id, network_map[network_id].val, network_map[network_id].addr_count, network_map[network_id].lgst_addr]);			
+			networks.push([network_id, network_map[network_id].val, network_map[network_id].addr_count, network_map[network_id].lgst_addr]);
+
+			if (address_map[network_map[network_id].lgst_addr].hasOwnProperty('identifier')) {
+				networks[networks.length-1].push(address_map[network_map[network_id].lgst_addr].identifier);
+			}
 		}
 	}
 

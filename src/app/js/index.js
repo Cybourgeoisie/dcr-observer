@@ -207,7 +207,7 @@ function setHdAddressInfo(hd_addresses, req_address) {
 		var $new_row = $hd_address_row.clone(true);
 		$new_row.find('th').html(i+1);
 		$new_row.find('td.hd-addr-address > a').html(address).data('address', address).attr('href', '#addr=' + address);
-		$new_row.find('td.hd-addr-balance').html(parseInt(balance).toLocaleString() + ' DCR');
+		$new_row.find('td.hd-addr-balance').html(parseFloat(balance).toLocaleString() + ' DCR');
 
 		if (req_address != address) {
 			$new_row.find('td.hd-addr-tx-link > a').attr('href', 'https://explorer.dcrdata.org/explorer/tx/' + tx_hash).html('View');
@@ -224,12 +224,22 @@ function setHdAddressInfo(hd_addresses, req_address) {
 		}
 
 		// Only display first 10 addresses by default
-		//if (i >= 10) {
-		//	$new_row.hide();
-		//}
+		if (i >= 10) {
+			$new_row.hide();
+		}
 
 		$hd_address_tbody.append($new_row);
 	}
+
+	// Allow user to see more
+	// Reset the "show all" button
+	$('button.show-all-hd').removeAttr('disabled').html('Show All Addresses');
+
+	// Set the "show all" button to do something
+	$('button.show-all-hd').click(function(event) {
+		$('.table-hd-addresses tr').show();
+		$('button.show-all-hd').attr("disabled", "disabled").html('Showing All Addresses');
+	});
 
 	// Set cumulative information
 	$('.hd-balance').html(total_balance.toLocaleString());

@@ -108,6 +108,8 @@ class Address extends \Scrollio\Service\AbstractService
 				block be ON be.block_id = ba.last_block_id
 			JOIN
 				tx ON tx.tx_id = sq.tx_id
+			WHERE
+				balance > 0
 			ORDER BY
 				balance DESC;
 		';

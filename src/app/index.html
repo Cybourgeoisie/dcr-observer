@@ -134,7 +134,14 @@
 				<tbody>
 					<tr>
 						<th scope="row">1</th>
-						<td class="top-hd-td-top-address"><a class="page-toggle" href="#addr">X</a></td>
+						<td class="top-hd-td-top-address">
+							<a class="page-toggle" href="#addr">X</a>
+							<small>
+								<span class="badge badge-pill badge-info top-hd-td-badge-address-identifier" style="vertical-align:text-top;display:none;">
+									<span class="top-hd-td-addr-identifier"></span>
+								</span>
+							</small>
+						</td>
 						<td class="top-hd-td-balance">X DCR</td>
 						<td class="top-hd-td-percent">X%</td>
 						<td class="top-hd-td-num-addrs">X</td>
@@ -460,7 +467,7 @@
 			<br />
 
 
-			<h5>Addresses</h5>
+			<h5>Addresses*</h5>
 
 			<table class="table table-hover table-hd-addresses">
 				<thead>
@@ -489,10 +496,10 @@
 			</table>
 
 			<p class="lead" style="text-align:center;">
-				<a class="btn btn-success my-2 my-sm-0 page-toggle" role="button" href="#home">
-					Back to Ranking
-				</a>
+				<button class="btn btn-primary my-2 my-sm-0 show-all-hd">Show All Addresses</button>
 			</p>
+
+			<p><small>(*) To reduce strain on the database, zero-balance addresses are not yet shown.</small></p>
 
 		</div>
 

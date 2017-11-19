@@ -10,6 +10,7 @@ X Wealth distribution by address
 X Address details page: rank, balance, in/out, staking, first & last activity
 X Update database with new block information
 X Perform safe database updates on new blocks
+X Fix bug with balance calculations
 - Add identifiers to addresses for developer fund, exchanges, miners, & stakepools
 	X Developer Fund
 	X Miners
@@ -24,4 +25,3 @@ X Perform safe database updates on new blocks
 - Voting Distribution Page: show distribution of voters' tickets & relative influence that their tickets have on vote outcome (onchain)
 - Mobile-friendly UI
 - Optimize database updates
-- Fix bug with balance calculations

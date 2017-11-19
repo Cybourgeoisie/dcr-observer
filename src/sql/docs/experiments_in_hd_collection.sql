@@ -73,3 +73,21 @@ FROM
 WHERE
 	address in tx
 
+SELECT
+  va_other.address_id,
+  vin_other.tx_id
+FROM
+  vout_address va_this
+JOIN
+  vin ON vin.vout_id = va_this.vout_id
+JOIN
+  vin vin_other ON vin_other.tx_id = vin.tx_id
+JOIN
+  vout_address va_other ON va_other.vout_id = vin_other.vout_id AND va_other.address_id != va_this.address_id
+JOIN
+  address a ON a.address_id = va_this.address_id
+WHERE
+  a.address = 'DscEWp5Ez3SZKVXKVWFy5272eAcCri2eVYu';
+
+  a.address = 'Dsf9SCZdvQ8fEX91fyxjPYA4MkQuX9B63vR';
+--  a.address = 'DscEWp5Ez3SZKVXKVWFy5272eAcCri2eVYu';

@@ -115,6 +115,14 @@ function pullTopNetworks(callback) {
 			$new_row.find('td.top-hd-td-percent').html(pct + '%');
 			$new_row.find('td.top-hd-td-num-addrs').html(num_addrs);
 
+			// If the address has an identifier, display it
+			$new_row.find('.top-hd-td-badge-address-identifier').hide();
+			$new_row.find('.top-hd-td-addr-identifier').html('');
+			if (data.top[i].length > 4) {
+				$new_row.find('.top-hd-td-badge-address-identifier').show();
+				$new_row.find('.top-hd-td-addr-identifier').html(data.top[i][4]);
+			}
+
 			// Only display first 10 addresses by default
 			if (i >= 10) {
 				$new_row.hide();
