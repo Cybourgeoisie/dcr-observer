@@ -11,6 +11,8 @@ var blockdir  = '../../../blocks/';
 var savefile  = '../../../address_map.all.json';
 //var network_savefile  = '../../../address_network.json';
 
+var b_create_historical_snapshots = true;
+
 // If we have a save state, use it
 fs.exists(savefile, function(exists) {
 	if (!exists) {
@@ -48,13 +50,20 @@ function collectCurrentAddressValues(next_block_height) {
 
 	var current_block_height = next_block_height;
 	while (next_block_height) {
-		current_block_height = next_block_height;
-		next_block_height = balanceTransactionsAtBlock(next_block_height);
 		if (next_block_height%10000==0) {
 			console.log("hrtbt@" + next_block_height + " & " + current_block_height);
+			if (b_create_historical_snapshots) {
+				calculateRichListAndWealthDistribution(next_block_height);
+				collectNetworks();
+				calculateNetworkRichListAndWealthDistribution(next_block_height);
+			}
+
 			//saveProgress(next_block_height);
 			//process.exit();
 		}
+
+		current_block_height = next_block_height;
+		next_block_height = balanceTransactionsAtBlock(next_block_height);
 	}
 
 	console.log("Reached end. Total DCR in circulation: " + total_dcr);
@@ -321,9 +330,13 @@ function getVout(height, tree, tx, vout) {
 // vout = how many vouts into the TX <- that's all I need
 // HOWEVER - tickets are separate addresses. We need to link them to parent addresses.
 
-function calculateRichListAndWealthDistribution() {
+function calculateRichListAndWealthDistribution(height) {
 	// Notify
 	console.log("Building rich list and wealth distribution...");
+
+	if (height) {
+		console.log("For historical data at height " + height);
+	}
 
 	// Set the addresses
 	var addresses = [];
@@ -347,7 +360,9 @@ function calculateRichListAndWealthDistribution() {
 		'total_dcr' : total_dcr
 	};
 
-	fs.writeFileSync('top_500_list.json', JSON.stringify(top_500_data));
+	var filename = 'top_500_list.json';
+	if (height) { filename = 'top_500_list.' + height + '.json'; }
+	fs.writeFileSync(filename, JSON.stringify(top_500_data));
 
 	// Now get their full info
 	var top_500_info = {};
@@ -356,7 +371,9 @@ function calculateRichListAndWealthDistribution() {
 	}
 
 	// And write that
-	fs.writeFileSync('top_500_info_list.json', JSON.stringify({
+	var filename = 'top_500_info_list.json';
+	if (height) { filename = 'top_500_info_list.' + height + '.json'; }
+	fs.writeFileSync(filename, JSON.stringify({
 		'top' : top_500_info,
 		'total_dcr' : total_dcr
 	}));
@@ -375,7 +392,9 @@ function calculateRichListAndWealthDistribution() {
 		}
 	}
 
-	fs.writeFileSync('wealth_distribution.json', JSON.stringify({
+	var filename = 'wealth_distribution.json';
+	if (height) { filename = 'wealth_distribution.' + height + '.json'; }
+	fs.writeFileSync(filename, JSON.stringify({
 		'bins' : bins,
 		'counts' : counts,
 		'value' : value,
@@ -421,7 +440,7 @@ function saveNetworks() {
 	fs.writeFileSync(network_savefile, JSON.stringify(address_map));
 }
 
-function calculateNetworkRichListAndWealthDistribution() {
+function calculateNetworkRichListAndWealthDistribution(height) {
 	// Notify
 	console.log("Building network rich list and wealth distribution...");
 	console.log("Total network count: " + network_count);
@@ -445,7 +464,9 @@ function calculateNetworkRichListAndWealthDistribution() {
 		'total_dcr' : total_dcr
 	};
 
-	fs.writeFileSync('top_500_networks_list.json', JSON.stringify(top_500_data));
+	var filename = 'top_500_networks_list.json';
+	if (height) { filename = 'top_500_networks_list.' + height + '.json'; }
+	fs.writeFileSync(filename, JSON.stringify(top_500_data));
 
 	// And determine the wealth distribution
 	var bins   = [1, 10, 100, 1000, 10000, 100000, 1000000];
@@ -461,7 +482,9 @@ function calculateNetworkRichListAndWealthDistribution() {
 		}
 	}
 
-	fs.writeFileSync('wealth_distribution_networks.json', JSON.stringify({
+	var filename = 'wealth_distribution_networks.json';
+	if (height) { filename = 'wealth_distribution_networks.' + height + '.json'; }
+	fs.writeFileSync(filename, JSON.stringify({
 		'bins' : bins,
 		'counts' : counts,
 		'value' : value,
