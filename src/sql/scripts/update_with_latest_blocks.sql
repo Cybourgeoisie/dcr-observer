@@ -6,13 +6,13 @@ BEGIN;
 UPDATE
   balance
 SET
-  vout = balance.vout + sq.vout_value,
-  vout_count = balance.vout_count + sq.vout_count
+  vout = balance.vout + COALESCE(sq.vout_value, 0),
+  vout_count = balance.vout_count + 1
 FROM (
   SELECT
+    DISTINCT ON (vout.vout_id)
     va.address_id,
-    coalesce(count(DISTINCT vout.vout_id), 0) AS vout_count,
-    coalesce(sum(coalesce(vout.value, 0)), 0) AS vout_value
+    COALESCE(vout.value, 0) AS vout_value
   FROM
     database_blockchain_state dbs
   JOIN
@@ -22,6 +22,7 @@ FROM (
   WHERE
     dbs.database_blockchain_state_id = 1
   GROUP BY
+    vout.vout_id,
     va.address_id
 ) AS sq
 WHERE
@@ -32,13 +33,13 @@ WHERE
 UPDATE
   balance
 SET
-  vin = balance.vin + sq.vin_amountin,
-  vin_count = balance.vin_count + sq.vin_count
+  vin = balance.vin + COALESCE(sq.vin_amountin, 0),
+  vin_count = balance.vin_count + 1
 FROM (
   SELECT
+    DISTINCT ON (vin.vin_id)
     va.address_id,
-    coalesce(count(DISTINCT vin.vin_id), 0) AS vin_count,
-    coalesce(sum(coalesce(vin.amountin, 0)), 0) AS vin_amountin
+    COALESCE(vin.amountin, 0) AS vin_amountin
   FROM
     database_blockchain_state dbs
   JOIN
@@ -48,6 +49,7 @@ FROM (
   WHERE
     dbs.database_blockchain_state_id = 1
   GROUP BY
+    vin.vin_id,
     va.address_id
 ) AS sq
 WHERE
@@ -114,13 +116,13 @@ WHERE
 UPDATE
   balance
 SET
-  svout = balance.svout + sq.vout_value,
-  svout_count = balance.svout_count + sq.vout_count
+  svout = balance.svout + COALESCE(sq.vout_value, 0),
+  svout_count = balance.svout_count + 1
 FROM (
   SELECT
+    DISTINCT ON (vout.vout_id)
     va.address_id,
-    coalesce(count(DISTINCT vout.vout_id), 0) AS vout_count,
-    coalesce(sum(coalesce(vout.value, 0)), 0) AS vout_value
+    COALESCE(vout.value, 0) AS vout_value
   FROM
     database_blockchain_state dbs
   JOIN
@@ -132,6 +134,7 @@ FROM (
   WHERE
     dbs.database_blockchain_state_id = 1
   GROUP BY
+    vout.vout_id,
     va.address_id
 ) AS sq
 WHERE
@@ -142,13 +145,13 @@ WHERE
 UPDATE
   balance
 SET
-  svin = balance.svin + sq.vin_amountin,
-  svin_count = balance.svin_count + sq.vin_count
+  svin = balance.svin + COALESCE(sq.vin_amountin, 0),
+  svin_count = balance.svin_count + 1
 FROM (
   SELECT
+    DISTINCT ON (vin.vin_id)
     va.address_id,
-    coalesce(count(DISTINCT vin.vin_id), 0) AS vin_count,
-    coalesce(sum(coalesce(vin.amountin, 0)), 0) AS vin_amountin
+    COALESCE(vin.amountin, 0) AS vin_amountin
   FROM
     database_blockchain_state dbs
   JOIN
@@ -160,6 +163,7 @@ FROM (
   WHERE
     dbs.database_blockchain_state_id = 1
   GROUP BY
+    vin.vin_id,
     va.address_id
 ) AS sq
 WHERE
@@ -242,7 +246,12 @@ COMMIT;
 BEGIN;
 
 -- Now the fat boy
-UPDATE database_blockchain_state SET total_dcr = sq.sum
-FROM (SELECT SUM(balance) AS sum FROM balance WHERE balance > 0) AS sq;
+UPDATE database_blockchain_state SET total_dcr = total_dcr + COALESCE(sq.sum, 0)
+FROM (
+  SELECT SUM(COALESCE(amountin, 0))
+  FROM database_blockchain_state dbs
+  JOIN vin ON vin.vin_id > dbs.last_vin_id
+  WHERE (coinbase != '' OR stakebase != '') AND dbs.database_blockchain_state_id = 1
+) AS sq;
 
 COMMIT;

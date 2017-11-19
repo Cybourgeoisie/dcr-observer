@@ -39,6 +39,14 @@ function pullTopAddresses(callback) {
 				$new_row.find('td.top-td-num-tx').html(num_tx);
 				$new_row.find('td.top-td-pct-stx').html(pct_stx + '%');
 
+				// If the address has an identifier, display it
+				$new_row.find('.top-td-badge-address-identifier').hide();
+				$new_row.find('.top-td-addr-identifier').html('');
+				if (address_info.hasOwnProperty('identifier') && address_info.identifier) {
+					$new_row.find('.top-td-badge-address-identifier').show();
+					$new_row.find('.top-td-addr-identifier').html(address_info.identifier);
+				}
+
 				// Only display first 10 addresses by default
 				if (i >= 10) {
 					$new_row.hide();

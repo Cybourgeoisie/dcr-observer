@@ -10,6 +10,11 @@ function boot() {
 	 	if (data.hasOwnProperty('success') && data.success) {
 	 		total_dcr = data.total_dcr;
 	 		current_block_height = data.height;
+
+	 		// Display current height and amount
+	 		$('span.dcr-current-block-height').html(parseInt(current_block_height).toLocaleString());
+	 		$('span.dcr-current-total-supply').html(parseFloat(total_dcr).toLocaleString());
+
 			handleNavigation(window.location.hash.substr(1) || "home");
 	 	}
 	});
@@ -22,6 +27,7 @@ function boot() {
 function getDcrPrice() {
 	$.getJSON('https://api.coinmarketcap.com/v1/ticker/decred/', function(data) {
 		dcr_price = parseFloat(data[0].price_usd);
+		$('span.dcr-current-price').html(dcr_price);
 	});
 }
 
@@ -124,4 +130,12 @@ function setAddressInfo(addr_info) {
 	$('.addr-address').html(addr_info.address);
 	$('.addr-view-block-explorer').attr('href', 'https://explorer.dcrdata.org/explorer/address/' + addr_info.address);
 	$('.addr-rank').html(addr_info.rank);
+
+	// If the address has an identifier, display it
+	$('.dcr-badge-address-identifier').hide();
+	$('span.addr-identifier').html('');
+	if (addr_info.hasOwnProperty('identifier') && addr_info.identifier) {
+		$('.dcr-badge-address-identifier').show();
+		$('span.addr-identifier').html(addr_info.identifier);
+	}
 }

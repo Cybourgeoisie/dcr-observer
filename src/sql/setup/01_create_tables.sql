@@ -62,8 +62,12 @@ CREATE TABLE "vout" (
 
 CREATE TABLE "address" (
 	"address_id"  BIGSERIAL PRIMARY KEY,
-	"address"     VARCHAR(80) UNIQUE
+	"address"     VARCHAR(80) UNIQUE,
+	"identifier"  VARCHAR(40)
 );
+
+-- ALTER TABLE "address" ADD COLUMN "identifier" VARCHAR(40);
+-- UPDATE "address" SET identifier = 'Dev Fund' WHERE address = 'Dcur2mcGjmENx4DhNqDctW5wJCVyT3Qeqkx';
 
 CREATE TABLE "vout_address" (
 	"vout_address_id" BIGSERIAL PRIMARY KEY,

@@ -18,6 +18,7 @@ class Address extends \Scrollio\Service\AbstractService
 		$sql = '
 			SELECT
 				a.address,
+				a.identifier,
 				ba.rank,
 				ba.balance,
 				COALESCE(ba.tx, 0)    AS "tx",
@@ -58,6 +59,7 @@ class Address extends \Scrollio\Service\AbstractService
 		$sql = '
 			SELECT
 				a.address,
+				a.identifier,
 				b.balance,
 				b.rank,
 				COALESCE(b.tx, 0) AS tx,

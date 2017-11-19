@@ -90,7 +90,14 @@
 				<tbody>
 					<tr>
 						<th scope="row">1</th>
-						<td class="top-td-address"><a class="page-toggle" href="#addr">X</a></td>
+						<td class="top-td-address">
+							<a class="page-toggle" href="#addr">X</a>
+							<small>
+								<span class="badge badge-pill badge-info top-td-badge-address-identifier" style="vertical-align:text-top;display:none;">
+									<span class="top-td-addr-identifier"></span>
+								</span>
+							</small>
+						</td>
 						<td class="top-td-balance">X DCR</td>
 						<td class="top-td-percent">X%</td>
 						<td class="top-td-num-tx">X</td>
@@ -233,8 +240,15 @@
 
 			<p class="lead">
 				Current Balance: <span class="addr-balance">X</span> DCR
+
+				<br class="d-block d-md-none d-l-none d-xl-none">
+
 				<small><span class="badge badge-pill badge-primary" style="vertical-align:text-top">
 					Rank #<span class="addr-rank">X</span>
+				</span></small>
+
+				<small><span class="badge badge-pill badge-info dcr-badge-address-identifier" style="vertical-align:text-top;display:none;">
+					<span class="addr-identifier"></span>
 				</span></small>
 			</p>
 
@@ -382,7 +396,13 @@
 
 	<footer class="footer">
 		<div class="container">
-			<span>&copy; 2017 JGR LTD.</span>
+			<span style="color:rgba(255,255,255,.75);">
+				<strong>Current Block:</strong> <span class="dcr-current-block-height"></span> &nbsp; &nbsp;
+				<strong>Supply:</strong> <span class="dcr-current-total-supply"></span> DCR &nbsp; &nbsp;
+				<span class="d-none d-md-inline d-l-inline d-xl-inline">
+					<strong>Price:</strong> $<span class="dcr-current-price"></span>
+				</span>
+			</span><br />
 		</div>
 	</footer>
 

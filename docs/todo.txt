@@ -10,10 +10,14 @@ X Wealth distribution by address
 X Address details page: rank, balance, in/out, staking, first & last activity
 X Update database with new block information
 X Perform safe database updates on new blocks
+- Add identifiers to addresses for developer fund, exchanges, miners, & stakepools
+	X Developer Fund
+	X Miners
+	- Exchanges
+	- Stakepools
 - Top 500 HD wallets from DB
 - Wealth distribution by HD wallet from DB
 - Additional address details: List all addresses linked together, and from which transactions (HD)
-- Add identifiers to addresses for developer fund, exchanges, miners, & stakepools
 - Historical snapshots of rich list & wealth distribution (slider)
 - Additional address details: Map portion of inputs from mining, genesis block, exchange, or staking
 - Flag addresses that are actively staking
