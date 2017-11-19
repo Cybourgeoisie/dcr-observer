@@ -16,12 +16,17 @@ X Fix bug with balance calculations
 	X Miners
 	- Exchanges
 	- Stakepools
-- Top 500 HD wallets from DB
-- Wealth distribution by HD wallet from DB
-- Additional address details: List all addresses linked together, and from which transactions (HD)
+X Top 500 HD wallets from DB (NOTE: Not from DB, but from accurate source)
+X Wealth distribution by HD wallet from DB (NOTE: Not from DB, but from accurate source)
+X Additional address details: List all addresses linked together, and from which transactions (HD)
 - Historical snapshots of rich list & wealth distribution (slider)
 - Additional address details: Map portion of inputs from mining, genesis block, exchange, or staking
 - Flag addresses that are actively staking
 - Voting Distribution Page: show distribution of voters' tickets & relative influence that their tickets have on vote outcome (onchain)
 - Mobile-friendly UI
-- Optimize database updates
+X Optimize database updates
+
+To Revisit:
+- DB should be definitive for more than just transactions and the top 500. We have two data sources. We should ideally only have one.
+	- It's fine if we migrate to mongo or an ever-running JS module, but it needs to be architected correctly.
+	- Alternatively, we just need to definitively determine HD wallets using Postgres instead of Javascript. Which could be via imports or a working schema, but I think the logic to generate HD wallets can't be fully implemented in SQL - at least, not to my knowledge. I think we need to go outside of Postgres to format the data and import it.

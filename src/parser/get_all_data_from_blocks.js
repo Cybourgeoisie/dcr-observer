@@ -102,7 +102,8 @@ function collectCurrentAddressValues(next_block_height) {
 	//saveNetworks();
 
 	// Save the current address state
-	saveProgress(current_block_height);
+	// It was worth a try. JSON.stringify won't stringify this whole thing.
+	//saveProgress(current_block_height);
 }
 
 function saveProgress(last_height) {
