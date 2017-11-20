@@ -1,5 +1,38 @@
 #!/bin/bash
 
+PIDFILE=/home/ec2-user/pid/autoupdate.pid
+
+echo""; date; echo "Starting Auto-Update";
+
+# Check for lockfile existence
+if [ -f $PIDFILE ]
+then
+  PID=$(cat $PIDFILE)
+  ps -p $PID > /dev/null 2>&1
+  if [ $? -eq 0 ]
+  then
+    echo "Process still running"
+    exit 1
+  else
+    ## Process not found assume not running
+    echo $$ > $PIDFILE
+    if [ $? -ne 0 ]
+    then
+      echo "Process not found, but could not create PID file"
+      exit 1
+    fi
+  fi
+else
+  echo $$ > $PIDFILE
+  if [ $? -ne 0 ]
+  then
+    echo "PID file not found, but could not create PID file"
+    exit 1
+  fi
+fi
+
+# Do our stuff
+
 # Update the blocks
 cd /home/ec2-user/dcr-rich-list/src/collector/;
 /home/ec2-user/.nvm/versions/node/v8.9.1/bin/node /home/ec2-user/dcr-rich-list/src/collector/collect_decred_blocks.js;
@@ -29,3 +62,6 @@ cd /home/ec2-user/dcr-rich-list/src/parser/;
 # And lastly copy the data over to the data directory
 cp -a /home/ec2-user/dcr-rich-list/src/parser/*json /var/www/html/data/;
 /bin/echo "Done";
+
+# Remove the lockfile
+rm $PIDFILE

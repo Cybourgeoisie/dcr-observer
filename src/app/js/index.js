@@ -1,10 +1,11 @@
 // Configuration
-var valid_uri_hashes = ['home', 'top-hd', 'dist', 'dist-hd', 'addr', 'hd-addr', '404'];
+var valid_uri_hashes = ['home', 'top-hd', 'dist', 'dist-hd', 'addr', 'hd-addr', '404', 'maintenance'];
 var dcr_price = 30.0;
-var total_dcr = 7000000;
-var current_block_height = 190000;
+var total_dcr = 6617242.27624844;
+var current_block_height = 187908;
 var historical_data_block = 190000;
 
+/*
 function boot() {
 	$.post('api/State/getInfo')
 	 .done(function(data) {
@@ -24,6 +25,21 @@ function boot() {
 	// Startup logic
 	setEvents();
 	getDcrPrice();
+}
+*/
+
+// For maintenance only
+function boot() {
+	// Startup logic
+	setEvents();
+	getDcrPrice();
+
+	// Display current height and amount
+	$('span.dcr-current-block-height').html(parseInt(current_block_height).toLocaleString());
+	$('span.historical-slider-value').html(parseInt(current_block_height).toLocaleString());
+	$('span.dcr-current-total-supply').html(parseFloat(total_dcr).toLocaleString());
+
+	handleNavigation(window.location.hash.substr(1) || "home");
 }
 
 function getDcrPrice() {
@@ -50,9 +66,11 @@ function handleNavigation(uri_hash) {
 
 	// If we're viewing an address, pass along to the address page
 	if (uri == 'addr' && uri_param && uri_param.length) {
-		loadAddressInfo(uri_param, function() { showPage('addr'); });
+		showPage('maintenance');
+		//loadAddressInfo(uri_param, function() { showPage('addr'); });
 	} else if (uri == 'hd-addr' && uri_param && uri_param.length) {
-		loadHdAddressInfo(uri_param, function() { showPage('hd-addr'); });
+		showPage('maintenance');
+		//loadHdAddressInfo(uri_param, function() { showPage('hd-addr'); });
 	} else if (uri == 'home') {
 		pullTopAddresses(function() { showPage('home'); });
 	} else if (uri == 'dist') {
