@@ -1,5 +1,5 @@
 function pullTopAddresses(callback) {
-	var filename = (historical_data_block == 190000) ? "./data/top_500_info_list.json" : "./data/historical/top_500_info_list." + historical_data_block + ".json";
+	var filename = (historical_data_block == 190000) ? "./data/top_500_info_list.json?nocache=" + (new Date()).getTime() : "./data/historical/top_500_info_list." + historical_data_block + ".json";
 
 	if (historical_data_block != 190000) {
 		$('.historical-block-header').html('At Block ' + parseInt(historical_data_block).toLocaleString());
@@ -164,7 +164,7 @@ function pullTopAddressesFromApi(callback) {
 }
 
 function pullTopNetworks(callback) {
-	var filename = (historical_data_block == 190000) ? "./data/top_500_networks_list.json" : "./data/historical/top_500_networks_list." + historical_data_block + ".json";
+	var filename = (historical_data_block == 190000) ? "./data/top_500_networks_list.json?nocache=" + (new Date()).getTime() : "./data/historical/top_500_networks_list." + historical_data_block + ".json";
 
 	if (historical_data_block != 190000) {
 		$('.historical-block-header').html('At Block ' + parseInt(historical_data_block).toLocaleString());
