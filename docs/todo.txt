@@ -19,11 +19,11 @@ X Fix bug with balance calculations
 X Top 500 HD wallets from DB (NOTE: Not from DB, but from accurate source)
 X Wealth distribution by HD wallet from DB (NOTE: Not from DB, but from accurate source)
 X Additional address details: List all addresses linked together, and from which transactions (HD)
-- Historical snapshots of rich list & wealth distribution (slider)
+X Historical snapshots of rich list & wealth distribution (slider)
 - Additional address details: Map portion of inputs from mining, genesis block, exchange, or staking
 - Flag addresses that are actively staking
 - Voting Distribution Page: show distribution of voters' tickets & relative influence that their tickets have on vote outcome (onchain)
-- Mobile-friendly UI
+X Mobile-friendly UI
 X Optimize database updates
 
 To Revisit:

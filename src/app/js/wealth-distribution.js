@@ -1,5 +1,12 @@
 function pullWealthDistribution(callback) {
 	var filename = (historical_data_block == 190000) ? "./data/wealth_distribution.json" : "./data/historical/wealth_distribution." + historical_data_block + ".json";
+
+	if (historical_data_block != 190000) {
+		$('.dist-lead').html('The Decred address wealth distribution at block ' + parseInt(historical_data_block).toLocaleString() + '.');
+	} else {
+		$('.dist-lead').html('The current Decred address wealth distribution.');
+	}
+
 	$.getJSON(filename, function(data) {
 		// Handle callbacks
 		if (callback && typeof callback === 'function') {
@@ -108,6 +115,13 @@ function pullWealthDistributionFromApi(callback) {
 
 function pullWealthDistributionNetworks(callback) {
 	var filename = (historical_data_block == 190000) ? "./data/wealth_distribution_networks.json" : "./data/historical/wealth_distribution_networks." + historical_data_block + ".json";
+
+	if (historical_data_block != 190000) {
+		$('.dist-hd-lead').html('The Decred wealth distribution by connected addresses at block ' + parseInt(historical_data_block).toLocaleString() + '.');
+	} else {
+		$('.dist-hd-lead').html('The current Decred wealth distribution by connected addresses.');
+	}
+
 	$.getJSON(filename, function(data) {
 		// Handle callbacks
 		if (callback && typeof callback === 'function') {

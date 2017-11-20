@@ -1,5 +1,5 @@
 // Configuration
-var valid_uri_hashes = ['home', 'top-hd', 'dist', 'dist-hd', 'addr', 'hd-addr'];
+var valid_uri_hashes = ['home', 'top-hd', 'dist', 'dist-hd', 'addr', 'hd-addr', '404'];
 var dcr_price = 30.0;
 var total_dcr = 7000000;
 var current_block_height = 190000;
@@ -82,9 +82,7 @@ function showPage(uri) {
 function setEvents() {
 	// Find all internal links, bind to handle navigation
 	$('a.page-toggle').click(function(event) {
-		//event.preventDefault();
-		//var uri_hash = $(this).attr('href').substr(1);
-		//handleNavigation.call(this, uri_hash);
+		$('.navbar-collapse').collapse('hide');
 	});
 
 	// Hash change - change page
@@ -96,6 +94,11 @@ function setEvents() {
 	$('#dcr-address-search').submit(function(event) {
 		event.preventDefault();
 		var address = $(this).find('input#dcr-address-input').val();
+		if (!address) {
+			return;
+		}
+
+		$('.navbar-collapse').collapse('hide');
 		window.location.hash = '#addr=' + address;
 		handleNavigation.call(this, 'addr=' + address);
 	});
@@ -147,6 +150,8 @@ function loadAddressInfo(address, callback) {
 	 		if (callback && typeof callback === 'function') {
 	 			callback.call(this, data.addr_info);	 			
 	 		}
+	 	} else {
+	 		showPage('404');
 	 	}
 	});
 }
@@ -237,7 +242,7 @@ function setHdAddressInfo(hd_addresses, req_address) {
 		var $new_row = $hd_address_row.clone(true);
 		$new_row.find('th').html(i+1);
 		$new_row.find('td.hd-addr-address > a').html(address).data('address', address).attr('href', '#addr=' + address);
-		$new_row.find('td.hd-addr-balance').html(parseFloat(balance).toLocaleString() + ' DCR');
+		$new_row.find('td.hd-addr-balance > .hd-addr-balance-value').html(parseFloat(balance).toLocaleString());
 
 		if (req_address != address) {
 			$new_row.find('td.hd-addr-tx-link > a').attr('href', 'https://explorer.dcrdata.org/explorer/tx/' + tx_hash).html('View');

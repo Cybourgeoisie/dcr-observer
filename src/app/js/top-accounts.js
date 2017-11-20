@@ -1,5 +1,12 @@
 function pullTopAddresses(callback) {
 	var filename = (historical_data_block == 190000) ? "./data/top_500_info_list.json" : "./data/historical/top_500_info_list." + historical_data_block + ".json";
+
+	if (historical_data_block != 190000) {
+		$('.historical-block-header').html('At Block ' + parseInt(historical_data_block).toLocaleString());
+	} else {
+		$('.historical-block-header').html('');
+	}
+
 	$.getJSON(filename, function(data) {
 		// Handle callbacks
 		if (callback && typeof callback === 'function') {
@@ -39,7 +46,7 @@ function pullTopAddresses(callback) {
 			var $new_row = $top_address_row.clone(true);
 			$new_row.find('th').html(rank);
 			$new_row.find('td.top-td-address > a').html(address).data('address', address).attr('href', '#addr=' + address);
-			$new_row.find('td.top-td-balance').html(parseInt(balance).toLocaleString() + ' DCR');
+			$new_row.find('td.top-td-balance > .top-balance').html(parseInt(balance).toLocaleString());
 			$new_row.find('td.top-td-percent').html(pct + '%');
 			$new_row.find('td.top-td-num-tx').html(num_tx);
 			$new_row.find('td.top-td-pct-stx').html(pct_stx + '%');
@@ -60,10 +67,13 @@ function pullTopAddresses(callback) {
 			$top_address_tbody.append($new_row);
 		}
 
+		// Reset the "show all 500" button
+		$('button.show-all-500').removeAttr('disabled').html('Show All 500');
+
 		// Set the "show all 500" button to do something
-		$('button.show-all-500-hd').click(function(event) {
-			$('.table-networks tr').show();
-			$('button.show-all-500-hd').attr("disabled", "disabled").html('Showing All 500');
+		$('button.show-all-500').click(function(event) {
+			$('.table-addresses tr').show();
+			$('button.show-all-500').attr("disabled", "disabled").html('Showing All 500');
 		});
 
 		// Show totals and percentages
@@ -155,6 +165,13 @@ function pullTopAddressesFromApi(callback) {
 
 function pullTopNetworks(callback) {
 	var filename = (historical_data_block == 190000) ? "./data/top_500_networks_list.json" : "./data/historical/top_500_networks_list." + historical_data_block + ".json";
+
+	if (historical_data_block != 190000) {
+		$('.historical-block-header').html('At Block ' + parseInt(historical_data_block).toLocaleString());
+	} else {
+		$('.historical-block-header').html('');
+	}
+
 	$.getJSON(filename, function(data) {
 		// Handle callbacks
 		if (callback && typeof callback === 'function') {
@@ -191,7 +208,7 @@ function pullTopNetworks(callback) {
 			var $new_row = $top_networks_row.clone(true);
 			$new_row.find('th').html(rank);
 			$new_row.find('td.top-hd-td-top-address > a').html(address).data('address', address).attr('href', '#addr=' + address);
-			$new_row.find('td.top-hd-td-balance').html(parseInt(balance).toLocaleString() + ' DCR');
+			$new_row.find('td.top-hd-td-balance > .top-hd-balance').html(parseInt(balance).toLocaleString());
 			$new_row.find('td.top-hd-td-percent').html(pct + '%');
 			$new_row.find('td.top-hd-td-num-addrs').html(num_addrs);
 
@@ -210,6 +227,9 @@ function pullTopNetworks(callback) {
 
 			$top_networks_tbody.append($new_row);
 		}
+
+		// Reset the "show all 500" button
+		$('button.show-all-500-hd').removeAttr('disabled').html('Show All 500');
 
 		// Set the "show all 500" button to do something
 		$('button.show-all-500-hd').click(function(event) {

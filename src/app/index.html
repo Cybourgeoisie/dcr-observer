@@ -70,7 +70,7 @@
 
 		<!-- Home Page -->
 		<div class="dcr-page dcr-page-home home-body" style="display:none;">
-			<h1>Top 500 Decred Addresses</h1>
+			<h1>Top 500 Decred Addresses <span class="historical-block-header"></span></h1>
 			<p class="lead">
 				<small>
 					<strong><span class="top-sum">X</span> DCR out of <span class="total-dcr">X</span> DCR</strong>
@@ -79,15 +79,24 @@
 				</small>
 			</p>
 
-			<table class="table table-hover table-addresses">
+			<table class="table table-hover table-addresses table-responsive-sm">
 				<thead>
 					<tr>
 						<th>#</th>
 						<th>Address</th>
 						<th>Balance</th>
-						<th>% DCR</th>
-						<th># TX</th>
-						<th>% STX</th>
+						<th>
+							<span class="d-none d-md-inline d-l-inline d-xl-inline">% DCR</span>
+							<span class="d-inline d-md-none d-l-none d-xl-none">%DCR</span>
+						</th>
+						<th>
+							<span class="d-none d-md-inline d-l-inline d-xl-inline"># TX</span>
+							<span class="d-inline d-md-none d-l-none d-xl-none">#TX</span>
+						</th>
+						<th>
+							<span class="d-none d-md-inline d-l-inline d-xl-inline">% STX</span>
+							<span class="d-inline d-md-none d-l-none d-xl-none">%STX</span>
+						</th>
 					</tr>
 				</thead>
 				<tbody>
@@ -101,7 +110,10 @@
 								</span>
 							</small>
 						</td>
-						<td class="top-td-balance">X DCR</td>
+						<td class="top-td-balance">
+							<span class="top-balance">X</span>
+							<span class="d-none d-md-inline d-l-inline d-xl-inline"> DCR</span>
+						</td>
 						<td class="top-td-percent">X%</td>
 						<td class="top-td-num-tx">X</td>
 						<td class="top-td-pct-stx">X%</td>
@@ -115,7 +127,7 @@
 		</div>
 
 		<div class="dcr-page dcr-page-top-hd home-body" style="display:none;">
-			<h1>Top 500 Known HD Wallets</h1>
+			<h1>Top 500 Known HD Wallets <span class="historical-block-header"></span></h1>
 			<p class="lead">
 				<small>
 					<strong><span class="top-hd-sum">X</span> DCR out of <span class="total-dcr">X</span> DCR</strong>
@@ -124,14 +136,20 @@
 				</small>
 			</p>
 
-			<table class="table table-hover table-networks">
+			<table class="table table-hover table-networks table-responsive-sm">
 				<thead>
 					<tr>
 						<th>#</th>
 						<th>Top Address</th>
 						<th>Balance</th>
-						<th>% DCR</th>
-						<th># Addresses</th>
+						<th>
+							<span class="d-none d-md-inline d-l-inline d-xl-inline">% DCR</span>
+							<span class="d-inline d-md-none d-l-none d-xl-none">%DCR</span>
+						</th>
+						<th>
+							<span class="d-none d-md-inline d-l-inline d-xl-inline"># Addresses</span>
+							<span class="d-inline d-md-none d-l-none d-xl-none">#Addresses</span>
+						</th>
 					</tr>
 				</thead>
 				<tbody>
@@ -145,7 +163,10 @@
 								</span>
 							</small>
 						</td>
-						<td class="top-hd-td-balance">X DCR</td>
+						<td class="top-hd-td-balance">
+							<span class="top-hd-balance">X</span>
+							<span class="d-none d-md-inline d-l-inline d-xl-inline"> DCR</span>
+						</td>
 						<td class="top-hd-td-percent">X%</td>
 						<td class="top-hd-td-num-addrs">X</td>
 					</tr>
@@ -160,17 +181,22 @@
 		<!-- Distribution Page -->
 		<div class="dcr-page dcr-page-dist dist-body" style="display:none;">
 			<h1>Distribution By Address</h1>
-			<p class="lead">The current Decred address wealth distribution.</p>
+			<p class="lead dist-lead">The current Decred address wealth distribution.</p>
 
-			<table class="table table-hover table-distribution">
+			<table class="table table-hover table-distribution table-responsive-sm">
 				<thead>
 					<tr>
 						<th>Balances</th>
 						<th>Addresses</th>
-						<th>% Addresses</th>
+						<th>
+							<span class="d-none d-md-inline d-l-inline d-xl-inline">% Addresses</span>
+							<span class="d-inline d-md-none d-l-none d-xl-none">%Addresses</span>
+						</th>
 						<th>Sum</th>
-						<!--<th>$ Value</th>-->
-						<th>% of Supply</th>
+						<th>
+							<span class="d-none d-md-inline d-l-inline d-xl-inline">% of Supply</span>
+							<span class="d-inline d-md-none d-l-none d-xl-none">%Supply</span>
+						</th>
 					</tr>
 				</thead>
 				<tbody>
@@ -184,7 +210,6 @@
 							<span class="wealth-pct-addrs" style="position:relative;top:-16px;">X%</span>
 						</td>
 						<td class="td-sum">X DCR</td>
-						<!--<td class="td-sum-value">$X</td>-->
 						<td class="td-pct-supply">
 							<div class="progress" style="position:relative;top:1px;opacity:0.5;">
 								<div class="progress-bar bg-success" role="progressbar" style="width:25%"></div>
@@ -200,17 +225,25 @@
 		<!-- HD Distribution Page -->
 		<div class="dcr-page dcr-page-dist-hd dist-body" style="display:none;">
 			<h1>Distribution By Known HD Wallets</h1>
-			<p class="lead">The current Decred wealth distribution by connected addresses.</p>
+			<p class="lead dist-hd-lead">The current Decred wealth distribution by connected addresses.</p>
 
-			<table class="table table-hover table-distribution-hd">
+			<table class="table table-hover table-distribution-hd table-responsive-sm">
 				<thead>
 					<tr>
 						<th>Balances</th>
-						<th>HD Wallets</th>
-						<th>% Wallets</th>
+						<th>
+							<span class="d-none d-md-inline d-l-inline d-xl-inline">HD Wallets</span>
+							<span class="d-inline d-md-none d-l-none d-xl-none">Wallets</span>
+						</th>
+						<th>
+							<span class="d-none d-md-inline d-l-inline d-xl-inline">% Wallets</span>
+							<span class="d-inline d-md-none d-l-none d-xl-none">%Wallets</span>
+						</th>
 						<th>Sum</th>
-						<!--<th>$ Value</th>-->
-						<th>% of Supply</th>
+						<th>
+							<span class="d-none d-md-inline d-l-inline d-xl-inline">% of Supply</span>
+							<span class="d-inline d-md-none d-l-none d-xl-none">%Supply</span>
+						</th>
 					</tr>
 				</thead>
 				<tbody>
@@ -224,7 +257,6 @@
 							<span class="wealth-hd-pct-wallets" style="position:relative;top:-16px;">X%</span>
 						</td>
 						<td class="td-hd-sum">X DCR</td>
-						<!--<td class="td-sum-value">$X</td>-->
 						<td class="td-hd-pct-supply">
 							<div class="progress" style="position:relative;top:1px;opacity:0.5;">
 								<div class="progress-bar bg-success" role="progressbar" style="width:25%"></div>
@@ -398,7 +430,7 @@
 			<!--
 			<h5>Activity</h5>
 
-			<table class="table table-hover table-activity">
+			<table class="table table-hover table-activity table-responsive-sm">
 				<thead>
 					<tr>
 						<th>Date</th>
@@ -487,13 +519,16 @@
 
 			<h5>Addresses*</h5>
 
-			<table class="table table-hover table-hd-addresses">
+			<table class="table table-hover table-hd-addresses table-responsive-sm">
 				<thead>
 					<tr>
 						<th>Row</th>
 						<th>Address</th>
 						<th>Balance</th>
-						<th>Shared TX</th>
+						<th>
+							<span class="d-none d-md-inline d-l-inline d-xl-inline">Shared TX</span>
+							<span class="d-inline d-md-none d-l-none d-xl-none">TX</span>
+						</th>
 					</tr>
 				</thead>
 				<tbody>
@@ -507,7 +542,10 @@
 								</span>
 							</small>
 						</td>
-						<td class="hd-addr-balance">X</td>
+						<td class="hd-addr-balance">
+							<span class="hd-addr-balance-value">X</span>
+							<span class="d-none d-md-inline d-l-inline d-xl-inline"> DCR</span>
+						</td>
 						<td class="hd-addr-tx-link"><a href="#" target="blank">View</a></td>
 					</tr>
 				</tbody>
@@ -519,6 +557,15 @@
 
 			<p><small>(*) To reduce strain on the database, zero-balance addresses are not yet shown.</small></p>
 
+		</div>
+
+		<!-- 404 Address Page -->
+		<div class="dcr-page dcr-page-404 address-body" style="display:none;">
+			<h1>Address Not Found</h1>
+
+			<p class="lead">
+				The provided address was not found.
+			</p>
 		</div>
 
 	</main>

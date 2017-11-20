@@ -23,13 +23,6 @@ body {
 	text-align: center;
 }
 
-@media (max-width: 576px) {
-	.address-body {
-		padding: 0rem 0rem;
-	}
-}
-
-
 .address-body .container {
 	max-width: unset !important;
 }
@@ -92,4 +85,28 @@ td {
 
 .slider-selection {
 	background: #BABABA;
+}
+
+@media (max-width: 767px) {
+	.home-body,
+	.dist-body,
+	.address-body {
+		padding: 0rem 0rem 2rem 0rem;
+		text-align: center;
+	}
+
+	.nav-item {
+		padding: 0 10px 5px 10px;
+	}
+
+	.btn {
+		padding: .25rem .5rem;
+		font-size: .875rem;
+		line-height: 1.5;
+		border-radius: .2rem;
+	}
+
+	h1, h2 {
+		font-size:150%;
+	}
 }
