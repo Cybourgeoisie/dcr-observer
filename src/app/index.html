@@ -14,6 +14,9 @@
 	<!-- Font Awesome -->
 	<link rel="stylesheet" href="css/font-awesome.min.css" integrity="sha256-eZrrJcwDc/3uDhsdt61sL2oOBY362qM3lon1gyExkL0=" crossorigin="anonymous" />
 
+	<!-- Bootstrap Slider -->
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-slider/10.0.0/css/bootstrap-slider.min.css" integrity="sha256-WfuSLYdzGvlsFU6ImYYSE277WsjfyU30QeGuNIjeJEI=" crossorigin="anonymous" />
+
 	<!-- Local stylesheet -->
 	<link href="css/style.css" rel="stylesheet">
 </head>
@@ -232,6 +235,21 @@
 				</tbody>
 			</table>
 			<p><small>(*) Zero-balance addresses are not included.</small></p>
+		</div>
+
+		<!-- Historical Data Slider -->
+		<div class="dcr-page dcr-page-home dcr-page-top-hd dcr-page-dist dcr-page-dist-hd slider-body" style="display:none;">
+			<h1>Historical Data</h1>
+			<p class="lead">
+				<input class="historical-slider-input" data-slider-id="historical-top-500-slider" 
+					type="text" data-slider-min="10000" data-slider-max="190000" 
+					data-slider-step="10000" data-slider-value="180000"/>
+			</p>
+			<p class="lead" style="text-align:center;">
+				<button class="btn btn-primary my-2 my-sm-0 historical-slider-button">
+					View Block #<span class="historical-slider-value"></span>
+				</button>
+			</p>
 		</div>
 
 		<!-- Address Page -->
@@ -525,6 +543,9 @@
 
 	<!-- Bootstrap -->
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.0.0-beta.2/js/bootstrap.min.js" integrity="sha256-GIa8Vh3sfESnVB2CN3rYGkD/MklvMq0lmITweQxE1qU=" crossorigin="anonymous"></script>
+
+	<!-- Bootstrap Slider -->
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-slider/10.0.0/bootstrap-slider.min.js" integrity="sha256-ssw743RfM8cbNhwou26tmmPhiNhq3buUbRG/RevtfG4=" crossorigin="anonymous"></script>
 
 	<!-- Site JS -->
 	<script src="./js/wealth-distribution.js"></script>

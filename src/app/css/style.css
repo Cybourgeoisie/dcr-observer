@@ -18,6 +18,11 @@ body {
 	text-align: center;
 }
 
+.slider-body {
+	padding: 0 0 2rem 0;
+	text-align: center;
+}
+
 @media (max-width: 576px) {
 	.address-body {
 		padding: 0rem 0rem;
@@ -85,3 +90,6 @@ td {
 	background-color: #2ed6a1;
 }
 
+.slider-selection {
+	background: #BABABA;
+}

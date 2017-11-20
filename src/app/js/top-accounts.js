@@ -1,4 +1,83 @@
 function pullTopAddresses(callback) {
+	var filename = (historical_data_block == 190000) ? "./data/top_500_info_list.json" : "./data/historical/top_500_info_list." + historical_data_block + ".json";
+	$.getJSON(filename, function(data) {
+		// Handle callbacks
+		if (callback && typeof callback === 'function') {
+			callback.call(this);
+		}
+
+		var $top_address_table = $('.table-addresses');
+		var $top_address_tbody = $top_address_table.find('tbody');
+		var $top_address_row = $top_address_table.find('tr:last').clone(true).show();
+
+		// Clear the existing data
+		$top_address_tbody.html('');
+
+		// Pull the total supply
+		var total_dcr = parseFloat(data.total_dcr);
+
+		// Now display them all
+		var sum_balance = 0, rank = 0;
+		for (var address in data.top) {
+			if (!data.top.hasOwnProperty(address)) {
+				continue;
+			}
+
+			var address_info = data.top[address];
+			rank++;
+
+			var balance = parseFloat(address_info.val);
+			sum_balance += balance;
+			balance = balance.toFixed(1);
+
+			var num_tx  = parseFloat(address_info.tx);
+			var num_stx = parseFloat(address_info.stx);
+			var pct_stx = ((num_stx/num_tx)*100).toFixed(2);
+
+			var pct = ((parseFloat(address_info.val) / total_dcr) * 100).toFixed(2);
+
+			var $new_row = $top_address_row.clone(true);
+			$new_row.find('th').html(rank);
+			$new_row.find('td.top-td-address > a').html(address).data('address', address).attr('href', '#addr=' + address);
+			$new_row.find('td.top-td-balance').html(parseInt(balance).toLocaleString() + ' DCR');
+			$new_row.find('td.top-td-percent').html(pct + '%');
+			$new_row.find('td.top-td-num-tx').html(num_tx);
+			$new_row.find('td.top-td-pct-stx').html(pct_stx + '%');
+
+			// If the address has an identifier, display it
+			$new_row.find('.top-td-badge-address-identifier').hide();
+			$new_row.find('.top-td-addr-identifier').html('');
+			if (address_info.hasOwnProperty('identifier')) {
+				$new_row.find('.top-td-badge-address-identifier').show();
+				$new_row.find('.top-td-addr-identifier').html(address_info.identifier);
+			}
+
+			// Only display first 10 addresses by default
+			if (rank > 10) {
+				$new_row.hide();
+			}
+
+			$top_address_tbody.append($new_row);
+		}
+
+		// Set the "show all 500" button to do something
+		$('button.show-all-500-hd').click(function(event) {
+			$('.table-networks tr').show();
+			$('button.show-all-500-hd').attr("disabled", "disabled").html('Showing All 500');
+		});
+
+		// Show totals and percentages
+		$('.top-sum').html(parseInt(sum_balance).toLocaleString());
+		$('.total-dcr').html(parseInt(total_dcr).toLocaleString());
+
+		var sum_percent = ((sum_balance / total_dcr) * 100).toFixed(2);
+		$('.top-sum-percent').html(sum_percent + '%');
+
+		
+	});
+}
+
+function pullTopAddressesFromApi(callback) {
 	$.post('api/Address/getTop')
 	 .done(function(data) {
 	 	if (data.hasOwnProperty('success') && data.success) {
@@ -75,7 +154,8 @@ function pullTopAddresses(callback) {
 }
 
 function pullTopNetworks(callback) {
-	$.getJSON("./data/top_500_networks_list.json", function(data) {
+	var filename = (historical_data_block == 190000) ? "./data/top_500_networks_list.json" : "./data/historical/top_500_networks_list." + historical_data_block + ".json";
+	$.getJSON(filename, function(data) {
 		// Handle callbacks
 		if (callback && typeof callback === 'function') {
 			callback.call(this);

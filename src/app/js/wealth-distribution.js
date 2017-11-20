@@ -1,5 +1,6 @@
 function pullWealthDistribution(callback) {
-	$.getJSON("./data/wealth_distribution.json", function(data) {
+	var filename = (historical_data_block == 190000) ? "./data/wealth_distribution.json" : "./data/historical/wealth_distribution." + historical_data_block + ".json";
+	$.getJSON(filename, function(data) {
 		// Handle callbacks
 		if (callback && typeof callback === 'function') {
 			callback.call(this);
@@ -106,7 +107,8 @@ function pullWealthDistributionFromApi(callback) {
 }
 
 function pullWealthDistributionNetworks(callback) {
-	$.getJSON("./data/wealth_distribution_networks.json", function(data) {
+	var filename = (historical_data_block == 190000) ? "./data/wealth_distribution_networks.json" : "./data/historical/wealth_distribution_networks." + historical_data_block + ".json";
+	$.getJSON(filename, function(data) {
 		// Handle callbacks
 		if (callback && typeof callback === 'function') {
 			callback.call(this);

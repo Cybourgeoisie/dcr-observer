@@ -3,6 +3,7 @@ var valid_uri_hashes = ['home', 'top-hd', 'dist', 'dist-hd', 'addr', 'hd-addr'];
 var dcr_price = 30.0;
 var total_dcr = 7000000;
 var current_block_height = 190000;
+var historical_data_block = 190000;
 
 function boot() {
 	$.post('api/State/getInfo')
@@ -13,6 +14,7 @@ function boot() {
 
 	 		// Display current height and amount
 	 		$('span.dcr-current-block-height').html(parseInt(current_block_height).toLocaleString());
+	 		$('span.historical-slider-value').html(parseInt(current_block_height).toLocaleString());
 	 		$('span.dcr-current-total-supply').html(parseFloat(total_dcr).toLocaleString());
 
 			handleNavigation(window.location.hash.substr(1) || "home");
@@ -96,6 +98,34 @@ function setEvents() {
 		var address = $(this).find('input#dcr-address-input').val();
 		window.location.hash = '#addr=' + address;
 		handleNavigation.call(this, 'addr=' + address);
+	});
+
+	// Attach logic to the slider
+	$('.historical-slider-input').slider({
+		"formatter": function(value) {
+			return 'Block: ' + value;
+		}
+	});
+
+	$('.historical-slider-input').on("slide", function(slideEvt) {
+		var block = (slideEvt.value==190000) ? parseInt(current_block_height) : slideEvt.value;
+		$('.historical-slider-value').html(block.toLocaleString());
+	});
+
+	$('.historical-slider-button').click(function(event) {
+		historical_data_block = $('.historical-slider-input').val();
+
+		// Reload the data
+		var uri = window.location.hash.substr(1) || "home";
+		if (uri == 'home') {
+			pullTopAddresses();
+		} else if (uri == 'dist') {
+			pullWealthDistribution();
+		} else if (uri == 'top-hd') {
+			pullTopNetworks();
+		} else if (uri == 'dist-hd') {
+			pullWealthDistributionNetworks();
+		}
 	});
 }
 
