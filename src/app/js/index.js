@@ -213,6 +213,7 @@ function loadHdAddressInfo(address, callback) {
 	});
 }
 
+var remaining_hd_addresses_to_load = [];
 function setHdAddressInfo(hd_addresses, req_address) {
 	// Set the current requested address
 	$('.hd-top-address').html(req_address);
@@ -232,41 +233,29 @@ function setHdAddressInfo(hd_addresses, req_address) {
 		total_received += parseFloat(hd_addresses[i].vout);
 		total_sent     += parseFloat(hd_addresses[i].vin);
 
-		// Get local information
-		var address    = hd_addresses[i].address;
-		var balance    = hd_addresses[i].balance;
-		var identifier = hd_addresses[i].identifier;
-		var tx_hash    = hd_addresses[i].tx_hash;
-
-		// Add a row
-		var $new_row = $hd_address_row.clone(true);
-		$new_row.find('th').html(i+1);
-		$new_row.find('td.hd-addr-address > a').html(address).data('address', address).attr('href', '#addr=' + address);
-		$new_row.find('td.hd-addr-balance > .hd-addr-balance-value').html(parseFloat(balance).toLocaleString());
-
-		// If the address has an identifier, display it
-		$new_row.find('.hd-badge-address-identifier').hide();
-		$new_row.find('.hd-addr-identifier').html('');
-		if (hd_addresses[i].hasOwnProperty('identifier') && identifier) {
-			$new_row.find('.hd-badge-address-identifier').show();
-			$new_row.find('.hd-addr-identifier').html(identifier);
+		if (i < 10) {
+			addHdAddressRow($hd_address_tbody, $hd_address_row, hd_addresses[i], i+1);
 		}
-
-		// Only display first 10 addresses by default
-		if (i >= 10) {
-			$new_row.hide();
-		}
-
-		$hd_address_tbody.append($new_row);
 	}
 
-	// Allow user to see more
-	// Reset the "show all" button
-	$('button.show-all-hd').removeAttr('disabled').html('Show All Addresses*');
+	if (hd_addresses.length > 10) {
+		// Store the remaining addresses for loading via "show all"
+		remaining_hd_addresses_to_load = hd_addresses.slice(10);
+		$('button.show-all-hd').removeAttr('disabled').html('Show All Addresses*');
+	} else {
+		$('button.show-all-hd').attr("disabled", "disabled").html('Showing All Addresses');
+	}
 
 	// Set the "show all" button to do something
 	$('button.show-all-hd').click(function(event) {
-		$('.table-hd-addresses tr').show();
+		var $hd_address_table = $('.table-hd-addresses');
+		var $hd_address_tbody = $hd_address_table.find('tbody');
+		var $hd_address_row = $hd_address_table.find('tr:last').clone(true).show();
+
+		for (var i = 0; i < remaining_hd_addresses_to_load.length; i++) {
+			addHdAddressRow($hd_address_tbody, $hd_address_row, hd_addresses[i], i + 11);			
+		}
+
 		$('button.show-all-hd').attr("disabled", "disabled").html('Showing All Addresses');
 	});
 
@@ -276,5 +265,28 @@ function setHdAddressInfo(hd_addresses, req_address) {
 	$('.hd-total-in').html(total_received.toLocaleString());
 	$('.hd-total-out').html(total_sent.toLocaleString());
 	$('.hd-num-addresses').html(hd_addresses.length);
+}
 
+function addHdAddressRow($hd_address_tbody, $hd_address_row, hd_address, row_number) {
+	// Get local information
+	var address    = hd_address.address;
+	var balance    = hd_address.balance;
+	var identifier = hd_address.identifier;
+	var tx_hash    = hd_address.tx_hash;
+
+	// Add a row
+	var $new_row = $hd_address_row.clone(true);
+	$new_row.find('th').html(row_number);
+	$new_row.find('td.hd-addr-address > a').html(address).data('address', address).attr('href', '#addr=' + address);
+	$new_row.find('td.hd-addr-balance > .hd-addr-balance-value').html(parseFloat(balance).toLocaleString());
+
+	// If the address has an identifier, display it
+	$new_row.find('.hd-badge-address-identifier').hide();
+	$new_row.find('.hd-addr-identifier').html('');
+	if (hd_address.hasOwnProperty('identifier') && identifier) {
+		$new_row.find('.hd-badge-address-identifier').show();
+		$new_row.find('.hd-addr-identifier').html(identifier);
+	}
+
+	$hd_address_tbody.append($new_row);
 }
