@@ -1,6 +1,13 @@
 -- Do all updates first
 BEGIN;
 
+-- Add new addresses
+INSERT INTO balance (address_id)
+SELECT a.address_id 
+FROM address a
+JOIN database_blockchain_state dbs ON dbs.last_address_id < a.address_id
+ON CONFLICT DO NOTHING;
+
 -- From the state, update the entries in the balance table
 -- vout count, vout value
 UPDATE
