@@ -7,6 +7,12 @@ function pullWealthDistribution(callback) {
 		$('.dist-lead').html('The current Decred address wealth distribution.');
 	}
 
+	// Use the API if we're not loading historical data
+	if (historical_data_block == 190000) {
+		pullWealthDistributionFromApi(callback);
+		return;
+	}
+
 	$.getJSON(filename, function(data) {
 		// Handle callbacks
 		if (callback && typeof callback === 'function') {
@@ -122,6 +128,12 @@ function pullWealthDistributionNetworks(callback) {
 		$('.dist-hd-lead').html('The current Decred wealth distribution by connected addresses.');
 	}
 
+	// Use the API if we're not loading historical data
+	if (historical_data_block == 190000) {
+		pullWealthDistributionNetworksFromApi(callback);
+		return;
+	}
+
 	$.getJSON(filename, function(data) {
 		// Handle callbacks
 		if (callback && typeof callback === 'function') {
@@ -172,6 +184,58 @@ function pullWealthDistributionNetworks(callback) {
 			$new_row.find('td.td-hd-pct-supply .wealth-hd-pct-supply').html(pct_dcr + "%");
 			$new_row.find('td.td-hd-pct-supply .progress-bar').css('width', pct_dcr + '%');
 			$distrib_tbody.append($new_row);
+		}
+	});
+}
+
+function pullWealthDistributionNetworksFromApi(callback) {
+	$.post('api/Address/getWealthNetworks')
+	 .done(function(data) {
+	 	if (data.hasOwnProperty('success') && data.success) {
+	 		// Handle callbacks
+	 		if (callback && typeof callback === 'function') {
+	 			callback.call(this);
+	 		}
+
+			var $distrib_table = $('.table-distribution-hd');
+			var $distrib_tbody = $distrib_table.find('tbody');
+			var $distrib_row = $distrib_table.find('tr:last').clone(false);
+
+			// Clear the existing data
+			$distrib_tbody.html('');
+
+			// Get the total address count
+			var total_wallets = 0;
+			for (var i = 0; i < data.wealth.length; i++) {
+				total_wallets += parseInt(data.wealth[i]['num_wallets']);
+			}
+
+			// Now display them all
+			for (var i = 0; i < data.wealth.length; i++) {
+				var bin;
+				if (i == 0) {
+					bin = "0* to " + parseInt(Math.pow(10, data.wealth[i]['bin'])).toLocaleString() + " DCR";
+				} else {
+					bin = parseInt(Math.pow(10, data.wealth[i-1]['bin'])).toLocaleString() + " to " + parseInt(Math.pow(10, data.wealth[i]['bin'])).toLocaleString() + " DCR";
+				}
+
+				var count = data.wealth[i]['num_wallets'];
+				var value = data.wealth[i]['total_balance'];
+
+				var pct_accts = ((parseFloat(count) / total_wallets) * 100).toFixed(4);
+				var pct_dcr = ((parseFloat(value) / total_dcr) * 100).toFixed(2);
+
+				var $new_row = $distrib_row.clone(false);
+				$new_row.find('th').html(bin);
+				$new_row.find('td.td-hd-num-wallets').html(parseInt(count).toLocaleString());
+				$new_row.find('td.td-hd-pct-wallets .wealth-hd-pct-wallets').html(pct_accts + "%");
+				$new_row.find('td.td-hd-pct-wallets .progress-bar').css('width', pct_accts + '%');
+				$new_row.find('td.td-hd-sum').html(parseInt(value).toLocaleString() + " DCR");
+				//$new_row.find('td.td-hd-sum-value').html();
+				$new_row.find('td.td-hd-pct-supply .wealth-hd-pct-supply').html(pct_dcr + "%");
+				$new_row.find('td.td-hd-pct-supply .progress-bar').css('width', pct_dcr + '%');
+				$distrib_tbody.append($new_row);
+			}
 		}
 	});
 }

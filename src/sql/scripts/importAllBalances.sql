@@ -1,6 +1,12 @@
 -- create all address rows
 INSERT INTO balance (address_id) SELECT address_id FROM address ON CONFLICT DO NOTHING;
 
+-- Stop autovacuum for the cluster
+ALTER SYSTEM SET autovacuum = off;
+SELECT * from pg_reload_conf();
+
+--select * from pg_settings where name like 'autovacuum%';
+
 -- vout count, vout value
 UPDATE
   balance
@@ -11,7 +17,7 @@ FROM (
   SELECT
     a.address_id,
     coalesce(count(DISTINCT vout.vout_id), 0) AS vout_count,
-    coalesce(sum(vout.value), 0) AS vout_value
+    coalesce(sum(coalesce(vout.value, 0)), 0) AS vout_value
   FROM
     address a
   JOIN
@@ -24,7 +30,6 @@ FROM (
 WHERE
   balance.address_id = sq.address_id;
 
-
 -- vin count, vin amountin
 UPDATE
   balance
@@ -35,7 +40,7 @@ FROM (
   SELECT
     a.address_id,
     coalesce(count(DISTINCT vin.vin_id), 0) AS vin_count,
-    coalesce(sum(vin.amountin), 0) AS vin_amountin
+    coalesce(sum(coalesce(vin.amountin, 0)), 0) AS vin_amountin
   FROM
     address a
   JOIN
@@ -76,6 +81,7 @@ FROM (
 ) AS sq
 WHERE
   balance.address_id = sq.address_id;
+
 
 -- stx
 UPDATE
@@ -167,6 +173,10 @@ FROM (
 WHERE
   balance.address_id = sq.address_id;
 
+--ALTER TABLE balance DISABLE TRIGGER ALL;
+--EXPLAIN ANALYZE UPDATE balance SET balance = COALESCE(vout, 0) - COALESCE(vin, 0) WHERE balance_id < 50000;
+
+ALTER TABLE balance DISABLE TRIGGER ALL;
 UPDATE
   balance
 SET
@@ -180,3 +190,9 @@ FROM (
 ) AS sq
 WHERE
   balance.address_id = sq.address_id;
+ALTER TABLE balance ENABLE TRIGGER ALL;
+
+-- Start autovacuum for the cluster
+-- I'm not a big fan of using the autovacuum right now.
+--ALTER SYSTEM SET autovacuum = on;
+--SELECT * from pg_reload_conf();

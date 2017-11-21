@@ -111,12 +111,17 @@ function produceDbInserts(height) {
 			db_inserts += 'FROM block WHERE block.height = ' + block.height + ';';
 
 			// Get the incoming amounts
+			var b_has_stakebase = false;
 			for (var j = 0; j < tx.vin.length; j++) {
 				var vin = tx.vin[j];
 
 				// Set defaults if not provided
 				if (!vin.hasOwnProperty('tree')) vin.tree = 'NULL';
 				if (!vin.hasOwnProperty('vout')) vin.vout = 'NULL';
+
+				if (vin.hasOwnProperty('stakebase')) {
+					b_has_stakebase = true;
+				}
 
 				// Pull from a pre-existing vout if we can
 				if (!vin.hasOwnProperty('coinbase') && !vin.hasOwnProperty('stakebase')) {
@@ -138,6 +143,24 @@ function produceDbInserts(height) {
 					db_inserts += 'INSERT INTO vin ("tx_id", "amountin", "blockheight", "tree", "blockindex", "vout", "coinbase", "stakebase", "sequence") ';
 					db_inserts += 'SELECT tx.tx_id, ' + vin.amountin + ',' + vin.blockheight + ',' + vin.tree + ',' + vin.blockindex + ',' + vin.vout + ',\'' + vin.coinbase + '\',\'' + vin.stakebase + '\',' + vin.sequence + ' ';
 					db_inserts += 'FROM tx WHERE tx.hash = \'' + tx.txid + '\';';
+				}
+			}
+
+			// Import any votes
+			if (b_has_stakebase && tx.vout.length > 2)
+			{
+				// Second vout is the vote
+				var voting_vout = tx.vout[1];
+
+				if (voting_vout.hasOwnProperty('scriptPubKey') && voting_vout.scriptPubKey.hasOwnProperty('hex'))
+				{
+					// These rules are true NOW but they may change in future versions
+					var vote_bits  = voting_vout.scriptPubKey.hex.substring(4,6);
+					var issue_bits = voting_vout.scriptPubKey.hex.substring(6,10);
+
+					db_inserts += 'INSERT INTO tx_vote ("tx_id", "hex", "votes", "version") ';
+					db_inserts += 'SELECT tx.tx_id, \'' + voting_vout.scriptPubKey.hex + '\',\'' + vote_bits + '\',\'' + issue_bits + '\' ';
+					db_inserts += 'FROM tx WHERE tx.hash = \'' + tx.txid + '\' ORDER BY tx.tx_id DESC LIMIT 1;\r\n';
 				}
 			}
 

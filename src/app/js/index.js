@@ -5,7 +5,6 @@ var total_dcr = 6617242.27624844;
 var current_block_height = 187908;
 var historical_data_block = 190000;
 
-/*
 function boot() {
 	$.post('api/State/getInfo')
 	 .done(function(data) {
@@ -25,21 +24,6 @@ function boot() {
 	// Startup logic
 	setEvents();
 	getDcrPrice();
-}
-*/
-
-// For maintenance only
-function boot() {
-	// Startup logic
-	setEvents();
-	getDcrPrice();
-
-	// Display current height and amount
-	$('span.dcr-current-block-height').html(parseInt(current_block_height).toLocaleString());
-	$('span.historical-slider-value').html(parseInt(current_block_height).toLocaleString());
-	$('span.dcr-current-total-supply').html(parseFloat(total_dcr).toLocaleString());
-
-	handleNavigation(window.location.hash.substr(1) || "home");
 }
 
 function getDcrPrice() {
@@ -66,11 +50,9 @@ function handleNavigation(uri_hash) {
 
 	// If we're viewing an address, pass along to the address page
 	if (uri == 'addr' && uri_param && uri_param.length) {
-		showPage('maintenance');
-		//loadAddressInfo(uri_param, function() { showPage('addr'); });
+		loadAddressInfo(uri_param, function() { showPage('addr'); });
 	} else if (uri == 'hd-addr' && uri_param && uri_param.length) {
-		showPage('maintenance');
-		//loadHdAddressInfo(uri_param, function() { showPage('hd-addr'); });
+		loadHdAddressInfo(uri_param, function() { showPage('hd-addr'); });
 	} else if (uri == 'home') {
 		pullTopAddresses(function() { showPage('home'); });
 	} else if (uri == 'dist') {
@@ -213,7 +195,7 @@ function setAddressNetwork(network_info, address) {
 	// Report the count
 	if (network_info && network_info.network_size && parseInt(network_info.network_size) > 1) {
 		$('span.addr-est-wallet').show();
-		$('span.addr-est-wallet > a').attr('href', '#hd-addr=' + address).html(parseInt(network_info.network_size) + '+ addresses');
+		$('span.addr-est-wallet > a').attr('href', '#hd-addr=' + address).html(parseInt(network_info.network_size) + ' addresses');
 	} else {
 		$('span.addr-est-wallet-none').show();
 	}
@@ -262,11 +244,13 @@ function setHdAddressInfo(hd_addresses, req_address) {
 		$new_row.find('td.hd-addr-address > a').html(address).data('address', address).attr('href', '#addr=' + address);
 		$new_row.find('td.hd-addr-balance > .hd-addr-balance-value').html(parseFloat(balance).toLocaleString());
 
+		/*
 		if (req_address != address) {
 			$new_row.find('td.hd-addr-tx-link > a').attr('href', 'https://explorer.dcrdata.org/explorer/tx/' + tx_hash).html('View');
 		} else {
 			$new_row.find('td.hd-addr-tx-link > a').html('');
 		}
+		*/
 
 		// If the address has an identifier, display it
 		$new_row.find('.hd-badge-address-identifier').hide();

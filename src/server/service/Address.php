@@ -66,8 +66,8 @@ class Address extends \Scrollio\Service\AbstractService
 			SELECT 
 				a.address,
 				a.identifier,
-				ba.balance,
-				tx.hash AS tx_hash,
+				CASE WHEN COALESCE(ba.balance, 0) < 0 THEN 0 ELSE COALESCE(ba.balance, 0) END AS balance,
+				--tx.hash AS tx_hash,
 				COALESCE(ba.tx, 0)    AS "tx",
 				COALESCE(ba.stx, 0)   AS "stx",
 				COALESCE(ba.vout, 0)  AS "vout",
@@ -80,38 +80,28 @@ class Address extends \Scrollio\Service\AbstractService
 				be.height AS last
 			FROM (
 				SELECT
-					DISTINCT va_other.address_id,
-					MIN(vin.tx_id) AS tx_id
+					DISTINCT a.address_id
 				FROM
-					vout_address va_this
+					address a
 				JOIN
-					vin ON vin.vout_id = va_this.vout_id
-				JOIN
-					vin vin_other ON vin_other.tx_id = vin.tx_id
-				JOIN
-					vout_address va_other ON 
-						va_other.vout_id = vin_other.vout_id
-				JOIN
-					address a ON a.address_id = va_this.address_id
+					address a_this ON a_this.address = $1
 				WHERE
-					a.address = $1
-				GROUP BY
-					va_other.address_id
+					a_this.network = a.network
 			) AS sq
 			JOIN
-				balance ba ON ba.address_id = sq.address_id
-			JOIN
-				address a ON a.address_id = ba.address_id
-			JOIN
+				address a ON a.address_id = sq.address_id
+			LEFT OUTER JOIN
+				balance ba ON ba.address_id = a.address_id
+			LEFT OUTER JOIN
 				block bs ON bs.block_id = ba.first_block_id
-			JOIN
+			LEFT OUTER JOIN
 				block be ON be.block_id = ba.last_block_id
-			JOIN
-				tx ON tx.tx_id = sq.tx_id
-			WHERE
-				balance > 0
+			--JOIN
+			--	tx ON tx.tx_id = sq.tx_id
+			--WHERE
+			--	balance > 0
 			ORDER BY
-				balance DESC;
+				balance DESC NULLS LAST;
 		';
 		$db_handler = \Geppetto\DatabaseHandler::init();
 		$res = $db_handler->query($sql, array($address));
@@ -140,20 +130,17 @@ class Address extends \Scrollio\Service\AbstractService
 
 		$sql = '
 			SELECT
-				COUNT(DISTINCT va_other.address_id)
-			FROM
-				vout_address va_this
-			JOIN
-				vin ON vin.vout_id = va_this.vout_id
-			JOIN
-				vin vin_other ON vin_other.tx_id = vin.tx_id
-			JOIN
-				vout_address va_other ON 
-					va_other.vout_id = vin_other.vout_id
-			JOIN
-				address a ON a.address_id = va_this.address_id
-			WHERE
-				a.address = $1;
+				count
+			FROM (
+				SELECT
+					COUNT(DISTINCT a.address_id) AS count
+				FROM
+					address a
+				JOIN
+					address a_this ON a_this.address = $1
+				WHERE
+					a_this.network = a.network
+			) AS sq;
 		';
 		$db_handler = \Geppetto\DatabaseHandler::init();
 		$res = $db_handler->query($sql, array($address));
@@ -200,6 +187,50 @@ class Address extends \Scrollio\Service\AbstractService
 		);
 	}
 
+	public function getTopNetworks()
+	{
+		$sql = '
+			SELECT
+				hd.network,
+				hd.balance,
+				hd.rank,
+				hd.num_addresses,
+				sq.address,
+				sq.identifier
+			FROM (
+				SELECT 
+			        DISTINCT ON (a.network)
+			        a.network,
+			        a.address,
+			        a.identifier
+			    FROM
+			        address a
+			    JOIN
+			        balance b ON b.address_id = a.address_id
+			    ORDER BY
+			        a.network, b.balance DESC
+			) AS sq
+			JOIN
+				hd_network hd ON sq.network = hd.network
+			GROUP BY
+				hd.network, hd.balance, hd.rank, hd.num_addresses, sq.address, sq.identifier
+			ORDER BY
+				balance DESC
+			LIMIT
+				500;
+		';
+		$db_handler = \Geppetto\DatabaseHandler::init();
+		$res = $db_handler->query($sql, array());
+
+		if (empty($res) || !array_key_exists(0, $res)) {
+			throw new \Exception('Could not collect top Decred addresses.');
+		}
+
+		return array(
+			'top' => $res
+		);
+	}
+
 	public function getWealth()
 	{
 		$sql = '
@@ -219,6 +250,41 @@ class Address extends \Scrollio\Service\AbstractService
 				SUM(balance) AS total_balance
 			FROM
 				balance
+			WHERE
+				balance > 0
+			GROUP BY 1 ORDER BY 1 ASC;
+		';
+		$db_handler = \Geppetto\DatabaseHandler::init();
+		$res = $db_handler->query($sql, array());
+
+		if (empty($res) || !array_key_exists(0, $res)) {
+			throw new \Exception('Could not collect Decred wealth by address.');
+		}
+
+		return array(
+			'wealth' => $res
+		);
+	}
+
+	public function getWealthNetworks()
+	{
+		$sql = '
+			SELECT
+				CASE
+					WHEN balance < 1         THEN 0
+					WHEN balance < 10        THEN 1
+					WHEN balance < 100       THEN 2
+					WHEN balance < 1000      THEN 3
+					WHEN balance < 10000     THEN 4
+					WHEN balance < 100000    THEN 5
+					WHEN balance < 1000000   THEN 6
+					WHEN balance < 10000000  THEN 7
+					WHEN balance < 100000000 THEN 8
+				ELSE 0 END AS bin,
+				COUNT(*) AS num_wallets,
+				SUM(balance) AS total_balance
+			FROM
+				hd_network
 			WHERE
 				balance > 0
 			GROUP BY 1 ORDER BY 1 ASC;

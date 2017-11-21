@@ -14,7 +14,7 @@ X Fix bug with balance calculations
 - Add identifiers to addresses for developer fund, exchanges, miners, & stakepools
 	X Developer Fund
 	X Miners
-	- Exchanges
+	X Exchanges
 	- Stakepools
 X Top 500 HD wallets from DB (NOTE: Not from DB, but from accurate source)
 X Wealth distribution by HD wallet from DB (NOTE: Not from DB, but from accurate source)
@@ -27,6 +27,7 @@ X Mobile-friendly UI
 X Optimize database updates
 
 To Revisit:
-- DB should be definitive for more than just transactions and the top 500. We have two data sources. We should ideally only have one.
+X DB should be definitive for more than just transactions and the top 500. We have two data sources. We should ideally only have one.
+	- UPDATE: Was able to migrate the HD logic to Postgres and the database. We can start to phase out the JavaScript caches.
 	- It's fine if we migrate to mongo or an ever-running JS module, but it needs to be architected correctly.
 	- Alternatively, we just need to definitively determine HD wallets using Postgres instead of Javascript. Which could be via imports or a working schema, but I think the logic to generate HD wallets can't be fully implemented in SQL - at least, not to my knowledge. I think we need to go outside of Postgres to format the data and import it.

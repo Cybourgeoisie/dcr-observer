@@ -47,8 +47,6 @@ CREATE TABLE "vout" (
 	"n"           BIGINT,
 	"version"     BIGINT,
 	"type"        TEXT,
-	"asm"         TEXT,
-	"hex"         TEXT,
 	"reqSigs"     INTEGER,
 	"key"         VARCHAR(22) -- Used for definitive insert matching ("{blockheight}-{tree}-{blockindex}-{n}")
 );
@@ -90,12 +88,15 @@ CREATE TABLE "vin" (
 	"vout"        INTEGER,
 	"coinbase"    TEXT,
 	"stakebase"   TEXT,
-	"sequence"    BIGINT,
-	"asm"         TEXT,
-	"hex"         TEXT
+	"sequence"    BIGINT
 );
 
 -- CREATE INDEX vin_tx_id_key ON vin (tx_id);
 -- CREATE INDEX vin_vout_id_key ON vin (vout_id);
+
+-- ALTER TABLE vout DROP COLUMN asm;
+-- ALTER TABLE vout DROP COLUMN hex;
+-- ALTER TABLE vin DROP COLUMN asm;
+-- ALTER TABLE vin DROP COLUMN hex;
 
 COMMIT;
