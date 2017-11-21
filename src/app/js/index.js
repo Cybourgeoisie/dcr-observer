@@ -244,14 +244,6 @@ function setHdAddressInfo(hd_addresses, req_address) {
 		$new_row.find('td.hd-addr-address > a').html(address).data('address', address).attr('href', '#addr=' + address);
 		$new_row.find('td.hd-addr-balance > .hd-addr-balance-value').html(parseFloat(balance).toLocaleString());
 
-		/*
-		if (req_address != address) {
-			$new_row.find('td.hd-addr-tx-link > a').attr('href', 'https://explorer.dcrdata.org/explorer/tx/' + tx_hash).html('View');
-		} else {
-			$new_row.find('td.hd-addr-tx-link > a').html('');
-		}
-		*/
-
 		// If the address has an identifier, display it
 		$new_row.find('.hd-badge-address-identifier').hide();
 		$new_row.find('.hd-addr-identifier').html('');
@@ -270,7 +262,7 @@ function setHdAddressInfo(hd_addresses, req_address) {
 
 	// Allow user to see more
 	// Reset the "show all" button
-	$('button.show-all-hd').removeAttr('disabled').html('Show All Addresses');
+	$('button.show-all-hd').removeAttr('disabled').html('Show All Addresses*');
 
 	// Set the "show all" button to do something
 	$('button.show-all-hd').click(function(event) {
@@ -283,4 +275,6 @@ function setHdAddressInfo(hd_addresses, req_address) {
 	$('.hd-fiat-value').html('$' + parseInt(parseFloat(total_balance)*dcr_price).toLocaleString());
 	$('.hd-total-in').html(total_received.toLocaleString());
 	$('.hd-total-out').html(total_sent.toLocaleString());
+	$('.hd-num-addresses').html(hd_addresses.length);
+
 }
