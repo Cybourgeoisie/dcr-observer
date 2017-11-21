@@ -29,7 +29,7 @@ INSERT INTO tx_network (tx_id, network) SELECT tx_id, 9223372036854775800 FROM t
 
 CREATE TABLE "hd_network" (
     "hd_network_id"  BIGSERIAL PRIMARY KEY,
---    "address_id"     BIGINT UNIQUE REFERENCES "address" (address_id),
+    "address_id"     BIGINT UNIQUE REFERENCES "address" (address_id),
     "network"        BIGINT UNIQUE,
     "balance"        NUMERIC,
     "rank"           BIGINT,
@@ -38,7 +38,9 @@ CREATE TABLE "hd_network" (
 
 -- ALTER TABLE hd_network ADD COLUMN rank BIGINT;
 -- ALTER TABLE hd_network ADD COLUMN num_addresses BIGINT;
+-- ALTER TABLE hd_network ADD COLUMN address_id BIGINT UNIQUE REFERENCES "address" (address_id);
 -- CREATE INDEX hd_network_network_idx ON hd_network (network);
+-- CREATE INDEX hd_network_address_id_idx ON hd_network (address_id);
 
 COMMIT;
 
@@ -116,23 +118,24 @@ FROM (
 WHERE
   hd_network.network = sq.network;
 
---UPDATE
---  hd_network
---SET
---  top_address_id = sq.address_id
---FROM (
---    SELECT 
---        DISTINCT ON (a.network)
---        a.network,
---        a.address_id
---    FROM
---        address a
---    JOIN
---        balance b ON b.address_id = a.address_id
---    ORDER BY
---        a.network, b.balance DESC
---) AS sq
---WHERE
---  hd_network.network = sq.network;
+UPDATE
+  hd_network
+SET
+  address_id = sq.address_id
+FROM (
+    SELECT 
+        DISTINCT ON (a.network)
+        a.network,
+        a.address_id
+    FROM
+        address a
+    JOIN
+        balance b ON b.address_id = a.address_id
+    ORDER BY
+        a.network, b.balance DESC
+) AS sq
+WHERE
+  hd_network.network = sq.network;
+
 
 COMMIT;

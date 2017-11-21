@@ -195,25 +195,14 @@ class Address extends \Scrollio\Service\AbstractService
 				hd.balance,
 				hd.rank,
 				hd.num_addresses,
-				sq.address,
-				sq.identifier
-			FROM (
-				SELECT 
-			        DISTINCT ON (a.network)
-			        a.network,
-			        a.address,
-			        a.identifier
-			    FROM
-			        address a
-			    JOIN
-			        balance b ON b.address_id = a.address_id
-			    ORDER BY
-			        a.network, b.balance DESC
-			) AS sq
+				a.address,
+				a.identifier
+			FROM
+				hd_network hd
 			JOIN
-				hd_network hd ON sq.network = hd.network
+				address a ON a.address_id = hd.address_id
 			GROUP BY
-				hd.network, hd.balance, hd.rank, hd.num_addresses, sq.address, sq.identifier
+				hd.network, hd.balance, hd.rank, hd.num_addresses, a.address, a.identifier
 			ORDER BY
 				balance DESC
 			LIMIT
