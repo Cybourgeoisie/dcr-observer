@@ -201,10 +201,8 @@ class Address extends \Scrollio\Service\AbstractService
 				hd_network hd
 			JOIN
 				address a ON a.address_id = hd.address_id
-			GROUP BY
-				hd.network, hd.balance, hd.rank, hd.num_addresses, a.address, a.identifier
 			ORDER BY
-				balance DESC
+				rank ASC
 			LIMIT
 				500;
 		';

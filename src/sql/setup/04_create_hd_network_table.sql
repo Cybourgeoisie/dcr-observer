@@ -41,6 +41,7 @@ CREATE TABLE "hd_network" (
 -- ALTER TABLE hd_network ADD COLUMN address_id BIGINT UNIQUE REFERENCES "address" (address_id);
 -- CREATE INDEX hd_network_network_idx ON hd_network (network);
 -- CREATE INDEX hd_network_address_id_idx ON hd_network (address_id);
+-- CREATE INDEX hd_network_rank_idx ON hd_network (rank);
 
 COMMIT;
 
