@@ -243,11 +243,17 @@ function setHdAddressInfo(hd_addresses, req_address) {
 	$hd_address_tbody.html('');
 
 	// Collect the cumulative information
-	var total_balance = 0, total_received = 0, total_sent = 0
+	var total_balance = 0, total_received = 0, total_sent = 0;
+	var identifier = '';
 	for (var i = 0; i < hd_addresses.length; i++) {
 		total_balance  += parseFloat(hd_addresses[i].balance);
 		total_received += parseFloat(hd_addresses[i].vout);
 		total_sent     += parseFloat(hd_addresses[i].vin);
+
+		// Pull the identifier from the requested address
+		if (hd_addresses[i].address == req_address) {
+			identifier = hd_addresses[i].identifier;
+		}
 
 		if (i < 10) {
 			addHdAddressRow($hd_address_tbody, $hd_address_row, hd_addresses[i], i+1);
@@ -282,6 +288,14 @@ function setHdAddressInfo(hd_addresses, req_address) {
 	$('.hd-total-in').html(total_received.toLocaleString());
 	$('.hd-total-out').html(total_sent.toLocaleString());
 	$('.hd-num-addresses').html(hd_addresses.length);
+
+	// If the top address has an identifier, display it
+	$('.dcr-badge-hd-address-identifier').hide();
+	$('span.hd-addr-identifier').html('');
+	if (identifier && identifier.length > 0) {
+		$('.dcr-badge-hd-address-identifier').show();
+		$('span.hd-addr-identifier').html(identifier);
+	}
 }
 
 function addHdAddressRow($hd_address_tbody, $hd_address_row, hd_address, row_number) {
