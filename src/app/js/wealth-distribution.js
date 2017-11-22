@@ -304,11 +304,13 @@ function showWealthDistributionPie(results) {
 	var e = document.documentElement,
 		g = document.getElementsByTagName('body')[0],
 		x = window.innerWidth || e.clientWidth || g.clientWidth;
-	var pieSize         = (x < 768) ? 280 : ((x < 992) ? 340 : 440);
+	var pieSize         = (x < 768) ? 240 : ((x < 992) ? 320 : 440);
 	var fontSize        = (x < 768) ? 11 : ((x < 992) ? 15 : 20);
 	var subFontSize     = (x < 768) ? 9 : ((x < 992) ? 11 : 12);
 	var subtitlePadding = (x < 768) ? 8 : ((x < 992) ? 10 : 12);
 	var labelFontSize   = (x < 768) ? 9 : ((x < 992) ? 10 : 11);
+	var truncateLength  = (x < 992) ? 10 : 12;
+	var widthBuffer     = (x < 768) ? 110 : 180;
 
 	// Generate colors for this data
 	var gradient, colorsHsv;
@@ -344,26 +346,20 @@ function showWealthDistributionPie(results) {
 			"location": "pie-center",
 			"titleSubtitlePadding": subtitlePadding
 		},
-		"size": { "canvasHeight": pieSize, "canvasWidth": pieSize+120, "pieInnerRadius": "55%", "pieOuterRadius": "100%" },
+		"size": { "canvasHeight": pieSize, "canvasWidth": pieSize+widthBuffer, "pieInnerRadius": "55%", "pieOuterRadius": "100%" },
 		"data": {
-			"sortOrder": "none",//"value-desc",
-			/*"smallSegmentGrouping": {
-				"enabled": true,
-				"value": 0.97,
-				"valueType": "percentage",
-				"label": "Other",
-				"color": "#cccccc"
-			},*/
+			"sortOrder": "none",
 			"content": contentData
 		},
 		"labels": {
-			"outer": { "format": "label", "pieDistance": 14, "hideWhenLessThanPercentage": 1 },
-			"inner": { "hideWhenLessThanPercentage": 1 },
+			"outer": { "format": "label-value2", "pieDistance": 6, "hideWhenLessThanPercentage": 1 },
+			"inner": { "hideWhenLessThanPercentage": 1.33 },
 			"mainLabel": { "fontSize": labelFontSize },
 			"percentage": { "color": "#ffffff", "decimalPlaces": 2 },
 			"value": { "color": "#adadad", "fontSize": labelFontSize },
 			"lines": { "enabled": false },
-			"truncation": { "enabled": true, "truncateLength":15 }
+			"truncation": { "enabled": true, "truncateLength":truncateLength },
+			formatter: function(ctx) { var label = ctx.label; if (ctx.part == 'value') { return parseInt(ctx.label).toLocaleString() + " DCR"; } return label; }
 		},
 		"effects": { "load": {
 			"effect": "default", // none / default

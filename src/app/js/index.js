@@ -136,6 +136,8 @@ function setEvents() {
 		var $source = $(e.relatedTarget);
 		if ($source.data('origin') == 'dist-addr' || $source.data('origin') == 'dist-hd-addr') {
 			getWealthDistributionPie($(this), $source);
+		} else if ($source.data('origin') == 'hd-addr') {
+			getAddressDistributionPie($(this), $source);
 		}
 	});
 
@@ -267,13 +269,14 @@ function setHdAddressInfo(hd_addresses, req_address) {
 		var $hd_address_row = $hd_address_table.find('tr:last').clone(true).show();
 
 		for (var i = 0; i < remaining_hd_addresses_to_load.length; i++) {
-			addHdAddressRow($hd_address_tbody, $hd_address_row, hd_addresses[i], i + 11);			
+			addHdAddressRow($hd_address_tbody, $hd_address_row, remaining_hd_addresses_to_load[i], i + 11);			
 		}
 
 		$('button.show-all-hd').attr("disabled", "disabled").html('Showing All Addresses');
 	});
 
 	// Set cumulative information
+	$('.hd-addr-view-all').data('address', req_address);
 	$('.hd-balance').html(total_balance.toLocaleString());
 	$('.hd-fiat-value').html('$' + parseInt(parseFloat(total_balance)*dcr_price).toLocaleString());
 	$('.hd-total-in').html(total_received.toLocaleString());
@@ -303,4 +306,102 @@ function addHdAddressRow($hd_address_tbody, $hd_address_row, hd_address, row_num
 	}
 
 	$hd_address_tbody.append($new_row);
+}
+
+function getAddressDistributionPie($modal, $source) {
+	// Display the loader
+	$modal.find('.modal-data-loading').show();
+
+	// Pull the address from the data source
+	var address = $source.data('address');
+
+	// Set title
+	$modal.find('.modal-title').html('Address Breakdown for HD Wallet');
+
+	$.post('api/Address/getHdChartBreakdown', {'address': address})
+	 .done(function(data) {
+	 	if (data.hasOwnProperty('success') && data.success) {
+	 		// Hide the loader
+			$modal.find('.modal-data-loading').hide();
+
+	 		// Load the pie
+	 		showAddressDistributionPie(data);
+	 	}
+	});
+}
+
+function showAddressDistributionPie(results) {
+	var data = results.data
+
+	// Determine the size of the pie
+	var e = document.documentElement,
+		g = document.getElementsByTagName('body')[0],
+		x = window.innerWidth || e.clientWidth || g.clientWidth;
+	var pieSize         = (x < 768) ? 240 : ((x < 992) ? 320 : 440);
+	var fontSize        = (x < 768) ? 11 : ((x < 992) ? 15 : 20);
+	var subFontSize     = (x < 768) ? 9 : ((x < 992) ? 11 : 12);
+	var subtitlePadding = (x < 768) ? 8 : ((x < 992) ? 10 : 12);
+	var labelFontSize   = (x < 768) ? 9 : ((x < 992) ? 10 : 11);
+	var truncateLength  = (x < 992) ? 10 : 12;
+	var widthBuffer     = (x < 768) ? 110 : 180;
+
+	// Generate colors for this data
+	var gradient, colorsHsv;
+	if (data.length > 2) {
+		gradient = tinygradient([
+			{color: '#2971FF', pos: 0},
+			{color: '#69D3F5', pos: 0.5},
+			{color: '#2ED6A1', pos: 1}
+		]);
+		colorsHsv = gradient.rgb(data.length);
+	} else if (data.length <= 2) {
+		colorsHsv = ['#2971FF','#2ED6A1'];
+	}
+
+	// Format the data
+	var contentData = [];
+	for (var i = 0; i < data.length; i++) {
+		contentData.push({
+			"label" : data[i].label,
+			"value" : parseFloat(data[i].value),
+			"color" : (data[i].label == 'Other') ? '#cccccc' : (data.length < 3) ? colorsHsv[i] : colorsHsv[i].toHexString()
+		});
+	}
+
+	var title = "Address Breakdown";
+
+	// Display the pie
+	d3pie("modal-d3", {
+		"header": {
+			"title": { "text": title, "fontSize": fontSize},
+			"location": "pie-center"
+		},
+		"size": { "canvasHeight": pieSize, "canvasWidth": pieSize+widthBuffer, "pieInnerRadius": "55%", "pieOuterRadius": "100%" },
+		"data": {
+			"sortOrder": "none",
+			"smallSegmentGrouping": {
+				"enabled": true,
+				"value": 1.32,
+				"valueType": "percentage",
+				"label": "Other",
+				"color": "#cccccc"
+			},
+			"content": contentData
+		},
+		"labels": {
+			"outer": { "format": "label-value2", "pieDistance": 6, "hideWhenLessThanPercentage": 1 },
+			"inner": { "hideWhenLessThanPercentage": 1.33 },
+			"mainLabel": { "fontSize": labelFontSize },
+			"percentage": { "color": "#ffffff", "decimalPlaces": 2 },
+			"value": { "color": "#adadad", "fontSize": labelFontSize },
+			"lines": { "enabled": false },
+			"truncation": { "enabled": true, "truncateLength":truncateLength },
+			formatter: function(ctx) { var label = ctx.label; if (ctx.part == 'value') { return parseInt(ctx.label).toLocaleString() + " DCR"; } return label; }
+		},
+		"effects": { "load": {
+			"effect": "default", // none / default
+			"speed": 750
+		}, "pullOutSegmentOnClick": { "effect": "linear", "speed": 400, "size": 8 } },
+		"misc": { "gradient": { "enabled": false, "percentage": 100 } }
+	});
 }

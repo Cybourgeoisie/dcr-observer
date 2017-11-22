@@ -825,6 +825,9 @@ var labels = {
 						formatterContext.value = d.value;
 						formatterContext.label = str;
 						str = settings.formatter(formatterContext);
+						if (settings.truncation.enabled && str.length > settings.truncation.truncateLength) {
+							str = str.substring(0, settings.truncation.truncateLength) + "...";
+						}
 					} else if (settings.truncation.enabled && d.label.length > settings.truncation.truncateLength) {
 						str = d.label.substring(0, settings.truncation.truncateLength) + "...";
 					}

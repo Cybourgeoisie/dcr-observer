@@ -120,6 +120,49 @@ class Address extends \Scrollio\Service\AbstractService
 		);
 	}
 
+	public function getHdChartBreakdown(string $address) {
+		// Validate the address
+		$address = preg_replace("/[^A-Za-z0-9]/", '', $address);
+		if (strlen($address) < 34 || strlen($address) > 36 || $address[0] != 'D')
+		{
+			throw new \Exception('Invalid address provided.');
+		}
+
+		$sql = '
+			SELECT 
+				a.address AS label,
+				ba.balance AS value
+			FROM (
+				SELECT
+					DISTINCT a.address_id
+				FROM
+					address a
+				JOIN
+					address a_this ON a_this.address = $1
+				WHERE
+					a_this.network = a.network
+			) AS sq
+			JOIN
+				address a ON a.address_id = sq.address_id
+			JOIN
+				balance ba ON ba.address_id = a.address_id
+			WHERE
+				balance > 0
+			ORDER BY
+				balance DESC;
+		';
+		$db_handler = \Geppetto\DatabaseHandler::init();
+		$res = $db_handler->query($sql, array($address));
+
+		if (empty($res) || !array_key_exists(0, $res) || !array_key_exists('value', $res[0])) {
+			throw new \Exception('Could not find breakdown for address');
+		}
+
+		return array(
+			'data' => $res
+		);
+	}
+
 	public function getImmediateNetwork(string $address) {
 		// Validate the address
 		$address = preg_replace("/[^A-Za-z0-9]/", '', $address);
