@@ -54,13 +54,16 @@ rm /home/ec2-user/dcr-rich-list/src/translator/sql_data/latest_blocks.sql;
 /bin/echo "Update the balances";
 /usr/bin/psql -d dcr-audit -U r9e43vzs5efe32gm -f /home/ec2-user/dcr-rich-list/src/sql/scripts/update_with_latest_blocks.sql;
 
+# We don't need the JS caches anymore.
+
 # And now we produce the HD cache information
-/bin/echo "Produce new list caches";
-cd /home/ec2-user/dcr-rich-list/src/parser/;
-/home/ec2-user/.nvm/versions/node/v8.9.1/bin/node --max-old-space-size=3072 /home/ec2-user/dcr-rich-list/src/parser/get_all_data_from_blocks.js;
+#/bin/echo "Produce new list caches";
+#cd /home/ec2-user/dcr-rich-list/src/parser/;
+#/home/ec2-user/.nvm/versions/node/v8.9.1/bin/node --max-old-space-size=3072 /home/ec2-user/dcr-rich-list/src/parser/get_all_data_from_blocks.js;
 
 # And lastly copy the data over to the data directory
-cp -a /home/ec2-user/dcr-rich-list/src/parser/*json /var/www/html/data/;
+#cp -a /home/ec2-user/dcr-rich-list/src/parser/*json /var/www/html/data/;
+
 /bin/echo "Done";
 
 # Remove the lockfile

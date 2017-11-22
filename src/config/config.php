@@ -24,7 +24,7 @@ switch (PROGRAM_ENVIRONMENT)
 		ini_set('display_errors', '0');
 
 		// Site address
-		define('SITE_ADDRESS', 'https://www.dcraudit.com');
+		define('SITE_ADDRESS', 'https://www.dcr.observer');
 
 		break;
 
@@ -59,8 +59,8 @@ define('GATEWAY_PATH', SERVER_PATH . 'gateway.php');
 define('API_ADDRESS', SITE_ADDRESS . 'api/');
 
 // Site Meta
-define('SITE_NAME', 'Decred Auditor');
-define('SITE_ADDRESS_CLEAN', 'www.dcraudit.com');
+define('SITE_NAME', 'Decred Observer');
+define('SITE_ADDRESS_CLEAN', 'www.dcr.observer');
 
 // Security
 define('PASSWORD_SALT', 'The proof-of-work difficulty as a multiple of the minimum difficulty');

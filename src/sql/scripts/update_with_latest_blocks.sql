@@ -1,6 +1,8 @@
 -- Do all updates first
 BEGIN;
 
+ALTER TABLE balance DISABLE TRIGGER ALL;
+
 -- Add new addresses
 INSERT INTO balance (address_id)
 SELECT a.address_id 
@@ -176,6 +178,8 @@ FROM (
 WHERE
   balance.address_id = sq.address_id;
 
+ALTER TABLE balance ENABLE TRIGGER ALL;
+
 COMMIT;
 -- End of all updates
 
@@ -236,6 +240,202 @@ FROM (
   JOIN vin ON vin.vin_id > dbs.last_vin_id
   WHERE (coinbase != '' OR stakebase != '') AND dbs.database_blockchain_state_id = 1
 ) AS sq;
+
+COMMIT;
+
+-- Update the address networks
+BEGIN;
+
+-- Update the address networks
+UPDATE
+  address
+SET
+  network = address_id
+FROM (
+  SELECT
+    last_address_id
+  FROM
+    database_blockchain_state
+  WHERE
+    database_blockchain_state_id = 1
+) AS dbs
+WHERE
+  address_id > dbs.last_address_id;
+
+-- Add the new tx networks
+INSERT INTO
+  tx_network (tx_id, network)
+SELECT
+  tx.tx_id, 9223372036854775800
+FROM
+  database_blockchain_state dbs
+JOIN
+  tx ON tx.tx_id > dbs.last_tx_id
+WHERE
+  dbs.database_blockchain_state_id = 1
+ON CONFLICT DO NOTHING;
+
+
+-- Now we need to do mixing with the txes
+-- (1) Get all tx / address pairs, set to lowest network, store to tx network
+UPDATE
+    tx_network
+SET
+    network = LEAST(tx_network.network, sq.network)
+FROM (
+    SELECT
+        tx.tx_id,
+        min(a.network) AS network
+    FROM
+        tx
+    JOIN
+        vin ON vin.tx_id = tx.tx_id
+    JOIN
+        vout_address va ON va.vout_id = vin.vout_id
+    JOIN
+        address a ON a.address_id = va.address_id
+    JOIN
+        database_blockchain_state dbs ON dbs.database_blockchain_state_id = 1
+    WHERE
+        tx.tx_id > dbs.last_tx_id
+    GROUP BY
+        tx.tx_id
+    ORDER BY
+        tx.tx_id
+) as sq
+WHERE
+    tx_network.tx_id = sq.tx_id;
+
+-- (2) Get all networks from txes that the address is matched to
+-- and update the address's network with the lowest from tx
+UPDATE
+    address
+SET
+    network = sq.network
+FROM (
+    SELECT
+        va.address_id,
+        min(tn.network) AS network
+    FROM 
+        tx_network tn
+    JOIN
+        vin ON vin.tx_id = tn.tx_id
+    JOIN
+        vout_address va ON va.vout_id = vin.vout_id
+    JOIN
+        database_blockchain_state dbs ON dbs.database_blockchain_state_id = 1
+    WHERE
+        tn.tx_id > dbs.last_tx_id
+    GROUP BY
+        va.address_id
+) as sq
+WHERE
+    address.address_id = sq.address_id;
+
+
+COMMIT;
+
+
+-- Now update the hd_network stats
+BEGIN;
+
+ALTER TABLE hd_network DISABLE TRIGGER ALL;
+
+-- Delete the existing balances, address counts, & addresses
+UPDATE hd_network SET address_id = NULL, balance = 0, num_addresses = 0;
+
+-- Insert any new hd networks
+INSERT INTO 
+    "hd_network" (network, balance)
+SELECT
+    DISTINCT ON (a.network)
+    a.network,
+    SUM(b.balance) AS balance
+FROM
+    address a
+JOIN
+    balance b ON b.address_id = a.address_id
+JOIN
+    database_blockchain_state dbs ON dbs.database_blockchain_state_id = 1
+WHERE
+    a.address_id > dbs.last_address_id
+GROUP BY
+    a.network
+ON CONFLICT DO NOTHING;
+
+-- hd balance
+UPDATE
+    hd_network
+SET
+    balance = sq.balance
+FROM (
+    SELECT
+        DISTINCT ON (a.network)
+        a.network,
+        SUM(b.balance) AS balance
+    FROM
+        address a
+    JOIN
+        balance b ON b.address_id = a.address_id
+    GROUP BY
+        a.network
+) AS sq
+WHERE
+    hd_network.network = sq.network;
+
+-- hd rank
+UPDATE
+  hd_network
+SET
+  rank = sq.rank
+FROM (
+  SELECT
+    network,
+    RANK() OVER(ORDER BY balance DESC) AS rank
+  FROM
+    hd_network
+) AS sq
+WHERE
+  hd_network.network = sq.network;
+
+-- hd num addresses
+UPDATE
+  hd_network
+SET
+  num_addresses = sq.num_addresses
+FROM (
+    SELECT
+        network,
+        COUNT(DISTINCT address_id) AS num_addresses
+    FROM 
+        address
+    GROUP BY
+        network
+) AS sq
+WHERE
+  hd_network.network = sq.network;
+
+-- hd primary address
+UPDATE
+  hd_network
+SET
+  address_id = sq.address_id
+FROM (
+    SELECT 
+        DISTINCT ON (a.network)
+        a.network,
+        a.address_id
+    FROM
+        address a
+    JOIN
+        balance b ON b.address_id = a.address_id
+    ORDER BY
+        a.network, b.balance DESC
+) AS sq
+WHERE
+  hd_network.network = sq.network;
+
+ALTER TABLE hd_network ENABLE TRIGGER ALL;
 
 COMMIT;
 

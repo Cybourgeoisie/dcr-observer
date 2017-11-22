@@ -102,7 +102,6 @@ FROM (
 WHERE
   hd_network.network = sq.network;
 
-
 UPDATE
   hd_network
 SET
@@ -137,6 +136,5 @@ FROM (
 ) AS sq
 WHERE
   hd_network.network = sq.network;
-
 
 COMMIT;

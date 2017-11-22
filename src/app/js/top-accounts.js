@@ -88,8 +88,6 @@ function pullTopAddresses(callback) {
 
 		var sum_percent = ((sum_balance / total_dcr) * 100).toFixed(2);
 		$('.top-sum-percent').html(sum_percent + '%');
-
-		
 	});
 }
 
@@ -129,7 +127,7 @@ function pullTopAddressesFromApi(callback) {
 				var $new_row = $top_address_row.clone(true);
 				$new_row.find('th').html(address_info.rank);
 				$new_row.find('td.top-td-address > a').html(address).data('address', address).attr('href', '#addr=' + address);
-				$new_row.find('td.top-td-balance').html(parseInt(balance).toLocaleString() + ' DCR');
+				$new_row.find('td.top-td-balance > .top-balance').html(parseInt(balance).toLocaleString() + ' DCR');
 				$new_row.find('td.top-td-percent').html(pct + '%');
 				$new_row.find('td.top-td-num-tx').html(num_tx);
 				$new_row.find('td.top-td-pct-stx').html(pct_stx + '%');
@@ -292,7 +290,7 @@ function pullTopNetworksFromApi(callback) {
 				var $new_row = $top_networks_row.clone(true);
 				$new_row.find('th').html(network_info.rank);
 				$new_row.find('td.top-hd-td-top-address > a').html(address).data('address', address).attr('href', '#addr=' + address);
-				$new_row.find('td.top-hd-td-balance').html(parseInt(balance).toLocaleString() + ' DCR');
+				$new_row.find('td.top-hd-td-balance > .top-hd-balance').html(parseInt(balance).toLocaleString() + ' DCR');
 				$new_row.find('td.top-hd-td-percent').html(pct + '%');
 				$new_row.find('td.top-hd-td-num-addrs').html(num_addrs);
 
