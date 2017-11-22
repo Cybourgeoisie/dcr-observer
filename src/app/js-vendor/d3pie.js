@@ -851,6 +851,7 @@ var labels = {
 						formatterContext.value = d.value;
 						formatterContext.label = d.percentage;
 						percentage = settings.formatter(formatterContext);
+						percentage += "%";
 					} else {
 						percentage += "%";
 					}

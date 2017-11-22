@@ -310,7 +310,7 @@ function showWealthDistributionPie(results) {
 	var subtitlePadding = (x < 768) ? 8 : ((x < 992) ? 10 : 12);
 	var labelFontSize   = (x < 768) ? 9 : ((x < 992) ? 10 : 11);
 	var truncateLength  = (x < 992) ? 10 : 12;
-	var widthBuffer     = (x < 768) ? 110 : 180;
+	var widthBuffer     = (x < 768) ? 130 : 220;
 
 	// Generate colors for this data
 	var gradient, colorsHsv;
@@ -346,7 +346,7 @@ function showWealthDistributionPie(results) {
 			"location": "pie-center",
 			"titleSubtitlePadding": subtitlePadding
 		},
-		"size": { "canvasHeight": pieSize, "canvasWidth": pieSize+widthBuffer, "pieInnerRadius": "55%", "pieOuterRadius": "100%" },
+		"size": { "canvasHeight": pieSize, "canvasWidth": pieSize+widthBuffer, "pieInnerRadius": "53%", "pieOuterRadius": "95%" },
 		"data": {
 			"sortOrder": "none",
 			"content": contentData

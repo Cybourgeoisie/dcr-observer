@@ -1,13 +1,13 @@
 Todo, 11/22/2017:
 
 X Verify that the update process works
-- Update the data on the main site
-I Find a good way to display data
+I Update the data on the main site
+X Find a good way to display data
 - Flag staking addresses
 - Add toggle-able rows
-I Find way to visualize data on the address and wealth pages
+X Find way to visualize data on the address and wealth pages
 - Beginning of voting distribution page
 - Talk to John about how staking works in the tx side
 X "I find myself wanting to be able to click on the HD wallets categories and see a break of addresses."
-- "Also wanting to click top addresses and seeing taken to a breakdown on that address"
+X "Also wanting to click top addresses and seeing taken to a breakdown on that address"
 
