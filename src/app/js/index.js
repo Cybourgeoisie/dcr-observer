@@ -130,6 +130,20 @@ function setEvents() {
 			pullWealthDistributionNetworks();
 		}
 	});
+
+	// Handle the data modal
+	$('.modal').on('shown.bs.modal', function (e) {
+		var $source = $(e.relatedTarget);
+		if ($source.data('origin') == 'dist-addr' || $source.data('origin') == 'dist-hd-addr') {
+			getWealthDistributionPie($(this), $source);
+		}
+	});
+
+	$('.modal').on('hidden.bs.modal', function (e) {
+		// Kill the data view
+		var modal_loader = $('.modal-data-loading').show();
+		$('#modal-d3').html('').html(modal_loader);
+	});
 }
 
 function loadAddressInfo(address, callback) {

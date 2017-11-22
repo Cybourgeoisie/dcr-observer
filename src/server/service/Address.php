@@ -253,6 +253,126 @@ class Address extends \Scrollio\Service\AbstractService
 		);
 	}
 
+	public function getWealthAddressesBetweenRanges(float $range_start, float $range_end)
+	{
+		// We do not let the site slow down
+		if ($range_start <= 0) {
+			$range_start = 0.01;
+		}
+
+		$bin = number_format($range_start) . ' to ' . number_format($range_end) . ' DCR';
+
+		$sql = '
+			SELECT
+				CASE WHEN a.identifier != \'\' THEN a.identifier ELSE a.address END AS label,
+				b.balance AS value
+			FROM
+				balance b
+			JOIN
+				address a ON a.address_id = b.address_id
+			WHERE
+				b.balance >= $1 AND b.balance < $2
+			ORDER BY balance DESC
+			LIMIT 70;
+		';
+		$db_handler = \Geppetto\DatabaseHandler::init();
+		$res = $db_handler->query($sql, array($range_start, $range_end));
+
+		if (empty($res) || !array_key_exists(0, $res)) {
+			throw new \Exception('Could not collect Decred wealth by address.');
+		}
+
+		$sql = '
+			SELECT
+				SUM(balance) AS value
+			FROM
+				balance
+			WHERE
+				balance >= $1 AND balance <= $2
+		';
+		$db_handler = \Geppetto\DatabaseHandler::init();
+		$res_other = $db_handler->query($sql, array($range_start, $range_end));
+		if (!empty($res_other) && array_key_exists('0', $res_other)) {
+			// Now subtract the total value of the aforementioned from this balance
+			$total = 0;
+			foreach ($res as $row) {
+				$total += $row['value'];
+			}
+					
+			$res_other[0]['value'] -= $total;
+			$res_other[0]['label'] = 'Other';
+
+			if ($res_other[0]['value'] >= 1) {
+				$res[] = $res_other[0];
+			}
+		}
+
+		return array(
+			'data' => $res,
+			'bin' => $bin
+		);
+	}
+
+	public function getWealthNetworksBetweenRanges(float $range_start, float $range_end)
+	{
+		// We do not let the site slow down
+		if ($range_start <= 0) {
+			$range_start = 0.01;
+		}
+
+		$bin = number_format($range_start) . ' to ' . number_format($range_end) . ' DCR';
+
+		$sql = '
+			SELECT
+				CASE WHEN a.identifier != \'\' THEN a.identifier ELSE a.address END AS label,
+				hd.balance AS value
+			FROM
+				hd_network hd
+			JOIN
+				address a ON a.address_id = hd.address_id
+			WHERE
+				hd.balance >= $1 AND hd.balance < $2
+			ORDER BY hd.balance DESC
+			LIMIT 70;
+		';
+		$db_handler = \Geppetto\DatabaseHandler::init();
+		$res = $db_handler->query($sql, array($range_start, $range_end));
+
+		if (empty($res) || !array_key_exists(0, $res)) {
+			throw new \Exception('Could not collect Decred wealth by address.');
+		}
+
+		$sql = '
+			SELECT
+				SUM(balance) AS value
+			FROM
+				hd_network
+			WHERE
+				balance >= $1 AND balance <= $2
+		';
+		$db_handler = \Geppetto\DatabaseHandler::init();
+		$res_other = $db_handler->query($sql, array($range_start, $range_end));
+		if (!empty($res_other) && array_key_exists('0', $res_other)) {
+			// Now subtract the total value of the aforementioned from this balance
+			$total = 0;
+			foreach ($res as $row) {
+				$total += $row['value'];
+			}
+					
+			$res_other[0]['value'] -= $total;
+			$res_other[0]['label'] = 'Other';
+
+			if ($res_other[0]['value'] >= 1) {
+				$res[] = $res_other[0];
+			}
+		}
+
+		return array(
+			'data' => $res,
+			'bin' => $bin
+		);
+	}
+
 	public function getWealthNetworks()
 	{
 		$sql = '

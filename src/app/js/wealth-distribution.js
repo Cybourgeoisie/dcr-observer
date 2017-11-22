@@ -9,9 +9,15 @@ function pullWealthDistribution(callback) {
 
 	// Use the API if we're not loading historical data
 	if (historical_data_block == 190000) {
+		// Show the breakdown button
+		$('.dist-addr-view-all').show();
+
 		pullWealthDistributionFromApi(callback);
 		return;
 	}
+
+	// Hide the breakdown button
+	$('.dist-addr-view-all').hide();
 
 	$.getJSON(filename, function(data) {
 		// Handle callbacks
@@ -40,10 +46,14 @@ function pullWealthDistribution(callback) {
 
 		// Now display them all
 		for (var i = 0; i < bins.length; i++) {
-			var bin;
+			var bin, range_start, range_end;
 			if (i == 0) {
+				range_start = 0.01;
+				range_end = 1;
 				bin = "0* to " + parseInt(bins[i]).toLocaleString() + " DCR";
 			} else {
+				range_start = parseInt(bins[i-1]);
+				range_end = parseInt(bins[i]);
 				bin = parseInt(bins[i-1]).toLocaleString() + " to " + parseInt(bins[i]).toLocaleString() + " DCR";
 			}
 
@@ -62,6 +72,7 @@ function pullWealthDistribution(callback) {
 			//$new_row.find('td.td-sum-value').html();
 			$new_row.find('td.td-pct-supply .wealth-pct-supply').html(pct_dcr + "%");
 			$new_row.find('td.td-pct-supply .progress-bar').css('width', pct_dcr + '%');
+			$new_row.find('td.td-view > button').data('range-start', range_start).data('range-end', range_end).attr('disabled', 'disabled');
 			$distrib_tbody.append($new_row);
 		}
 	});
@@ -91,10 +102,14 @@ function pullWealthDistributionFromApi(callback) {
 
 			// Now display them all
 			for (var i = 0; i < data.wealth.length; i++) {
-				var bin;
+				var bin, range_start, range_end;
 				if (i == 0) {
+					range_start = 0.01;
+					range_end = 1;
 					bin = "0* to " + parseInt(Math.pow(10, data.wealth[i]['bin'])).toLocaleString() + " DCR";
 				} else {
+					range_start = parseInt(Math.pow(10, data.wealth[i-1]['bin']));
+					range_end = parseInt(Math.pow(10, data.wealth[i]['bin']));
 					bin = parseInt(Math.pow(10, data.wealth[i-1]['bin'])).toLocaleString() + " to " + parseInt(Math.pow(10, data.wealth[i]['bin'])).toLocaleString() + " DCR";
 				}
 
@@ -105,6 +120,7 @@ function pullWealthDistributionFromApi(callback) {
 				var pct_dcr = ((parseFloat(value) / total_dcr) * 100).toFixed(2);
 
 				var $new_row = $distrib_row.clone(false);
+				$new_row.data('source', i);
 				$new_row.find('th').html(bin);
 				$new_row.find('td.td-num-addrs').html(parseInt(count).toLocaleString());
 				$new_row.find('td.td-pct-addrs .wealth-pct-addrs').html(pct_accts + "%");
@@ -113,6 +129,7 @@ function pullWealthDistributionFromApi(callback) {
 				//$new_row.find('td.td-sum-value').html();
 				$new_row.find('td.td-pct-supply .wealth-pct-supply').html(pct_dcr + "%");
 				$new_row.find('td.td-pct-supply .progress-bar').css('width', pct_dcr + '%');
+				$new_row.find('td.td-view > button').data('range-start', range_start).data('range-end', range_end).removeAttr('disabled');
 				$distrib_tbody.append($new_row);
 			}
 		}
@@ -130,9 +147,13 @@ function pullWealthDistributionNetworks(callback) {
 
 	// Use the API if we're not loading historical data
 	if (historical_data_block == 190000) {
+		$('.dist-hd-addr-view-all').show();
 		pullWealthDistributionNetworksFromApi(callback);
 		return;
 	}
+
+	// Hide the breakdown button
+	$('.dist-hd-addr-view-all').hide();
 
 	$.getJSON(filename, function(data) {
 		// Handle callbacks
@@ -183,6 +204,7 @@ function pullWealthDistributionNetworks(callback) {
 			//$new_row.find('td.td-sum-value').html();
 			$new_row.find('td.td-hd-pct-supply .wealth-hd-pct-supply').html(pct_dcr + "%");
 			$new_row.find('td.td-hd-pct-supply .progress-bar').css('width', pct_dcr + '%');
+			$new_row.find('td.td-hd-view > button').attr('disabled', 'disabled');
 			$distrib_tbody.append($new_row);
 		}
 	});
@@ -212,10 +234,14 @@ function pullWealthDistributionNetworksFromApi(callback) {
 
 			// Now display them all
 			for (var i = 0; i < data.wealth.length; i++) {
-				var bin;
+				var bin, range_start, range_end;
 				if (i == 0) {
+					range_start = 0.01;
+					range_end = 1;
 					bin = "0* to " + parseInt(Math.pow(10, data.wealth[i]['bin'])).toLocaleString() + " DCR";
 				} else {
+					range_start = parseInt(Math.pow(10, data.wealth[i-1]['bin']));
+					range_end = parseInt(Math.pow(10, data.wealth[i]['bin']));
 					bin = parseInt(Math.pow(10, data.wealth[i-1]['bin'])).toLocaleString() + " to " + parseInt(Math.pow(10, data.wealth[i]['bin'])).toLocaleString() + " DCR";
 				}
 
@@ -234,8 +260,115 @@ function pullWealthDistributionNetworksFromApi(callback) {
 				//$new_row.find('td.td-hd-sum-value').html();
 				$new_row.find('td.td-hd-pct-supply .wealth-hd-pct-supply').html(pct_dcr + "%");
 				$new_row.find('td.td-hd-pct-supply .progress-bar').css('width', pct_dcr + '%');
+				$new_row.find('td.td-hd-view > button').data('range-start', range_start).data('range-end', range_end).removeAttr('disabled');
 				$distrib_tbody.append($new_row);
 			}
 		}
+	});
+}
+
+function getWealthDistributionPie($modal, $source) {
+	// Display the loader
+	$modal.find('.modal-data-loading').show();
+
+	// Pull the ranges from the data source
+	var range_start = parseFloat($source.data('range-start'));
+	var range_end = parseFloat($source.data('range-end'));
+
+	// Determine if we're getting networks or addresses
+	var api_address;
+	if ($source.data('origin') == 'dist-addr') {
+		api_address = 'api/Address/getWealthAddressesBetweenRanges';
+		$modal.find('.modal-title').html('Wealth Breakdown By Address');
+	} else {
+		api_address = 'api/Address/getWealthNetworksBetweenRanges';
+		$modal.find('.modal-title').html('Wealth Breakdown By Wallet');
+	}
+
+	$.post(api_address, {range_start: range_start, range_end: range_end})
+	 .done(function(data) {
+	 	if (data.hasOwnProperty('success') && data.success) {
+	 		// Hide the loader
+			$modal.find('.modal-data-loading').hide();
+
+	 		// Load the pie
+	 		showWealthDistributionPie(data);
+	 	}
+	});
+}
+
+function showWealthDistributionPie(results) {
+	var data = results.data
+
+	// Determine the size of the pie
+	var e = document.documentElement,
+		g = document.getElementsByTagName('body')[0],
+		x = window.innerWidth || e.clientWidth || g.clientWidth;
+	var pieSize         = (x < 768) ? 280 : ((x < 992) ? 340 : 440);
+	var fontSize        = (x < 768) ? 11 : ((x < 992) ? 15 : 20);
+	var subFontSize     = (x < 768) ? 9 : ((x < 992) ? 11 : 12);
+	var subtitlePadding = (x < 768) ? 8 : ((x < 992) ? 10 : 12);
+	var labelFontSize   = (x < 768) ? 9 : ((x < 992) ? 10 : 11);
+
+	// Generate colors for this data
+	var gradient, colorsHsv;
+	if (data.length > 2) {
+		gradient = tinygradient([
+			{color: '#2971FF', pos: 0},
+			{color: '#69D3F5', pos: 0.5},
+			{color: '#2ED6A1', pos: 1}
+		]);
+		colorsHsv = gradient.rgb(data.length);
+	} else if (data.length <= 2) {
+		colorsHsv = ['#2971FF','#2ED6A1'];
+	}
+
+	// Format the data
+	var contentData = [];
+	for (var i = 0; i < data.length; i++) {
+		contentData.push({
+			"label" : data[i].label,
+			"value" : parseFloat(data[i].value),
+			"color" : (data[i].label == 'Other') ? '#cccccc' : (data.length < 3) ? colorsHsv[i] : colorsHsv[i].toHexString()
+		});
+	}
+
+	var title = "Wealth Breakdown";
+	var subtitle = (results.bin == '0 to 100,000,000 DCR') ? "All Decred" : results.bin;
+
+	// Display the pie
+	d3pie("modal-d3", {
+		"header": {
+			"title": { "text": title, "fontSize": fontSize},
+			"subtitle": { "text": subtitle, "color": "#999999", "fontSize": subFontSize},
+			"location": "pie-center",
+			"titleSubtitlePadding": subtitlePadding
+		},
+		"size": { "canvasHeight": pieSize, "canvasWidth": pieSize+120, "pieInnerRadius": "55%", "pieOuterRadius": "100%" },
+		"data": {
+			"sortOrder": "none",//"value-desc",
+			/*"smallSegmentGrouping": {
+				"enabled": true,
+				"value": 0.97,
+				"valueType": "percentage",
+				"label": "Other",
+				"color": "#cccccc"
+			},*/
+			"content": contentData
+		},
+		"labels": {
+			"outer": { "format": "label", "pieDistance": 14, "hideWhenLessThanPercentage": 1 },
+			"inner": { "hideWhenLessThanPercentage": 1 },
+			"mainLabel": { "fontSize": labelFontSize },
+			"percentage": { "color": "#ffffff", "decimalPlaces": 2 },
+			"value": { "color": "#adadad", "fontSize": labelFontSize },
+			"lines": { "enabled": false },
+			"truncation": { "enabled": true, "truncateLength":15 }
+		},
+		"effects": { "load": {
+			"effect": "default", // none / default
+			"speed": 750
+		}, "pullOutSegmentOnClick": { "effect": "linear", "speed": 400, "size": 8 } },
+		"misc": { "gradient": { "enabled": false, "percentage": 100 } }
 	});
 }

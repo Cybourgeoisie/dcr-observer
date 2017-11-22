@@ -243,7 +243,7 @@ FROM (
 
 COMMIT;
 
--- Update the address networks
+-- Now the address networks
 BEGIN;
 
 -- Update the address networks

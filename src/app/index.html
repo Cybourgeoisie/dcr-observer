@@ -22,6 +22,26 @@
 </head>
 <body>
 
+	<!-- Popup Data Modal -->
+	<div class="modal fade data-modal" tabindex="-1" role="dialog">
+		<div class="modal-dialog modal-lg">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title"></h5>
+					<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+						<span aria-hidden="true">&times;</span>
+					</button>
+				</div>
+				<div id="modal-d3" class="modal-body" style="text-align:center;margin:auto;">
+					<div class="modal-data-loading" style="height:auto;text-align:center;">
+						<i class="fa fa-cog fa-spin fa-3x fa-fw"></i>
+						<p class="lead">Loading...</p>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
 	<!-- Navigation Bar -->
 	<nav class="navbar navbar-expand-md navbar-dark bg-dark fixed-top dcr-navbar-top">
 		<a class="navbar-brand page-toggle" href="#home">
@@ -181,7 +201,14 @@
 		<!-- Distribution Page -->
 		<div class="dcr-page dcr-page-dist dist-body" style="display:none;">
 			<h1>Distribution By Address</h1>
-			<p class="lead dist-lead">The current Decred address wealth distribution.</p>
+			<p class="lead">
+				<span class="dist-lead">The current Decred address wealth distribution.</span>
+				<button class="btn btn-default dist-addr-view-all" style="padding:2px 6px;margin:0;font-size:80%;"
+					data-toggle="modal" data-target=".data-modal" 
+					data-origin="dist-addr" data-range-start="0.0001", data-range-end="100000000">
+					<i class="fa fa-pie-chart" aria-hidden="true"></i>
+				</button>
+			</p>
 
 			<table class="table table-hover table-distribution table-responsive-sm">
 				<thead>
@@ -197,6 +224,7 @@
 							<span class="d-none d-md-inline d-l-inline d-xl-inline">% of Supply</span>
 							<span class="d-inline d-md-none d-l-none d-xl-none">%Supply</span>
 						</th>
+						<th>View</th>
 					</tr>
 				</thead>
 				<tbody>
@@ -216,6 +244,13 @@
 							</div>
 							<span class="wealth-pct-supply" style="position:relative;top:-16px;">X%</span>
 						</td>
+						<td class="td-view">
+							<button class="btn btn-default" style="padding:2px 6px;margin:0;font-size:80%;"
+								data-toggle="modal" data-target=".data-modal" 
+								data-origin="dist-addr" data-source="">
+								<i class="fa fa-pie-chart" aria-hidden="true"></i>
+							</button>
+						</td>
 					</tr>
 				</tbody>
 			</table>
@@ -225,7 +260,14 @@
 		<!-- HD Distribution Page -->
 		<div class="dcr-page dcr-page-dist-hd dist-body" style="display:none;">
 			<h1>Distribution By Known HD Wallets</h1>
-			<p class="lead dist-hd-lead">The current Decred wealth distribution by connected addresses.</p>
+			<p class="lead">
+				<span class="dist-hd-lead">The current Decred wealth distribution by connected addresses.</span>
+				<button class="btn btn-default dist-hd-addr-view-all" style="padding:2px 6px;margin:0;font-size:80%;"
+					data-toggle="modal" data-target=".data-modal" 
+					data-origin="dist-hd-addr" data-range-start="0.0001", data-range-end="100000000">
+					<i class="fa fa-pie-chart" aria-hidden="true"></i>
+				</button>
+			</p>
 
 			<table class="table table-hover table-distribution-hd table-responsive-sm">
 				<thead>
@@ -244,6 +286,7 @@
 							<span class="d-none d-md-inline d-l-inline d-xl-inline">% of Supply</span>
 							<span class="d-inline d-md-none d-l-none d-xl-none">%Supply</span>
 						</th>
+						<th>View</th>
 					</tr>
 				</thead>
 				<tbody>
@@ -262,6 +305,13 @@
 								<div class="progress-bar bg-success" role="progressbar" style="width:25%"></div>
 							</div>
 							<span class="wealth-hd-pct-supply" style="position:relative;top:-16px;">X%</span>
+						</td>
+						<td class="td-hd-view">
+							<button class="btn btn-default" style="padding:2px 6px;margin:0;font-size:80%;"
+								data-toggle="modal" data-target=".data-modal" 
+								data-origin="dist-hd-addr" data-source="">
+								<i class="fa fa-pie-chart" aria-hidden="true"></i>
+							</button>
 						</td>
 					</tr>
 				</tbody>
@@ -579,7 +629,6 @@
 			</p>
 		</div>
 
-
 	</main>
 
 	<footer class="footer">
@@ -605,6 +654,16 @@
 
 	<!-- Bootstrap Slider -->
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-slider/10.0.0/bootstrap-slider.min.js" integrity="sha256-ssw743RfM8cbNhwou26tmmPhiNhq3buUbRG/RevtfG4=" crossorigin="anonymous"></script>
+
+	<!-- Tiny Color & Tiny Gradient -->
+	<script src="./vendor/tinycolor.min.js"></script>
+	<script src="./vendor/tinygradient.js"></script>
+
+	<!-- D3.js ya sumbitches -->
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/4.11.0/d3.min.js" integrity="sha256-aYYnqVVhAJ4lDammP4Qybmxg3/HVpA7/sNSCntyCyu4=" crossorigin="anonymous"></script>
+
+	<!-- D3pie -->
+	<script src="./vendor/d3pie.js"></script>
 
 	<!-- Site JS -->
 	<script src="./js/wealth-distribution.js"></script>
