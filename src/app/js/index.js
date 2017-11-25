@@ -555,13 +555,6 @@ function showAddressInputPie(results, addr_or_wallet = 'Address') {
 		"size": { "canvasHeight": pieSize, "canvasWidth": pieSize+widthBuffer, "pieInnerRadius": "53%", "pieOuterRadius": "90%" },
 		"data": {
 			"sortOrder": "value-asc",
-			"smallSegmentGrouping": {
-				"enabled": true,
-				"value": 0.1,
-				"valueType": "percentage",
-				"label": "Other",
-				"color": "#cccccc"
-			},
 			"content": contentData
 		},
 		"labels": {
