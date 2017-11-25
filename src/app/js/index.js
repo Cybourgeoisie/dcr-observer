@@ -17,21 +17,27 @@ function boot() {
 	 		$('span.historical-slider-value').html(parseInt(current_block_height).toLocaleString());
 	 		$('span.dcr-current-total-supply').html(parseFloat(total_dcr).toLocaleString());
 
-			handleNavigation(window.location.hash.substr(1) || "home");
+	 		$.getJSON('https://api.coinmarketcap.com/v1/ticker/decred/', function(data) {
+	 			dcr_price = parseFloat(data[0].price_usd);
+				$('span.dcr-current-price').html(dcr_price);
+				handleNavigation(window.location.hash.substr(1) || "home");
+			});
 	 	}
 	});
 
 	// Startup logic
 	setEvents();
-	getDcrPrice();
+	//getDcrPrice();
 }
 
+/*
 function getDcrPrice() {
 	$.getJSON('https://api.coinmarketcap.com/v1/ticker/decred/', function(data) {
 		dcr_price = parseFloat(data[0].price_usd);
 		$('span.dcr-current-price').html(dcr_price);
 	});
 }
+*/
 
 // Show and hide page elements as we navigate the site
 function handleNavigation(uri_hash) {
@@ -138,6 +144,8 @@ function setEvents() {
 			getWealthDistributionPie($(this), $source);
 		} else if ($source.data('origin') == 'hd-addr') {
 			getAddressDistributionPie($(this), $source);
+		} else if ($source.data('origin') == 'addr-input' || $source.data('origin') == 'hd-addr-input') {
+			getAddressInputPie($(this), $source);
 		}
 	});
 
@@ -181,19 +189,30 @@ function setAddressInfo(addr_info) {
 	$('.addr-first-date').html(start_date.toLocaleDateString());
 	$('.addr-last-activity').html(parseInt(addr_info.last).toLocaleString());
 	$('.addr-first-activity').html(parseInt(addr_info.first).toLocaleString());
-	$('.addr-total-out').html(parseInt(addr_info.vin).toLocaleString());
-	$('.addr-total-in').html(parseInt(addr_info.vout).toLocaleString());
+	$('.addr-total-out').html(parseFloat(addr_info.vin).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2}));
+	$('.addr-total-in').html(parseFloat(addr_info.vout).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2}));
 	$('.addr-num-tx').html(parseInt(addr_info.tx).toLocaleString());
 	$('.addr-num-stx').html(parseInt(addr_info.stx).toLocaleString());
 	$('.addr-pct-stx').html((parseFloat(addr_info.stx)/parseFloat(addr_info.tx)*100).toFixed(2));
-	$('.addr-staked-out').html(parseInt(addr_info.svin).toLocaleString());
-	$('.addr-staked-in').html(parseInt(addr_info.svout).toLocaleString());
-	$('.addr-balance').html(parseInt(addr_info.balance).toLocaleString());
-	$('.addr-fiat-value').html('$' + parseInt(parseFloat(addr_info.balance)*dcr_price).toLocaleString());
+	$('.addr-staked-out').html(parseFloat(addr_info.svin).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2}));
+	$('.addr-staked-in').html(parseFloat(addr_info.svout).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2}));
 	$('.addr-address').html(addr_info.address);
 	$('.addr-view-block-explorer').attr('href', 'https://explorer.dcrdata.org/explorer/address/' + addr_info.address);
 	$('.addr-rank').html(addr_info.rank);
 
+	// Set the button to view the balance breakdown
+	$('.addr-input-btn').data('address', addr_info.address);
+
+	// Balances
+	//var total_balance = parseFloat(addr_info.balance) + parseFloat(addr_info.actively_staking);
+	var total_balance = parseFloat(addr_info.balance);
+	$('.addr-balance').html(parseFloat(addr_info.balance).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2}));
+	$('.addr-fiat-value').html('$' + (parseFloat(addr_info.balance)*dcr_price).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2}));
+	//$('.addr-liquid-balance').html(parseFloat(addr_info.liquid_balance).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2}));
+	//$('.addr-stake-submissions').html(parseFloat(addr_info.stake_submissions).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2}));
+	//$('.addr-actively-staking').html(parseFloat(addr_info.actively_staking).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2}));
+	$('.addr-total-balance').html(total_balance.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2}));
+	
 	// If the address has an identifier, display it
 	$('.dcr-badge-address-identifier').hide();
 	$('span.addr-identifier').html('');
@@ -215,6 +234,59 @@ function setAddressNetwork(network_info, address) {
 	} else {
 		$('span.addr-est-wallet-none').show();
 	}
+}
+
+function getAddressDistributionPie($modal, $source) {
+	// Display the loader
+	$modal.find('.modal-data-loading').show();
+
+	// Pull the address from the data source
+	var address = $source.data('address');
+
+	// Set title
+	$modal.find('.modal-title').html('Address Breakdown for HD Wallet');
+
+	$.post('api/Address/getHdChartBreakdown', {'address': address})
+	 .done(function(data) {
+	 	if (data.hasOwnProperty('success') && data.success) {
+	 		// Hide the loader
+			$modal.find('.modal-data-loading').hide();
+
+	 		// Load the pie
+	 		showAddressDistributionPie(data);
+	 	}
+	});
+}
+
+function getAddressInputPie($modal, $source) {
+	// Display the loader
+	$modal.find('.modal-data-loading').show();
+
+	// Pull the address from the data source
+	var address = $source.data('address');
+
+	// Set title
+	var addr_or_wallet, api_address;
+	if ($source.data('origin') == 'hd-addr-input') {
+		addr_or_wallet = 'Wallet';
+		api_address = 'api/Address/getHdVoutDetails';
+		$modal.find('.modal-title').html('HD Wallet Input Breakdown (Experimental)');
+	} else {
+		addr_or_wallet = 'Address';
+		api_address = 'api/Address/getVoutDetails';
+		$modal.find('.modal-title').html('Address Input Breakdown (Experimental)');
+	}
+
+	$.post(api_address, {'address': address})
+	 .done(function(data) {
+	 	if (data.hasOwnProperty('success') && data.success) {
+	 		// Hide the loader
+			$modal.find('.modal-data-loading').hide();
+
+	 		// Load the pie
+	 		showAddressInputPie(data, addr_or_wallet);
+	 	}
+	});
 }
 
 function loadHdAddressInfo(address, callback) {
@@ -280,6 +352,9 @@ function setHdAddressInfo(hd_addresses, req_address) {
 
 		$('button.show-all-hd').attr("disabled", "disabled").html('Showing All Addresses');
 	});
+
+	// Set the button to view the balance breakdown
+	$('.hd-addr-input-btn').data('address', req_address);
 
 	// Set cumulative information
 	$('.hd-addr-view-all').data('address', req_address);
@@ -390,12 +465,12 @@ function showAddressDistributionPie(results) {
 			"title": { "text": title, "fontSize": fontSize},
 			"location": "pie-center"
 		},
-		"size": { "canvasHeight": pieSize, "canvasWidth": pieSize+widthBuffer, "pieInnerRadius": "53%", "pieOuterRadius": "95%" },
+		"size": { "canvasHeight": pieSize, "canvasWidth": pieSize+widthBuffer, "pieInnerRadius": "53%", "pieOuterRadius": "90%" },
 		"data": {
 			"sortOrder": "none",
 			"smallSegmentGrouping": {
 				"enabled": true,
-				"value": 1.32,
+				"value": 0.1,
 				"valueType": "percentage",
 				"label": "Other",
 				"color": "#cccccc"
@@ -403,7 +478,7 @@ function showAddressDistributionPie(results) {
 			"content": contentData
 		},
 		"labels": {
-			"outer": { "format": "label-value2", "pieDistance": 6, "hideWhenLessThanPercentage": 1 },
+			"outer": { "format": "label-value2", "pieDistance": 12, "hideWhenLessThanPercentage": 1 },
 			"inner": { "hideWhenLessThanPercentage": 1.33 },
 			"mainLabel": { "fontSize": labelFontSize },
 			"percentage": { "color": "#ffffff", "decimalPlaces": 2 },
@@ -417,5 +492,97 @@ function showAddressDistributionPie(results) {
 			"speed": 750
 		}, "pullOutSegmentOnClick": { "effect": "linear", "speed": 400, "size": 8 } },
 		"misc": { "gradient": { "enabled": false, "percentage": 100 } }
+	});
+}
+
+function showAddressInputPie(results, addr_or_wallet = 'Address') {
+	var data = results.data
+
+	// Determine the size of the pie
+	var e = document.documentElement,
+		g = document.getElementsByTagName('body')[0],
+		x = window.innerWidth || e.clientWidth || g.clientWidth;
+	var pieSize         = (x < 768) ? 240 : ((x < 992) ? 320 : 440);
+	var fontSize        = (x < 768) ? 11 : ((x < 992) ? 15 : 20);
+	var subFontSize     = (x < 768) ? 9 : ((x < 992) ? 11 : 12);
+	var subtitlePadding = (x < 768) ? 8 : ((x < 992) ? 10 : 12);
+	var labelFontSize   = (x < 768) ? 9 : ((x < 992) ? 10 : 11);
+	var truncateLength  = (x < 992) ? 10 : 12;
+	var widthBuffer     = (x < 768) ? 130 : 220;
+
+	// Generate colors for this data
+	var gradient, colorsHsv;
+	if (data.length > 2) {
+		gradient = tinygradient([
+			{color: '#2971FF', pos: 0},
+			{color: '#69D3F5', pos: 0.5},
+			{color: '#2ED6A1', pos: 1}
+		]);
+		colorsHsv = gradient.rgb(data.length);
+		for (var i = 0; i < data.length; i++) {
+			colorsHsv[i] = colorsHsv[i].toHexString();
+		}
+	} else if (data.length <= 2) {
+		colorsHsv = ['#2971FF','#2ED6A1'];
+	}
+
+	// Format the data
+	var contentData = [], sum = 0;
+	for (var i = 0; i < data.length; i++) {
+		if (data[i].value <= 0) {
+			continue;
+		}
+
+		sum += parseFloat(data[i].value);
+
+		contentData.push({
+			"label" : data[i].label,
+			"value" : parseFloat(data[i].value)
+		});
+	}
+
+	var title = addr_or_wallet + " Inputs";
+	var subtitle = parseInt(sum).toLocaleString() + ' DCR';
+
+	// Display the pie
+	d3pie("modal-d3", {
+		"header": {
+			"title": { "text": title, "fontSize": fontSize},
+			"subtitle": { "text": subtitle, "color": "#999999", "fontSize": subFontSize},
+			"location": "pie-center",
+			"titleSubtitlePadding": subtitlePadding
+		},
+		"size": { "canvasHeight": pieSize, "canvasWidth": pieSize+widthBuffer, "pieInnerRadius": "53%", "pieOuterRadius": "90%" },
+		"data": {
+			"sortOrder": "value-asc",
+			"smallSegmentGrouping": {
+				"enabled": true,
+				"value": 0.1,
+				"valueType": "percentage",
+				"label": "Other",
+				"color": "#cccccc"
+			},
+			"content": contentData
+		},
+		"labels": {
+			"outer": { "format": "label-value2", "pieDistance": 12, "hideWhenLessThanPercentage": 0 },
+			"inner": { "hideWhenLessThanPercentage": 1.33 },
+			"mainLabel": { "fontSize": labelFontSize },
+			"percentage": { "color": "#ffffff", "decimalPlaces": 2 },
+			"value": { "color": "#adadad", "fontSize": labelFontSize },
+			"lines": { "enabled": false },
+			formatter: function(ctx) { var label = ctx.label; if (ctx.part == 'value') { return parseInt(ctx.label).toLocaleString() + " DCR"; } return label; }
+		},
+		"effects": { "load": {
+			"effect": "default", // none / default
+			"speed": 750
+		}, "pullOutSegmentOnClick": { "effect": "linear", "speed": 400, "size": 8 } },
+		"misc": { 
+			"colors": {
+				"background": null,
+				"segments": colorsHsv,
+				"segmentStroke": "#ffffff"
+			},
+			"gradient": { "enabled": false, "percentage": 100 } }
 	});
 }

@@ -10,6 +10,10 @@ FROM address a
 JOIN database_blockchain_state dbs ON dbs.last_address_id < a.address_id
 ON CONFLICT DO NOTHING;
 
+
+-- These updates for vout, vin, and counts are incorrect
+
+
 -- From the state, update the entries in the balance table
 -- vout count, vout value
 UPDATE
@@ -21,7 +25,7 @@ FROM (
   SELECT
     DISTINCT ON (vout.vout_id)
     va.address_id,
-    COALESCE(vout.value, 0) AS vout_value
+    COALESCE(vout.value, 0) AS vout_value -- COALESCE(SUM(vout.value), 0)
   FROM
     database_blockchain_state dbs
   JOIN
@@ -48,7 +52,7 @@ FROM (
   SELECT
     DISTINCT ON (vin.vin_id)
     va.address_id,
-    COALESCE(vin.amountin, 0) AS vin_amountin
+    COALESCE(vin.amountin, 0) AS vin_amountin -- COALESCE(SUM(vin.amountin), 0)
   FROM
     database_blockchain_state dbs
   JOIN

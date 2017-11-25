@@ -1016,7 +1016,7 @@ var labels = {
 			.attr("stroke-width", 1)
 			.attr("fill", "none")
 			.style("opacity", function(d, i) {
-				var percentage = pie.options.labels.inner.hideWhenLessThanPercentage;
+				var percentage = pie.options.labels.outer.hideWhenLessThanPercentage;
 				return (percentage !== null && d.percentage < percentage) ? 0 : 1;
 			})
 			.style("display", function(d, i) {
@@ -1076,7 +1076,7 @@ var labels = {
 				.transition()
 				.duration(labelFadeInTime)
 				.style("opacity", function(d, i) {
-					var percentage = pie.options.labels.inner.hideWhenLessThanPercentage;
+					var percentage = pie.options.labels.outer.hideWhenLessThanPercentage;
 					return (percentage !== null && d.percentage < percentage) ? 0 : 1;
 				})
 				.style("display", function(d, i) {

@@ -346,14 +346,14 @@ function showWealthDistributionPie(results) {
 			"location": "pie-center",
 			"titleSubtitlePadding": subtitlePadding
 		},
-		"size": { "canvasHeight": pieSize, "canvasWidth": pieSize+widthBuffer, "pieInnerRadius": "53%", "pieOuterRadius": "95%" },
+		"size": { "canvasHeight": pieSize, "canvasWidth": pieSize+widthBuffer, "pieInnerRadius": "53%", "pieOuterRadius": "90%" },
 		"data": {
 			"sortOrder": "none",
 			"content": contentData
 		},
 		"labels": {
-			"outer": { "format": "label-value2", "pieDistance": 6, "hideWhenLessThanPercentage": 1 },
-			"inner": { "hideWhenLessThanPercentage": 1.33 },
+			"outer": { "format": "label-value2", "pieDistance": 12, "hideWhenLessThanPercentage": 1 },
+			"inner": { "hideWhenLessThanPercentage": 1 },
 			"mainLabel": { "fontSize": labelFontSize },
 			"percentage": { "color": "#ffffff", "decimalPlaces": 2 },
 			"value": { "color": "#adadad", "fontSize": labelFontSize },

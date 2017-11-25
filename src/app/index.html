@@ -36,6 +36,9 @@
 					<div class="modal-data-loading" style="height:auto;text-align:center;">
 						<i class="fa fa-cog fa-spin fa-3x fa-fw"></i>
 						<p class="lead">Loading...</p>
+						<p class="lead">
+							<strong>Note:</strong> "Experimental" charts may take up to a minute to load data for addresses with thousands of transactions. This data is not yet cached, but will be for the production launch.
+						</p>
 					</div>
 				</div>
 			</div>
@@ -205,7 +208,7 @@
 				<span class="dist-lead">The current Decred address wealth distribution.</span>
 				<button class="btn btn-default dist-addr-view-all" style="padding:2px 6px;margin:0;font-size:80%;"
 					data-toggle="modal" data-target=".data-modal" 
-					data-origin="dist-addr" data-range-start="0.0001", data-range-end="100000000">
+					data-origin="dist-addr" data-range-start="0.0001" data-range-end="100000000">
 					<i class="fa fa-pie-chart" aria-hidden="true"></i>
 				</button>
 			</p>
@@ -264,7 +267,7 @@
 				<span class="dist-hd-lead">The current Decred wealth distribution by connected addresses.</span>
 				<button class="btn btn-default dist-hd-addr-view-all" style="padding:2px 6px;margin:0;font-size:80%;"
 					data-toggle="modal" data-target=".data-modal" 
-					data-origin="dist-hd-addr" data-range-start="0.0001", data-range-end="100000000">
+					data-origin="dist-hd-addr" data-range-start="0.0001" data-range-end="100000000">
 					<i class="fa fa-pie-chart" aria-hidden="true"></i>
 				</button>
 			</p>
@@ -378,13 +381,15 @@
 						<span class="addr-fiat-value"></span>
 					</div>
 				</div>
-
 				<div class="row">
 					<div class="col-6 text-right" style="font-weight:bold;">
 						Total Received
 					</div>
 					<div class="col-6 text-left" style="color:rgba(0,0,0,.5);">
 						<span class="addr-total-in">X</span> DCR
+						<button class="btn btn-default addr-input-btn" style="padding:2px 6px;margin:0;font-size:70%;" data-toggle="modal" data-target=".data-modal" data-origin="addr-input">
+							<i class="fa fa-pie-chart" aria-hidden="true"></i>
+						</button>
 					</div>
 				</div>
 				<div class="row">
@@ -409,6 +414,46 @@
 				</div>
 			</div>
 			<br />
+
+			<!--
+			<h5>
+				Balance Details
+			</h5>
+
+			<div class="container">
+				<div class="row">
+					<div class="col-6 text-right" style="font-weight:bold;">
+						Liquid Balance
+					</div>
+					<div class="col-6 text-left" style="color:rgba(0,0,0,.5);">
+						<span class="addr-liquid-balance">X</span> DCR
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-6 text-right" style="font-weight:bold;">
+						Actively Staking
+					</div>
+					<div class="col-6 text-left" style="color:rgba(0,0,0,.5);">
+						<span class="addr-actively-staking">X</span> DCR
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-6 text-right" style="font-weight:bold;">
+						Stake Submissions
+					</div>
+					<div class="col-6 text-left" style="color:rgba(0,0,0,.5);">
+						<span class="addr-stake-submissions">X</span> DCR
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-6 text-right" style="font-weight:bold;">
+						Total Balance
+					</div>
+					<div class="col-6 text-left" style="color:rgba(0,0,0,.5);">
+						<span class="addr-total-balance">X</span> DCR
+					</div>
+				</div>
+			</div><br />-->
 
 			<h5>Activity</h5>
 
@@ -458,14 +503,14 @@
 				</div>
 				<div class="row">
 					<div class="col-6 text-right" style="font-weight:bold;">
-						Staking Out
+						Staking Sent
 					</div>
 					<div class="col-6 text-left" style="color:rgba(0,0,0,.5);">
 						<span class="addr-staked-out">X</span> DCR
 					</div>
 				</div>
-			</div>
-			<br /><br />
+			</div><br />
+			<br />
 
 			<p class="lead" style="text-align:center;">
 				<a class="btn btn-success my-2 my-sm-0 page-toggle" role="button" href="#home">
@@ -563,6 +608,9 @@
 					</div>
 					<div class="col-6 text-left" style="color:rgba(0,0,0,.5);">
 						<span class="hd-total-in">X</span> DCR
+						<button class="btn btn-default hd-addr-input-btn" style="padding:2px 6px;margin:0;font-size:70%;" data-toggle="modal" data-target=".data-modal" data-origin="hd-addr-input">
+							<i class="fa fa-pie-chart" aria-hidden="true"></i>
+						</button>
 					</div>
 				</div>
 				<div class="row">

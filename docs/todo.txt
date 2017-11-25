@@ -20,11 +20,21 @@ X Top 500 HD wallets from DB (NOTE: Not from DB, but from accurate source)
 X Wealth distribution by HD wallet from DB (NOTE: Not from DB, but from accurate source)
 X Additional address details: List all addresses linked together, and from which transactions (HD)
 X Historical snapshots of rich list & wealth distribution (slider)
-- Additional address details: Map portion of inputs from mining, genesis block, exchange, or staking
+X Additional address details: Map portion of inputs from mining, genesis block, exchange, or staking
 - Flag addresses that are actively staking
 - Voting Distribution Page: show distribution of voters' tickets & relative influence that their tickets have on vote outcome (onchain)
 X Mobile-friendly UI
 X Optimize database updates
+
+
+Additional Todo:
+- Add caching on PHP side to common DB queries
+- Re-run the historical data accumulation to include tags for all current identifiers
+- Add Google Analytics
+- Backup entire database, download, before launch
+- SSL certificate
+- Add toggle-able rows
+
 
 To Revisit:
 X DB should be definitive for more than just transactions and the top 500. We have two data sources. We should ideally only have one.
