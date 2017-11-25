@@ -2,10 +2,12 @@
 INSERT INTO balance (address_id) SELECT address_id FROM address ON CONFLICT DO NOTHING;
 
 -- Stop autovacuum for the cluster
-ALTER SYSTEM SET autovacuum = off;
-SELECT * from pg_reload_conf();
+--ALTER SYSTEM SET autovacuum = off;
+--SELECT * from pg_reload_conf();
 
 --select * from pg_settings where name like 'autovacuum%';
+
+ALTER TABLE balance DISABLE TRIGGER ALL;
 
 -- vout count, vout value
 UPDATE
@@ -53,6 +55,8 @@ FROM (
 WHERE
   balance.address_id = sq.address_id;
 
+VACUUM FULL ANALYZE balance;
+
 -- first & last blocks and tx count
 UPDATE
   balance
@@ -82,7 +86,6 @@ FROM (
 WHERE
   balance.address_id = sq.address_id;
 
-
 -- stx
 UPDATE
   balance
@@ -107,6 +110,8 @@ FROM (
 ) AS sq
 WHERE
   balance.address_id = sq.address_id;
+
+VACUUM FULL ANALYZE balance;
 
 -- svout count, svout value
 UPDATE
@@ -158,6 +163,61 @@ FROM (
 WHERE
   balance.address_id = sq.address_id;
 
+VACUUM FULL ANALYZE balance;
+
+-- liquid
+UPDATE
+  balance
+SET
+  liquid = sq.liquid
+FROM (
+  SELECT
+    DISTINCT a.address_id,
+    COALESCE(SUM(vout.value), 0) AS liquid
+  FROM
+    address a 
+  JOIN
+    vout_address va ON va.address_id = a.address_id
+  JOIN
+    vout ON vout.vout_id = va.vout_id AND vout.type != 'stakesubmission' 
+  LEFT JOIN
+    vin ON vin.vout_id = vout.vout_id 
+  WHERE
+    vin.vin_id IS NULL
+  GROUP BY
+    a.address_id
+) AS sq
+WHERE
+  balance.address_id = sq.address_id;
+
+-- staking
+UPDATE
+  balance
+SET
+  active_stake_submissions = sq.stake_submissions
+FROM (
+  SELECT
+    DISTINCT a.address_id,
+    COALESCE(SUM(vout.value), 0) AS stake_submissions
+  FROM
+    address a 
+  JOIN
+    vout_address va ON va.address_id = a.address_id
+  JOIN
+    vout ON vout.vout_id = va.vout_id AND vout.type = 'stakesubmission' 
+  LEFT JOIN
+    vin ON vin.vout_id = vout.vout_id 
+  WHERE
+    vin.vin_id IS NULL
+  GROUP BY
+    a.address_id
+) AS sq
+WHERE
+  balance.address_id = sq.address_id;
+
+VACUUM FULL ANALYZE balance;
+
+
 -- now the tour de force
 UPDATE
   balance
@@ -173,10 +233,10 @@ FROM (
 WHERE
   balance.address_id = sq.address_id;
 
---ALTER TABLE balance DISABLE TRIGGER ALL;
+VACUUM FULL ANALYZE balance;
+
 --EXPLAIN ANALYZE UPDATE balance SET balance = COALESCE(vout, 0) - COALESCE(vin, 0) WHERE balance_id < 50000;
 
-ALTER TABLE balance DISABLE TRIGGER ALL;
 UPDATE
   balance
 SET
@@ -190,7 +250,10 @@ FROM (
 ) AS sq
 WHERE
   balance.address_id = sq.address_id;
+
 ALTER TABLE balance ENABLE TRIGGER ALL;
+
+VACUUM FULL ANALYZE balance;
 
 -- Start autovacuum for the cluster
 -- I'm not a big fan of using the autovacuum right now.
