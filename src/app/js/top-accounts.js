@@ -9,8 +9,10 @@ function pullTopAddresses(callback) {
 
 	// Use the API if we're not loading historical data
 	if (historical_data_block == 190000) {
-		pullTopAddressesFromApi(callback);
-		return;
+		if (!MAINTENANCE_MODE) {
+			pullTopAddressesFromApi(callback);
+			return;
+		}
 	}
 
 	$.getJSON(filename, function(data) {
@@ -178,8 +180,10 @@ function pullTopNetworks(callback) {
 
 	// Use the API if we're not loading historical data
 	if (historical_data_block == 190000) {
-		pullTopNetworksFromApi(callback);
-		return;
+		if (!MAINTENANCE_MODE) {
+			pullTopNetworksFromApi(callback);
+			return;
+		}
 	}
 
 	$.getJSON(filename, function(data) {

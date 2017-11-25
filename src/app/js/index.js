@@ -5,7 +5,24 @@ var total_dcr = 6617242.27624844;
 var current_block_height = 187908;
 var historical_data_block = 190000;
 
+// Maintenance Mode
+var MAINTENANCE_MODE = true;
+
 function boot() {
+	if (MAINTENANCE_MODE) {
+		// Startup logic
+		setEvents();
+		getDcrPrice();
+
+		// Display current height and amount
+		$('span.dcr-current-block-height').html(parseInt(current_block_height).toLocaleString());
+		$('span.historical-slider-value').html(parseInt(current_block_height).toLocaleString());
+		$('span.dcr-current-total-supply').html(parseFloat(total_dcr).toLocaleString());
+
+		handleNavigation(window.location.hash.substr(1) || "home");
+		return;
+	}
+
 	$.post('api/State/getInfo')
 	 .done(function(data) {
 	 	if (data.hasOwnProperty('success') && data.success) {
@@ -30,14 +47,12 @@ function boot() {
 	//getDcrPrice();
 }
 
-/*
 function getDcrPrice() {
 	$.getJSON('https://api.coinmarketcap.com/v1/ticker/decred/', function(data) {
 		dcr_price = parseFloat(data[0].price_usd);
 		$('span.dcr-current-price').html(dcr_price);
 	});
 }
-*/
 
 // Show and hide page elements as we navigate the site
 function handleNavigation(uri_hash) {
@@ -56,9 +71,17 @@ function handleNavigation(uri_hash) {
 
 	// If we're viewing an address, pass along to the address page
 	if (uri == 'addr' && uri_param && uri_param.length) {
-		loadAddressInfo(uri_param, function() { showPage('addr'); });
+		if (MAINTENANCE_MODE) {
+			showPage('maintenance');
+		} else {
+			loadAddressInfo(uri_param, function() { showPage('addr'); });			
+		}
 	} else if (uri == 'hd-addr' && uri_param && uri_param.length) {
-		loadHdAddressInfo(uri_param, function() { showPage('hd-addr'); });
+		if (MAINTENANCE_MODE) {
+			showPage('maintenance');
+		} else {
+			loadHdAddressInfo(uri_param, function() { showPage('hd-addr'); });
+		}
 	} else if (uri == 'home') {
 		pullTopAddresses(function() { showPage('home'); });
 	} else if (uri == 'dist') {
@@ -67,6 +90,12 @@ function handleNavigation(uri_hash) {
 		pullTopNetworks(function() { showPage('top-hd'); });
 	} else if (uri == 'dist-hd') {
 		pullWealthDistributionNetworks(function() { showPage('dist-hd'); });
+	} else if (uri == 'voting') {
+		if (MAINTENANCE_MODE) {
+			showPage('maintenance');
+		} else {
+			showPage('maintenance');
+		}
 	} else {
 		showPage(uri);
 	}
@@ -139,6 +168,10 @@ function setEvents() {
 
 	// Handle the data modal
 	$('.modal').on('shown.bs.modal', function (e) {
+		if (MAINTENANCE_MODE) {
+			return;
+		}
+
 		var $source = $(e.relatedTarget);
 		if ($source.data('origin') == 'dist-addr' || $source.data('origin') == 'dist-hd-addr') {
 			getWealthDistributionPie($(this), $source);

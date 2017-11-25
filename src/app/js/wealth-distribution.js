@@ -9,11 +9,13 @@ function pullWealthDistribution(callback) {
 
 	// Use the API if we're not loading historical data
 	if (historical_data_block == 190000) {
-		// Show the breakdown button
-		$('.dist-addr-view-all').show();
+		if (!MAINTENANCE_MODE) {
+			// Show the breakdown button
+			$('.dist-addr-view-all').show();
 
-		pullWealthDistributionFromApi(callback);
-		return;
+			pullWealthDistributionFromApi(callback);
+			return;
+		}
 	}
 
 	// Hide the breakdown button
@@ -147,9 +149,11 @@ function pullWealthDistributionNetworks(callback) {
 
 	// Use the API if we're not loading historical data
 	if (historical_data_block == 190000) {
-		$('.dist-hd-addr-view-all').show();
-		pullWealthDistributionNetworksFromApi(callback);
-		return;
+		if (!MAINTENANCE_MODE) {
+			$('.dist-hd-addr-view-all').show();
+			pullWealthDistributionNetworksFromApi(callback);
+			return;
+		}
 	}
 
 	// Hide the breakdown button
