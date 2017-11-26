@@ -237,6 +237,8 @@ VACUUM FULL ANALYZE balance;
 
 --EXPLAIN ANALYZE UPDATE balance SET balance = COALESCE(vout, 0) - COALESCE(vin, 0) WHERE balance_id < 50000;
 
+-- This one is insane:
+
 UPDATE
   balance
 SET

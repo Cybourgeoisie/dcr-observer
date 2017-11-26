@@ -1,8 +1,8 @@
 // Configuration
 var valid_uri_hashes = ['home', 'top-hd', 'dist', 'dist-hd', 'addr', 'hd-addr', '404', 'maintenance'];
 var dcr_price = 30.0;
-var total_dcr = 6617242.27624844;
-var current_block_height = 187908;
+var total_dcr = 6651899.447322492;
+var current_block_height = 189416;
 var historical_data_block = 190000;
 
 // Maintenance Mode

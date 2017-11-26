@@ -36,7 +36,7 @@ function processBlocks(height) {
 		}
 
 		/*
-		if (height%7700==0) {
+		if (height%7800==0) {
 			console.log("Reached end.");
 			saveProgress(height);
 			process.exit();

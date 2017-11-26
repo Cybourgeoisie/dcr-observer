@@ -39,4 +39,9 @@ Kind of kicking off from the previous several lessons..
 - Use WHERE statements to limit everything extensively. The more limitations, the faster the query. Postgres knows how to optimize for these, even if you think it won't.
 
 
+On Nov 25:
+==========
 
+- I suspect that updating a row by combining values within the same row (updating the balance from vout/vin in the same table) takes a while because the original data has to be preserved. On the face of it, the calculation seems dead simple, but it should probably be compiled from other tables, or stored to another table. If I had to guess, it creates a temporary copy of the table or data.
+
+- ALWAYS COALESCE if there's ANY possibility that a value could be null. It destroys the entire calculation.
