@@ -36,7 +36,13 @@ body {
 .table-distribution-hd td,
 .table-distribution-hd th,
 .table-hd-addresses td,
-.table-hd-addresses th {
+.table-hd-addresses th,
+.table-distribution-voting td,
+.table-distribution-voting th,
+.table-distribution-voting-hd td,
+.table-distribution-voting-hd th,
+.table-distribution-voting-stakesubmissions td,
+.table-distribution-voting-stakesubmissions th {
 	font-size:80%;
 }
 
