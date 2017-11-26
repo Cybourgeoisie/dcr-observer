@@ -41,8 +41,8 @@ body {
 .table-distribution-voting th,
 .table-distribution-voting-hd td,
 .table-distribution-voting-hd th,
-.table-distribution-voting-stakesubmissions td,
-.table-distribution-voting-stakesubmissions th {
+.table-distribution-voting-stakesubmission td,
+.table-distribution-voting-stakesubmission th {
 	font-size:80%;
 }
 

@@ -8,19 +8,33 @@ class Voting extends \Scrollio\Service\AbstractService
 {
 	public function getTopAddresses(int $start = 0, int $end = 0)
 	{
-		// Get total
+		// Get the starting block
 		$sql = '
-			SELECT
-				COUNT(tv.*) AS total
-			FROM
-				tx_vote tv
-			JOIN
-				database_blockchain_state dbs ON dbs.database_blockchain_state_id = 1
-			JOIN
-				tx ON tx.tx_id = tv.tx_id AND tx.block_id > dbs.last_block_id - 8064;
+			SELECT (dbs.last_block_id - 8064) AS start_block_id
+			FROM database_blockchain_state dbs
+			WHERE dbs.database_blockchain_state_id = 1;
 		';
 		$db_handler = \Geppetto\DatabaseHandler::init();
 		$res = $db_handler->query($sql, array());
+
+		if (empty($res) || !array_key_exists(0, $res) || !array_key_exists('start_block_id', $res[0])) {
+			throw new \Exception('Could not collect top ticket awardees.');
+		}
+
+		// Get the start_block_id
+		$start_block_id = $res[0]['start_block_id'];
+
+		// Get total
+		$sql = '
+			SELECT
+				COUNT(tv.tx_vote_id) AS total
+			FROM
+				tx_vote tv
+			JOIN
+				tx ON tx.tx_id = tv.tx_id AND tx.block_id > $1;
+		';
+		$db_handler = \Geppetto\DatabaseHandler::init();
+		$res = $db_handler->query($sql, array($start_block_id));
 
 		if (empty($res) || !array_key_exists(0, $res) || !array_key_exists('total', $res[0])) {
 			throw new \Exception('Could not collect top ticket awardees.');
@@ -36,9 +50,7 @@ class Voting extends \Scrollio\Service\AbstractService
 			FROM
 				tx_vote tv
 			JOIN
-				database_blockchain_state dbs ON dbs.database_blockchain_state_id = 1
-			JOIN
-				tx ON tx.tx_id = tv.tx_id AND tx.block_id > dbs.last_block_id - 8064
+				tx ON tx.tx_id = tv.tx_id AND tx.block_id > $1
 			JOIN
 				vin ON vin.tx_id = tv.tx_id
 			JOIN
@@ -51,7 +63,7 @@ class Voting extends \Scrollio\Service\AbstractService
 				vout_address origin_vout_address ON origin_vout_address.vout_id = origin_vin.vout_id;
 		';
 		$db_handler = \Geppetto\DatabaseHandler::init();
-		$res = $db_handler->query($sql, array());
+		$res = $db_handler->query($sql, array($start_block_id));
 
 		if (empty($res) || !array_key_exists(0, $res) || !array_key_exists('total_addresses', $res[0])) {
 			throw new \Exception('Could not collect top ticket awardees.');
@@ -62,15 +74,12 @@ class Voting extends \Scrollio\Service\AbstractService
 
 		$sql = '
 			SELECT
-				DISTINCT a.address_id,
 				a.address,
-				COUNT(tv.*) AS num
+				COUNT(tv.tx_vote_id) AS num
 			FROM
 				tx_vote tv
 			JOIN
-				database_blockchain_state dbs ON dbs.database_blockchain_state_id = 1
-			JOIN
-				tx ON tx.tx_id = tv.tx_id AND tx.block_id > dbs.last_block_id - 8064
+				tx ON tx.tx_id = tv.tx_id AND tx.block_id > $1
 			JOIN
 				vin ON vin.tx_id = tv.tx_id
 			JOIN
@@ -86,12 +95,12 @@ class Voting extends \Scrollio\Service\AbstractService
 			GROUP BY
 				a.address_id
 			ORDER BY
-				3 DESC
+				2 DESC
 			LIMIT
 				200;
 		';
 		$db_handler = \Geppetto\DatabaseHandler::init();
-		$res = $db_handler->query($sql, array());
+		$res = $db_handler->query($sql, array($start_block_id));
 
 		if (empty($res) || !array_key_exists(0, $res)) {
 			throw new \Exception('Could not collect top Decred addresses.');
@@ -106,19 +115,33 @@ class Voting extends \Scrollio\Service\AbstractService
 
 	public function getTopNetworks(int $start = 0, int $end = 0)
 	{
-		// Get total
+		// Get the starting block
 		$sql = '
-			SELECT
-				COUNT(tv.*) AS total
-			FROM
-				tx_vote tv
-			JOIN
-				database_blockchain_state dbs ON dbs.database_blockchain_state_id = 1
-			JOIN
-				tx ON tx.tx_id = tv.tx_id AND tx.block_id > dbs.last_block_id - 8064;
+			SELECT (dbs.last_block_id - 8064) AS start_block_id
+			FROM database_blockchain_state dbs
+			WHERE dbs.database_blockchain_state_id = 1;
 		';
 		$db_handler = \Geppetto\DatabaseHandler::init();
 		$res = $db_handler->query($sql, array());
+
+		if (empty($res) || !array_key_exists(0, $res) || !array_key_exists('start_block_id', $res[0])) {
+			throw new \Exception('Could not collect top ticket awardees.');
+		}
+
+		// Get the start_block_id
+		$start_block_id = $res[0]['start_block_id'];
+
+		// Get total
+		$sql = '
+			SELECT
+				COUNT(tv.tx_vote_id) AS total
+			FROM
+				tx_vote tv
+			JOIN
+				tx ON tx.tx_id = tv.tx_id AND tx.block_id > $1;
+		';
+		$db_handler = \Geppetto\DatabaseHandler::init();
+		$res = $db_handler->query($sql, array($start_block_id));
 
 		if (empty($res) || !array_key_exists(0, $res) || !array_key_exists('total', $res[0])) {
 			throw new \Exception('Could not collect top ticket awardees.');
@@ -134,9 +157,7 @@ class Voting extends \Scrollio\Service\AbstractService
 			FROM
 				tx_vote tv
 			JOIN
-				database_blockchain_state dbs ON dbs.database_blockchain_state_id = 1
-			JOIN
-				tx ON tx.tx_id = tv.tx_id AND tx.block_id > dbs.last_block_id - 8064
+				tx ON tx.tx_id = tv.tx_id AND tx.block_id > $1
 			JOIN
 				vin ON vin.tx_id = tv.tx_id
 			JOIN
@@ -151,7 +172,7 @@ class Voting extends \Scrollio\Service\AbstractService
 				address a ON a.address_id = origin_vout_address.address_id;
 		';
 		$db_handler = \Geppetto\DatabaseHandler::init();
-		$res = $db_handler->query($sql, array());
+		$res = $db_handler->query($sql, array($start_block_id));
 
 		if (empty($res) || !array_key_exists(0, $res) || !array_key_exists('total_networks', $res[0])) {
 			throw new \Exception('Could not collect top ticket networks.');
@@ -162,15 +183,12 @@ class Voting extends \Scrollio\Service\AbstractService
 
 		$sql = '
 			SELECT
-				DISTINCT hn.network,
 				primary_address.address,
-				COUNT(tv.*) AS num
+				COUNT(tv.tx_vote_id) AS num
 			FROM
 				tx_vote tv
 			JOIN
-				database_blockchain_state dbs ON dbs.database_blockchain_state_id = 1
-			JOIN
-				tx ON tx.tx_id = tv.tx_id AND tx.block_id > dbs.last_block_id - 8064
+				tx ON tx.tx_id = tv.tx_id AND tx.block_id > $1
 			JOIN
 				vin ON vin.tx_id = tv.tx_id
 			JOIN
@@ -191,12 +209,12 @@ class Voting extends \Scrollio\Service\AbstractService
 				hn.network,
 				primary_address.address
 			ORDER BY
-				3 DESC
+				2 DESC
 			LIMIT
 				200;
 		';
 		$db_handler = \Geppetto\DatabaseHandler::init();
-		$res = $db_handler->query($sql, array());
+		$res = $db_handler->query($sql, array($start_block_id));
 
 		if (empty($res) || !array_key_exists(0, $res)) {
 			throw new \Exception('Could not collect top Decred wallets.');
@@ -211,19 +229,33 @@ class Voting extends \Scrollio\Service\AbstractService
 
 	public function getTopStakeAddresses(int $start = 0, int $end = 0)
 	{
-		// Get total
+		// Get the starting block
 		$sql = '
-			SELECT
-				COUNT(tv.*) AS total
-			FROM
-				tx_vote tv
-			JOIN
-				database_blockchain_state dbs ON dbs.database_blockchain_state_id = 1
-			JOIN
-				tx ON tx.tx_id = tv.tx_id AND tx.block_id > dbs.last_block_id - 8064;
+			SELECT (dbs.last_block_id - 8064) AS start_block_id
+			FROM database_blockchain_state dbs
+			WHERE dbs.database_blockchain_state_id = 1;
 		';
 		$db_handler = \Geppetto\DatabaseHandler::init();
 		$res = $db_handler->query($sql, array());
+
+		if (empty($res) || !array_key_exists(0, $res) || !array_key_exists('start_block_id', $res[0])) {
+			throw new \Exception('Could not collect top ticket awardees.');
+		}
+
+		// Get the start_block_id
+		$start_block_id = $res[0]['start_block_id'];
+
+		// Get total
+		$sql = '
+			SELECT
+				COUNT(tv.tx_vote_id) AS total
+			FROM
+				tx_vote tv
+			JOIN
+				tx ON tx.tx_id = tv.tx_id AND tx.block_id > $1;
+		';
+		$db_handler = \Geppetto\DatabaseHandler::init();
+		$res = $db_handler->query($sql, array($start_block_id));
 
 		if (empty($res) || !array_key_exists(0, $res) || !array_key_exists('total', $res[0])) {
 			throw new \Exception('Could not collect top ticket awardees.');
@@ -239,16 +271,14 @@ class Voting extends \Scrollio\Service\AbstractService
 			FROM
 				tx_vote tv
 			JOIN
-				database_blockchain_state dbs ON dbs.database_blockchain_state_id = 1
-			JOIN
-				tx ON tx.tx_id = tv.tx_id AND tx.block_id > dbs.last_block_id - 8064
+				tx ON tx.tx_id = tv.tx_id AND tx.block_id > $1
 			JOIN
 				vin ON vin.tx_id = tv.tx_id
 			JOIN
 				vout_address origin_ss_vout_address ON origin_ss_vout_address.vout_id = vin.vout_id;
 		';
 		$db_handler = \Geppetto\DatabaseHandler::init();
-		$res = $db_handler->query($sql, array());
+		$res = $db_handler->query($sql, array($start_block_id));
 
 		if (empty($res) || !array_key_exists(0, $res) || !array_key_exists('total_addresses', $res[0])) {
 			throw new \Exception('Could not collect top ticket awardees.');
@@ -259,15 +289,12 @@ class Voting extends \Scrollio\Service\AbstractService
 
 		$sql = '
 			SELECT
-				DISTINCT a.address_id,
 				a.address,
-				COUNT(tv.*) AS num
+				COUNT(tv.tx_vote_id) AS num
 			FROM
 				tx_vote tv
 			JOIN
-				database_blockchain_state dbs ON dbs.database_blockchain_state_id = 1
-			JOIN
-				tx ON tx.tx_id = tv.tx_id AND tx.block_id > dbs.last_block_id - 8064
+				tx ON tx.tx_id = tv.tx_id AND tx.block_id > $1
 			JOIN
 				vin ON vin.tx_id = tv.tx_id
 			JOIN
@@ -277,12 +304,12 @@ class Voting extends \Scrollio\Service\AbstractService
 			GROUP BY
 				a.address_id
 			ORDER BY
-				3 DESC
+				2 DESC
 			LIMIT
 				200;
 		';
 		$db_handler = \Geppetto\DatabaseHandler::init();
-		$res = $db_handler->query($sql, array());
+		$res = $db_handler->query($sql, array($start_block_id));
 
 		if (empty($res) || !array_key_exists(0, $res)) {
 			throw new \Exception('Could not collect top ticket awardees.');
