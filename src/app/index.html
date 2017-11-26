@@ -70,9 +70,14 @@
 						<a class="dropdown-item page-toggle" href="#dist-hd">Wealth By HD Wallet</a>
 					</div>
 				</li>
-				<!--<li class="nav-item">
-					<a class="nav-link page-toggle" href="#voting">Voting</a>
-				</li>-->
+				<li class="nav-item dropdown">
+					<a class="nav-link dropdown-toggle" href="#" id="dcr-voting-dropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Voting</a>
+					<div class="dropdown-menu" aria-labelledby="dcr-voting-dropdown">
+						<a class="dropdown-item page-toggle" href="#voting">Top Voting Address</a>
+						<a class="dropdown-item page-toggle" href="#voting-hd">Top Voting HD Wallets</a>
+						<a class="dropdown-item page-toggle" href="#voting-stakesubmission">Top Voting Stake Pools</a>
+					</div>
+				</li>
 			</ul>
 
 			<form id="dcr-address-search" class="form-inline my-2 my-lg-0">
@@ -337,12 +342,25 @@
 			</p>
 		</div>
 
-		<!-- Voting Page -->
+		<!-- Voting Address Distribution Page -->
 		<div class="dcr-page dcr-page-voting dist-body" style="display:none;">
-			<h1>Voting Distribution</h1>
+			<h1>Top 200 Voters</h1>
 			<p class="lead">
-				<span class="dist-voting-lead">The Decred voting record.</span>
+				<span>The current Decred voter distribution for the past 8064 blocks.</span>
 			</p>
+
+			<h4>Summary</h4>
+			<p class="lead">
+				<small>
+					<strong>
+						<span class="top-votes">X</span> out of <span class="total-votes">X</span> Votes
+					</strong> | <span class="top-votes-percent">X%</span> of Votes 
+					<br />
+					<strong>
+						<span class="top-voters">200</span> out of <span class="total-voters">X</span> Addresses
+					</strong> | <span class="top-voters-percent">X%</span> of Addresses
+				</small>
+			</p><br />
 
 			<table class="table table-hover table-distribution-voting table-responsive-sm">
 				<thead>
@@ -356,12 +374,107 @@
 				<tbody>
 					<tr>
 						<th scope="row">1</th>
-						<td class="td-voting-address">X</td>
+						<td class="td-voting-address">
+							<a href="#addr">X</a>
+						</td>
 						<td class="td-voting-num">X</td>
 						<td class="td-voting-pct">X%</td>
 					</tr>
 				</tbody>
 			</table>
+
+			<p class="lead" style="text-align:center;">
+				<button class="btn btn-primary my-2 my-sm-0 show-all-voting-200">Show Top 200</button>
+			</p>
+		</div>
+
+		<!-- Voting HD Wallet Distribution Page -->
+		<div class="dcr-page dcr-page-voting-hd dist-body" style="display:none;">
+			<h1>Top 200 Voting HD Wallets</h1>
+			<p class="lead">
+				<span>The top Decred voters by HD Wallets for the past 8064 blocks.</span>
+			</p>
+
+			<h4>Summary</h4>
+			<p class="lead">
+				<small>
+					<strong>
+						<span class="top-votes-hd">X</span> out of <span class="total-votes-hd">X</span> Votes
+					</strong> | <span class="top-votes-hd-percent">X%</span> of Votes 
+					<br />
+					<strong>
+						<span class="top-voters-hd">200</span> out of <span class="total-voters-hd">X</span> HD Wallets
+					</strong> | <span class="top-voters-hd-percent">X%</span> of HD Wallets
+				</small>
+			</p><br />
+
+			<table class="table table-hover table-distribution-voting-hd table-responsive-sm">
+				<thead>
+					<tr>
+						<th>Rank</th>
+						<th>Wallet</th>
+						<th># Votes</th>
+						<th>% Votes</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr>
+						<th scope="row">1</th>
+						<td class="td-voting-hd-address">
+							<a href="#hd-addr">X</a>
+						</td>
+						<td class="td-voting-hd-num">X</td>
+						<td class="td-voting-hd-pct">X%</td>
+					</tr>
+				</tbody>
+			</table>
+
+			<p class="lead" style="text-align:center;">
+				<button class="btn btn-primary my-2 my-sm-0 show-all-voting-hd-200">Show Top 200</button>
+			</p>
+		</div>
+
+		<!-- Voting Stakepool Distribution Page -->
+		<div class="dcr-page dcr-page-voting-stakesubmission dist-body" style="display:none;">
+			<h1>Top 200 Stake Pools</h1>
+			<p class="lead">
+				<span>The top Decred stake pools over the past 8064 blocks.</span>
+			</p>
+
+			<h4>Summary</h4>
+			<p class="lead">
+				<small>
+					<strong><span class="top-stakesubmission-votes">X</span> out of <span class="total-stakesubmission-votes">X</span> Votes</strong> | <span class="top-stakesubmission-votes-percent">X%</span> of Votes 
+					<br />
+					<strong><span class="top-stakesubmission-voters">200</span> out of <span class="total-stakesubmission-voters">X</span> Stake Pools</strong> | 
+					<span class="top-stakesubmission-voters-percent">X%</span> of Stake Pools
+				</small>
+			</p>
+
+			<table class="table table-hover table-distribution-voting-stakesubmission table-responsive-sm">
+				<thead>
+					<tr>
+						<th>Rank</th>
+						<th>Address</th>
+						<th># Votes</th>
+						<th>% Votes</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr>
+						<th scope="row">1</th>
+						<td class="td-voting-stakesubmission-address">
+							<a href="#addr">X</a>
+						</td>
+						<td class="td-voting-stakesubmission-num">X</td>
+						<td class="td-voting-stakesubmission-pct">X%</td>
+					</tr>
+				</tbody>
+			</table>
+
+			<p class="lead" style="text-align:center;">
+				<button class="btn btn-primary my-2 my-sm-0 show-all-voting-stakesubmission-200">Show Top 200</button>
+			</p>
 		</div>
 
 		<!-- Address Page -->
@@ -754,6 +867,7 @@
 	<script src="./js-vendor/d3pie.js"></script>
 
 	<!-- Site JS -->
+	<script src="./js/voting.js"></script>
 	<script src="./js/wealth-distribution.js"></script>
 	<script src="./js/top-accounts.js"></script>
 	<script src="./js/index.js"></script>

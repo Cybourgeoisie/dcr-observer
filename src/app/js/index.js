@@ -1,5 +1,5 @@
 // Configuration
-var valid_uri_hashes = ['home', 'top-hd', 'dist', 'dist-hd', 'addr', 'hd-addr', 'voting', '404', 'maintenance'];
+var valid_uri_hashes = ['home', 'top-hd', 'dist', 'dist-hd', 'addr', 'hd-addr', 'voting', 'voting-hd', 'voting-stakesubmission', '404', 'maintenance'];
 var dcr_price = 30.0;
 var total_dcr = 6651899.447322492;
 var current_block_height = 189416;
@@ -94,7 +94,19 @@ function handleNavigation(uri_hash) {
 		if (MAINTENANCE_MODE) {
 			showPage('maintenance');
 		} else {
-			showPage('voting');
+			pullTicketDistributionFromApi(function() { showPage('voting'); });
+		}
+	} else if (uri == 'voting-hd') {
+		if (MAINTENANCE_MODE) {
+			showPage('maintenance');
+		} else {
+			pullTicketNetworkDistributionFromApi(function() { showPage('voting-hd'); });
+		}
+	} else if (uri == 'voting-stakesubmission') {
+		if (MAINTENANCE_MODE) {
+			showPage('maintenance');
+		} else {
+			pullTicketStakePoolDistributionFromApi(function() { showPage('voting-stakesubmission'); });
 		}
 	} else {
 		showPage(uri);
