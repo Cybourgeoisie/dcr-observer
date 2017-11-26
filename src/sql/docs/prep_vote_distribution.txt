@@ -1,0 +1,56 @@
+SELECT
+    DISTINCT a.address,
+    COUNT(tv.*) AS num_votes
+FROM
+    tx_vote tv
+JOIN
+    vin ON vin.tx_id = tv.tx_id
+JOIN
+    vout origin_ss_vout ON
+        origin_ss_vout.vout_id = vin.vout_id AND 
+        origin_ss_vout.type = 'stakesubmission'
+JOIN
+    vin origin_vin ON origin_vin.tx_id = origin_ss_vout.tx_id
+JOIN
+    vout_address origin_vout_address ON origin_vout_address.vout_id = origin_vin.vout_id
+JOIN
+    address a ON a.address_id = origin_vout_address.address_id
+GROUP BY
+    a.address_id
+ORDER BY 2 DESC;
+
+SELECT
+    DISTINCT a.network,
+    COUNT(tv.*) AS num_votes
+FROM
+    tx_vote tv
+JOIN
+    vin ON vin.tx_id = tv.tx_id
+JOIN
+    vout origin_ss_vout ON
+        origin_ss_vout.vout_id = vin.vout_id AND 
+        origin_ss_vout.type = 'stakesubmission'
+JOIN
+    vin origin_vin ON origin_vin.tx_id = origin_ss_vout.tx_id
+JOIN
+    vout_address origin_vout_address ON origin_vout_address.vout_id = origin_vin.vout_id
+JOIN
+    address a ON a.address_id = origin_vout_address.address_id
+GROUP BY
+    a.network
+ORDER BY 2 DESC;
+
+SELECT
+    DISTINCT a.address_id,
+    COUNT(tv.*) AS num_votes_per_pool
+FROM
+    tx_vote tv
+JOIN
+    vin ON vin.tx_id = tv.tx_id
+JOIN
+    vout_address origin_ss_vout_address ON origin_ss_vout_address.vout_id = vin.vout_id
+JOIN
+    address a ON a.address_id = origin_ss_vout_address.address_id
+GROUP BY
+    a.address_id
+ORDER BY 2 DESC;

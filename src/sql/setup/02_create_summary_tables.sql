@@ -54,7 +54,8 @@ ALTER TABLE "balance" ADD COLUMN "active_stake_submissions" NUMERIC;
 CREATE TABLE "balance_rank" (
 	"balance_rank_id" BIGSERIAL PRIMARY KEY,
 	"balance_id"      BIGINT UNIQUE REFERENCES "balance" (balance_id),
-	"rank"            BIGINT
+	"rank"            BIGINT--,
+	--"liquid_rank"     BIGINT
 );
 
 -- CREATE INDEX balance_rank_balance_id_idx ON balance_rank (balance_id);

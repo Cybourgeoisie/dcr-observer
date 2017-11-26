@@ -177,11 +177,118 @@ FROM (
 WHERE
   balance.address_id = sq.address_id;
 
+---- liquid
+--UPDATE
+--  balance
+--SET
+--  liquid = COALESCE(balance.liquid, 0) + COALESCE(sq.liquid_vout, 0) - COALESCE(sq.liquid_vin, 0)
+--FROM (
+--  SELECT
+--    DISTINCT va.address_id,
+--    COALESCE(SUM(vout.value), 0) AS liquid_vout,
+--    COALESCE(SUM(vin.amountin), 0) AS liquid_vin
+--  FROM
+--    database_blockchain_state dbs
+--  JOIN
+--    vout ON vout.type != 'stakesubmission' AND vout.vout_id > dbs.last_vout_id
+--  JOIN
+--    vin ON vin.vin_id > dbs.last_vin_id
+--  JOIN
+--    vout prior_vout ON prior_vout.vout_id = vin.vout_id AND prior_vout.type != 'stakesubmission'
+--  JOIN
+--    vout_address va ON vout.vout_id = va.vout_id OR vin.vout_id = va.vout_id
+--  WHERE
+--    dbs.database_blockchain_state_id = 1
+--  GROUP BY
+--    va.address_id
+--) AS sq
+--WHERE
+--  balance.address_id = sq.address_id;
+--
+---- staking
+--UPDATE
+--  balance
+--SET
+--  active_stake_submissions = COALESCE(balance.active_stake_submissions, 0) + COALESCE(sq.stake_submissions_vout, 0) - COALESCE(sq.stake_submissions_vin, 0)
+--FROM (
+--  SELECT
+--    DISTINCT va.address_id,
+--    COALESCE(SUM(vout.value), 0) AS stake_submissions_vout,
+--    COALESCE(SUM(vin.amountin), 0) AS stake_submissions_vin
+--  FROM
+--    database_blockchain_state dbs
+--  JOIN
+--    vout ON vout.type = 'stakesubmission' AND vout.vout_id > dbs.last_vout_id
+--  JOIN
+--    vin ON vin.vin_id > dbs.last_vin_id
+--  JOIN
+--    vout prior_vout ON prior_vout.vout_id = vin.vout_id AND prior_vout.type = 'stakesubmission'
+--  JOIN
+--    vout_address va ON vout.vout_id = va.vout_id OR vin.vout_id = va.vout_id
+--  WHERE
+--    dbs.database_blockchain_state_id = 1
+--  GROUP BY
+--    va.address_id
+--) AS sq
+--WHERE
+--  balance.address_id = sq.address_id;
+
+-- liquid
+UPDATE
+  balance
+SET
+  liquid = sq.liquid
+FROM (
+  SELECT
+    DISTINCT a.address_id,
+    COALESCE(SUM(vout.value), 0) AS liquid
+  FROM
+    address a 
+  JOIN
+    vout_address va ON va.address_id = a.address_id
+  JOIN
+    vout ON vout.vout_id = va.vout_id AND vout.type != 'stakesubmission' 
+  LEFT JOIN
+    vin ON vin.vout_id = vout.vout_id 
+  WHERE
+    vin.vin_id IS NULL
+  GROUP BY
+    a.address_id
+) AS sq
+WHERE
+  balance.address_id = sq.address_id;
+
+-- staking
+UPDATE
+  balance
+SET
+  active_stake_submissions = sq.stake_submissions
+FROM (
+  SELECT
+    DISTINCT a.address_id,
+    COALESCE(SUM(vout.value), 0) AS stake_submissions
+  FROM
+    address a 
+  JOIN
+    vout_address va ON va.address_id = a.address_id
+  JOIN
+    vout ON vout.vout_id = va.vout_id AND vout.type = 'stakesubmission' 
+  LEFT JOIN
+    vin ON vin.vout_id = vout.vout_id 
+  WHERE
+    vin.vin_id IS NULL
+  GROUP BY
+    a.address_id
+) AS sq
+WHERE
+  balance.address_id = sq.address_id;
+
 ALTER TABLE balance ENABLE TRIGGER ALL;
 
 COMMIT;
 -- End of all updates
 
+VACUUM FULL ANALYZE balance;
 
 -- Now update balance
 BEGIN;
@@ -228,6 +335,8 @@ WHERE
   balance.address_id = sq.address_id;
 
 COMMIT;
+
+VACUUM FULL ANALYZE balance;
 
 -- Now the fat boy
 BEGIN;
@@ -335,6 +444,10 @@ WHERE
 COMMIT;
 
 
+VACUUM FULL ANALYZE address;
+VACUUM FULL ANALYZE tx_network;
+
+
 -- Now update the hd_network stats
 BEGIN;
 
@@ -396,6 +509,12 @@ FROM (
 ) AS sq
 WHERE
   hd_network.network = sq.network;
+
+COMMIT;
+
+VACUUM FULL ANALYZE hd_network;
+
+BEGIN;
 
 -- hd num addresses
 UPDATE

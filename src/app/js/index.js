@@ -1,12 +1,12 @@
 // Configuration
-var valid_uri_hashes = ['home', 'top-hd', 'dist', 'dist-hd', 'addr', 'hd-addr', '404', 'maintenance'];
+var valid_uri_hashes = ['home', 'top-hd', 'dist', 'dist-hd', 'addr', 'hd-addr', 'voting', '404', 'maintenance'];
 var dcr_price = 30.0;
 var total_dcr = 6651899.447322492;
 var current_block_height = 189416;
 var historical_data_block = 190000;
 
 // Maintenance Mode
-var MAINTENANCE_MODE = true;
+var MAINTENANCE_MODE = false;
 
 function boot() {
 	if (MAINTENANCE_MODE) {
@@ -94,7 +94,7 @@ function handleNavigation(uri_hash) {
 		if (MAINTENANCE_MODE) {
 			showPage('maintenance');
 		} else {
-			showPage('maintenance');
+			showPage('voting');
 		}
 	} else {
 		showPage(uri);
@@ -241,8 +241,8 @@ function setAddressInfo(addr_info) {
 	var total_balance = parseFloat(addr_info.balance);
 	$('.addr-balance').html(parseFloat(addr_info.balance).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2}));
 	$('.addr-fiat-value').html('$' + (parseFloat(addr_info.balance)*dcr_price).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2}));
-	//$('.addr-liquid-balance').html(parseFloat(addr_info.liquid_balance).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2}));
-	//$('.addr-stake-submissions').html(parseFloat(addr_info.stake_submissions).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2}));
+	$('.addr-liquid-balance').html(parseFloat(addr_info.liquid).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2}));
+	$('.addr-stake-submissions').html(parseFloat(addr_info.active_stake_submissions).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2}));
 	//$('.addr-actively-staking').html(parseFloat(addr_info.actively_staking).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2}));
 	$('.addr-total-balance').html(total_balance.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2}));
 	

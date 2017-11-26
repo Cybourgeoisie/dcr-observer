@@ -30,7 +30,9 @@ class Address extends \Scrollio\Service\AbstractService
 				EXTRACT(EPOCH FROM bs.time) AS "start",
 				EXTRACT(EPOCH FROM be.time) AS "end",
 				bs.height AS first,
-				be.height AS last--,
+				be.height AS last,
+				COALESCE(ba.liquid, 0) AS liquid,
+				COALESCE(ba.active_stake_submissions, 0) AS active_stake_submissions
 				--(
 				--	SELECT COALESCE(SUM(vout_stxsub.value), 0) FROM address a 
 				--	JOIN vout_address va ON va.address_id = a.address_id 
@@ -69,22 +71,6 @@ class Address extends \Scrollio\Service\AbstractService
 				--		vin_spent.vout_id = vout_stxsub.vout_id
 				--	WHERE a.address = $1 AND vin_spent.vin_id IS NULL 
 				--) AS actively_staking, -- sstxcommitment is current address, stakesubmission is diff
-				--(
-				--	SELECT COALESCE(SUM(vout.value), 0) AS balance
-				--	FROM address a 
-				--	JOIN vout_address va ON va.address_id = a.address_id
-				--	JOIN vout ON vout.vout_id = va.vout_id AND vout.type != \'stakesubmission\' 
-				--	LEFT JOIN vin ON vin.vout_id = vout.vout_id 
-				--	WHERE a.address = $1 AND vin.vin_id IS NULL
-				--) AS liquid_balance,
-				--(
-				--	SELECT COALESCE(SUM(vout.value), 0)
-				--	FROM address a 
-				--	JOIN vout_address va ON va.address_id = a.address_id
-				--	JOIN vout ON vout.vout_id = va.vout_id AND vout.type = \'stakesubmission\' 
-				--	LEFT JOIN vin ON vin.vout_id = vout.vout_id 
-				--	WHERE a.address = $1 AND vin.vin_id IS NULL
-				--) AS stake_submissions
 			FROM
 				address a
 			JOIN
