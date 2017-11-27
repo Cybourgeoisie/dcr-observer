@@ -24,28 +24,10 @@ class Voting extends \Scrollio\Service\AbstractService
 		// Get the start_block_id
 		$start_block_id = $res[0]['start_block_id'];
 
-		// Get total
+		// Get total & count of all addresses that voted
 		$sql = '
 			SELECT
-				COUNT(tv.tx_vote_id) AS total
-			FROM
-				tx_vote tv
-			JOIN
-				tx ON tx.tx_id = tv.tx_id AND tx.block_id > $1;
-		';
-		$db_handler = \Geppetto\DatabaseHandler::init();
-		$res = $db_handler->query($sql, array($start_block_id));
-
-		if (empty($res) || !array_key_exists(0, $res) || !array_key_exists('total', $res[0])) {
-			throw new \Exception('Could not collect top ticket awardees.');
-		}
-
-		// Get the total
-		$total = $res[0]['total'];
-
-		// Get count of all addresses that voted
-		$sql = '
-			SELECT
+				COUNT(tv.tx_vote_id) AS total,
 				COUNT(DISTINCT origin_vout_address.address_id) AS total_addresses
 			FROM
 				tx_vote tv
@@ -70,6 +52,7 @@ class Voting extends \Scrollio\Service\AbstractService
 		}
 
 		// Get the total_addresses
+		$total = $res[0]['total'];
 		$total_addresses = $res[0]['total_addresses'];
 
 		$sql = '
@@ -131,28 +114,10 @@ class Voting extends \Scrollio\Service\AbstractService
 		// Get the start_block_id
 		$start_block_id = $res[0]['start_block_id'];
 
-		// Get total
-		$sql = '
-			SELECT
-				COUNT(tv.tx_vote_id) AS total
-			FROM
-				tx_vote tv
-			JOIN
-				tx ON tx.tx_id = tv.tx_id AND tx.block_id > $1;
-		';
-		$db_handler = \Geppetto\DatabaseHandler::init();
-		$res = $db_handler->query($sql, array($start_block_id));
-
-		if (empty($res) || !array_key_exists(0, $res) || !array_key_exists('total', $res[0])) {
-			throw new \Exception('Could not collect top ticket awardees.');
-		}
-
-		// Get the total
-		$total = $res[0]['total'];
-
 		// Get count of all addresses that voted
 		$sql = '
 			SELECT
+				COUNT(tv.tx_vote_id) AS total,
 				COUNT(DISTINCT a.network) AS total_networks
 			FROM
 				tx_vote tv
@@ -179,6 +144,7 @@ class Voting extends \Scrollio\Service\AbstractService
 		}
 
 		// Get the total_networks
+		$total = $res[0]['total'];
 		$total_networks = $res[0]['total_networks'];
 
 		$sql = '
@@ -245,28 +211,10 @@ class Voting extends \Scrollio\Service\AbstractService
 		// Get the start_block_id
 		$start_block_id = $res[0]['start_block_id'];
 
-		// Get total
-		$sql = '
-			SELECT
-				COUNT(tv.tx_vote_id) AS total
-			FROM
-				tx_vote tv
-			JOIN
-				tx ON tx.tx_id = tv.tx_id AND tx.block_id > $1;
-		';
-		$db_handler = \Geppetto\DatabaseHandler::init();
-		$res = $db_handler->query($sql, array($start_block_id));
-
-		if (empty($res) || !array_key_exists(0, $res) || !array_key_exists('total', $res[0])) {
-			throw new \Exception('Could not collect top ticket awardees.');
-		}
-
-		// Get the total
-		$total = $res[0]['total'];
-
 		// Get count of all addresses that voted
 		$sql = '
 			SELECT
+				COUNT(tv.tx_vote_id) AS total,
 				COUNT(DISTINCT origin_ss_vout_address.address_id) AS total_addresses
 			FROM
 				tx_vote tv
@@ -285,6 +233,7 @@ class Voting extends \Scrollio\Service\AbstractService
 		}
 
 		// Get the total_addresses
+		$total = $res[0]['total'];
 		$total_addresses = $res[0]['total_addresses'];
 
 		$sql = '
