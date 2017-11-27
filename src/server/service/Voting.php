@@ -34,13 +34,7 @@ class Voting extends \Scrollio\Service\AbstractService
 			JOIN
 				tx ON tx.tx_id = tv.tx_id AND tx.block_id > $1
 			JOIN
-				vin ON vin.tx_id = tv.tx_id
-			JOIN
-				vout origin_ss_vout ON
-					origin_ss_vout.vout_id = vin.vout_id AND 
-					origin_ss_vout.type = \'stakesubmission\'
-			JOIN
-				vin origin_vin ON origin_vin.tx_id = origin_ss_vout.tx_id
+				vin origin_vin ON origin_vin.tx_id = tv.origin_tx_id
 			JOIN
 				vout_address origin_vout_address ON origin_vout_address.vout_id = origin_vin.vout_id;
 		';
@@ -64,13 +58,7 @@ class Voting extends \Scrollio\Service\AbstractService
 			JOIN
 				tx ON tx.tx_id = tv.tx_id AND tx.block_id > $1
 			JOIN
-				vin ON vin.tx_id = tv.tx_id
-			JOIN
-				vout origin_ss_vout ON
-					origin_ss_vout.vout_id = vin.vout_id AND 
-					origin_ss_vout.type = \'stakesubmission\'
-			JOIN
-				vin origin_vin ON origin_vin.tx_id = origin_ss_vout.tx_id
+				vin origin_vin ON origin_vin.tx_id = tv.origin_tx_id
 			JOIN
 				vout_address origin_vout_address ON origin_vout_address.vout_id = origin_vin.vout_id
 			JOIN
@@ -124,13 +112,7 @@ class Voting extends \Scrollio\Service\AbstractService
 			JOIN
 				tx ON tx.tx_id = tv.tx_id AND tx.block_id > $1
 			JOIN
-				vin ON vin.tx_id = tv.tx_id
-			JOIN
-				vout origin_ss_vout ON
-					origin_ss_vout.vout_id = vin.vout_id AND 
-					origin_ss_vout.type = \'stakesubmission\'
-			JOIN
-				vin origin_vin ON origin_vin.tx_id = origin_ss_vout.tx_id
+				vin origin_vin ON origin_vin.tx_id = tv.origin_tx_id
 			JOIN
 				vout_address origin_vout_address ON origin_vout_address.vout_id = origin_vin.vout_id
 			JOIN
@@ -156,13 +138,7 @@ class Voting extends \Scrollio\Service\AbstractService
 			JOIN
 				tx ON tx.tx_id = tv.tx_id AND tx.block_id > $1
 			JOIN
-				vin ON vin.tx_id = tv.tx_id
-			JOIN
-				vout origin_ss_vout ON
-					origin_ss_vout.vout_id = vin.vout_id AND 
-					origin_ss_vout.type = \'stakesubmission\'
-			JOIN
-				vin origin_vin ON origin_vin.tx_id = origin_ss_vout.tx_id
+				vin origin_vin ON origin_vin.tx_id = tv.origin_tx_id
 			JOIN
 				vout_address origin_vout_address ON origin_vout_address.vout_id = origin_vin.vout_id
 			JOIN
