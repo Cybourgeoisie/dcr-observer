@@ -89,8 +89,119 @@ class Address extends \Scrollio\Service\AbstractService
 			throw new \Exception('Could not find address.');
 		}
 
+		$voting_info = $this->getVotingRecord($address);
+
 		return array(
-			'addr_info' => $res[0]
+			'addr_info'      => $res[0],
+			'voting_record'  => $voting_info['voting_record'],
+			'voting_tally'   => $voting_info['voting_tally'],
+			'tickets_staked' => $voting_info['tickets_staked']
+		);
+	}
+
+	public function getVotingRecord(string $address)
+	{
+		// Validate the address
+		$address = preg_replace("/[^A-Za-z0-9]/", '', $address);
+		if (strlen($address) < 34 || strlen($address) > 36 || $address[0] != 'D')
+		{
+			throw new \Exception('Invalid address provided.');
+		}
+
+		$sql = '
+			SELECT
+				tv.version,
+				tv.votes,
+				COUNT(tv.tx_vote_id) AS count
+			FROM
+				address a
+			JOIN
+				vout_address va ON va.address_id = a.address_id
+			JOIN
+				vin ON vin.vout_id = va.vout_id
+			JOIN
+				tx_vote tv ON tv.origin_tx_id = vin.tx_id
+			WHERE
+				a.address = $1
+			GROUP BY
+				tv.version, tv.votes;
+		';
+		$db_handler = \Geppetto\DatabaseHandler::init();
+		$res = $db_handler->query($sql, array($address));
+
+		// Format the voting record
+		$tickets_staked = 0;
+		$voting_tally = array('v4' => 0, 'v5' => 0, 'all' => 0);
+		$voting_record = array(
+			'v4-sdiff' => array(
+				'version' => 'V4', 'issue' => 'sdiffalgorithm', 'yes' => 0, 'no' => 0, 'abstain' => 0
+			),
+			'v4-lnsupport' => array(
+				'version' => 'V4', 'issue' => 'lnsupport', 'yes' => 0, 'no' => 0, 'abstain' => 0
+			),
+			'v5-lnfeatures' => array(
+				'version' => 'V5', 'issue' => 'lnfeatures', 'yes' => 0, 'no' => 0, 'abstain' => 0
+			)
+		);
+
+		foreach ($res as $row) {
+			$tickets_staked += $row['count'];
+			switch($row['version']) {
+				case '0004':
+					$voting_tally['all'] += $row['count'];
+					$voting_tally['v4'] += $row['count'];
+					switch($row['votes']) {
+						case '01':
+							$voting_record['v4-sdiff']['abstain'] += $row['count'];
+							$voting_record['v4-lnsupport']['abstain'] += $row['count'];
+							break;
+						case '03':
+							$voting_record['v4-sdiff']['no'] += $row['count'];
+							$voting_record['v4-lnsupport']['abstain'] += $row['count'];
+							break;
+						case '05':
+							$voting_record['v4-sdiff']['yes'] += $row['count'];
+							$voting_record['v4-lnsupport']['abstain'] += $row['count'];
+							break;
+						case '11':
+							$voting_record['v4-sdiff']['abstain'] += $row['count'];
+							$voting_record['v4-lnsupport']['yes'] += $row['count'];
+							break;
+						case '11':
+							$voting_record['v4-sdiff']['yes'] += $row['count'];
+							$voting_record['v4-lnsupport']['yes'] += $row['count'];
+							break;
+						default:
+							break;
+					}
+				break;
+				case '0005':
+					$voting_tally['all'] += $row['count'];
+					$voting_tally['v5'] += $row['count'];
+					switch($row['votes']) {
+						case '01':
+							$voting_record['v5-lnfeatures']['abstain'] += $row['count'];
+							break;
+						case '03':
+							$voting_record['v5-lnfeatures']['no'] += $row['count'];
+							break;
+						case '05':
+							$voting_record['v5-lnfeatures']['yes'] += $row['count'];
+							break;
+						default:
+							break;
+					}
+				break;
+				default:
+				break;
+			}
+		}
+
+		return array(
+			'address' => $address,
+			'voting_record' => $voting_record,
+			'voting_tally' => $voting_tally,
+			'tickets_staked' => $tickets_staked
 		);
 	}
 
