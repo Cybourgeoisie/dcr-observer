@@ -89,7 +89,7 @@ class Address extends \Scrollio\Service\AbstractService
 			throw new \Exception('Could not find address.');
 		}
 
-		$voting_info = $this->getVotingRecord($address);
+		$voting_info = $this->getAddressVotingRecord($address);
 
 		return array(
 			'addr_info'      => $res[0],
@@ -99,7 +99,7 @@ class Address extends \Scrollio\Service\AbstractService
 		);
 	}
 
-	public function getVotingRecord(string $address)
+	public function getAddressVotingRecord(string $address)
 	{
 		// Validate the address
 		$address = preg_replace("/[^A-Za-z0-9]/", '', $address);
@@ -129,6 +129,45 @@ class Address extends \Scrollio\Service\AbstractService
 		$db_handler = \Geppetto\DatabaseHandler::init();
 		$res = $db_handler->query($sql, array($address));
 
+		return $this->formatTickets($address, $res);
+	}
+
+	public function getWalletVotingRecord(string $address)
+	{
+		// Validate the address
+		$address = preg_replace("/[^A-Za-z0-9]/", '', $address);
+		if (strlen($address) < 34 || strlen($address) > 36 || $address[0] != 'D')
+		{
+			throw new \Exception('Invalid address provided.');
+		}
+
+		$sql = '
+			SELECT
+				tv.version,
+				tv.votes,
+				COUNT(tv.tx_vote_id) AS count
+			FROM
+				address a_network
+			JOIN
+				address a ON a.network = a_network.network
+			JOIN
+				vout_address va ON va.address_id = a_network.address_id
+			JOIN
+				vin ON vin.vout_id = va.vout_id
+			JOIN
+				tx_vote tv ON tv.origin_tx_id = vin.tx_id
+			WHERE
+				a.address = $1
+			GROUP BY
+				tv.version, tv.votes;
+		';
+		$db_handler = \Geppetto\DatabaseHandler::init();
+		$res = $db_handler->query($sql, array($address));
+
+		return $this->formatTickets($address, $res);
+	}
+
+	protected function formatTickets($address, $res) {
 		// Format the voting record
 		$tickets_staked = 0;
 		$voting_tally = array('v4' => 0, 'v5' => 0, 'all' => 0);
@@ -167,7 +206,7 @@ class Address extends \Scrollio\Service\AbstractService
 							$voting_record['v4-sdiff']['abstain'] += $row['count'];
 							$voting_record['v4-lnsupport']['yes'] += $row['count'];
 							break;
-						case '11':
+						case '15':
 							$voting_record['v4-sdiff']['yes'] += $row['count'];
 							$voting_record['v4-lnsupport']['yes'] += $row['count'];
 							break;
@@ -346,9 +385,14 @@ class Address extends \Scrollio\Service\AbstractService
 			);
 		}
 
+		$voting_info = $this->getWalletVotingRecord($address);
+
 		return array(
-			'count' => count($res),
-			'addresses' => $res
+			'count'          => count($res),
+			'addresses'      => $res,
+			'voting_record'  => $voting_info['voting_record'],
+			'voting_tally'   => $voting_info['voting_tally'],
+			'tickets_staked' => $voting_info['tickets_staked']
 		);
 	}
 

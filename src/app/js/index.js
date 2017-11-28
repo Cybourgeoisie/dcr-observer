@@ -271,55 +271,65 @@ function setAddressInfo(data) {
 	}
 
 	// Show the address's voting record
-	if (voting_tally.all > 0) {
-		$('.addr-voting-record-container-none').hide();
-		$('.addr-voting-record-container').show();
+	showVotingRecord('addr', data.voting_tally, data.voting_record, data.tickets_staked);
+}
 
-		var $vr_row = $('.addr-voting-record:last').clone(true);
-		$('.addr-voting-record-container').html('');
+function showVotingRecord(addr_or_hd, voting_tally, voting_record, tickets_staked) {
+	var prefix = 'addr';
+	if (addr_or_hd == 'hd') {
+		prefix = 'hd-addr';
+	}
+
+	if (voting_tally.all > 0) {
+		$('.' + prefix + '-voting-record-container-none').hide();
+		$('.' + prefix + '-voting-record-container').show();
+
+		var $vr_row = $('.' + prefix + '-voting-record:last').clone(true);
+		$('.' + prefix + '-voting-record-container').html('');
 
 		if (voting_tally.v4 > 0) {
 			$row = $vr_row.clone(true);
-			$row.find('.addr-staking-version').html('V4 Votes'); // Set the header
-			$vr_tr = $row.find('.table-addr-votes > tbody > tr:last').clone(true); // Copy a tr
-			$row.find('.table-addr-votes > tbody').html(''); // Clear all other tr's
+			$row.find('.' + prefix + '-staking-version').html('V4 Votes'); // Set the header
+			$vr_tr = $row.find('.table-' + prefix + '-votes > tbody > tr:last').clone(true); // Copy a tr
+			$row.find('.table-' + prefix + '-votes > tbody').html(''); // Clear all other tr's
 
 			var issues = ['v4-sdiff', 'v4-lnsupport'];
 			for (var i = 0; i < issues.length; i++) {
 				$tr = $vr_tr.clone(true);
-				$tr.find('.addr-votes-issue').html(voting_record[issues[i]]['issue']);
-				$tr.find('.addr-votes-yes').html(voting_record[issues[i]]['yes']);
-				$tr.find('.addr-votes-no').html(voting_record[issues[i]]['no']);
-				$tr.find('.addr-votes-abstain').html(voting_record[issues[i]]['abstain']);
-				$row.find('.table-addr-votes > tbody').append($tr);
+				$tr.find('.' + prefix + '-votes-issue').html(voting_record[issues[i]]['issue']);
+				$tr.find('.' + prefix + '-votes-yes').html(voting_record[issues[i]]['yes']);
+				$tr.find('.' + prefix + '-votes-no').html(voting_record[issues[i]]['no']);
+				$tr.find('.' + prefix + '-votes-abstain').html(voting_record[issues[i]]['abstain']);
+				$row.find('.table-' + prefix + '-votes > tbody').append($tr);
 			}
 
-			$('.addr-voting-record-container').append($row);
+			$('.' + prefix + '-voting-record-container').append($row);
 		}
-		else if (voting_tally.v5 > 0) {
+		
+		if (voting_tally.v5 > 0) {
 			$row = $vr_row.clone(true);
-			$row.find('.addr-staking-version').html('V5 Votes'); // Set the header
-			$tr = $row.find('.table-addr-votes > tr:last').clone(true); // Copy a tr
-			$row.find('.table-addr-votes > tbody').html(''); // Clear all other tr's
+			$row.find('.' + prefix + '-staking-version').html('V5 Votes'); // Set the header
+			$tr = $row.find('.table-' + prefix + '-votes > tbody > tr:last').clone(true); // Copy a tr
+			$row.find('.table-' + prefix + '-votes > tbody').html(''); // Clear all other tr's
 
 			var issues = ['v5-lnfeatures'];
 			for (var i = 0; i < issues.length; i++) {
-				$tr.find('.addr-votes-issue').html(voting_record[issues[i]]['issue']);
-				$tr.find('.addr-votes-yes').html(voting_record[issues[i]]['yes']);
-				$tr.find('.addr-votes-no').html(voting_record[issues[i]]['no']);
-				$tr.find('.addr-votes-abstain').html(voting_record[issues[i]]['abstain']);
-				$row.find('.table-addr-votes > tbody').append($tr);
+				$tr.find('.' + prefix + '-votes-issue').html(voting_record[issues[i]]['issue']);
+				$tr.find('.' + prefix + '-votes-yes').html(voting_record[issues[i]]['yes']);
+				$tr.find('.' + prefix + '-votes-no').html(voting_record[issues[i]]['no']);
+				$tr.find('.' + prefix + '-votes-abstain').html(voting_record[issues[i]]['abstain']);
+				$row.find('.table-' + prefix + '-votes > tbody').append($tr);
 			}
 
-			$('.addr-voting-record-container').append($row);
+			$('.' + prefix + '-voting-record-container').append($row);
 		}
 	} else {
-		$('.addr-voting-record-container-none').show();
-		$('.addr-voting-record-container').hide();
+		$('.' + prefix + '-voting-record-container-none').show();
+		$('.' + prefix + '-voting-record-container').hide();
 	}
 
-	$('.addr-tickets-staked').html(data.tickets_staked);
-	$('.addr-total-votes').html(data.voting_tally.all);
+	$('.' + prefix + '-tickets-staked').html(tickets_staked);
+	$('.' + prefix + '-total-votes').html(voting_tally.all);
 }
 
 function setAddressNetwork(network_info, address) {
@@ -393,7 +403,7 @@ function loadHdAddressInfo(address, callback) {
 	$.post('api/Address/getHdDetails', { 'address' : address })
 	 .done(function(data) {
 	 	if (data.hasOwnProperty('success') && data.success) {
-	 		setHdAddressInfo(data.addresses, address);
+	 		setHdAddressInfo(data, address);
 	 		if (callback && typeof callback === 'function') {
 	 			callback.call(this, data.addresses);	 			
 	 		}
@@ -402,7 +412,9 @@ function loadHdAddressInfo(address, callback) {
 }
 
 var remaining_hd_addresses_to_load = [];
-function setHdAddressInfo(hd_addresses, req_address) {
+function setHdAddressInfo(data, req_address) {
+	hd_addresses = data.addresses;
+
 	// Set the current requested address
 	$('.hd-top-address').html(req_address);
 
@@ -471,6 +483,9 @@ function setHdAddressInfo(hd_addresses, req_address) {
 		$('.dcr-badge-hd-address-identifier').show();
 		$('span.hd-addr-identifier').html(identifier);
 	}
+
+	// Show the wallet's voting record
+	showVotingRecord('hd', data.voting_tally, data.voting_record, data.tickets_staked);
 }
 
 function addHdAddressRow($hd_address_tbody, $hd_address_row, hd_address, row_number) {

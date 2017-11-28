@@ -44,7 +44,9 @@ body {
 .table-distribution-voting-stakesubmission td,
 .table-distribution-voting-stakesubmission th,
 .table-addr-votes td,
-.table-addr-votes th {
+.table-addr-votes th,
+.table-hd-addr-votes td,
+.table-hd-addr-votes th {
 	font-size:80%;
 }
 
