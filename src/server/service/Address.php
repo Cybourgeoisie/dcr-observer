@@ -259,38 +259,45 @@ class Address extends \Scrollio\Service\AbstractService
 			-- All coinbase inputs (mining), except the genesis block
 			(SELECT COALESCE(SUM(vout.value), 0) 
 			FROM address a 
-			JOIN vout_address va ON va.address_id = a.address_id 
-			JOIN vout ON vout.vout_id = va.vout_id 
+			--JOIN vout_address va ON va.address_id = a.address_id 
+			--JOIN vout ON vout.vout_id = va.vout_id 
+			JOIN vout ON vout.address_id = a.address_id 
 			JOIN tx ON tx.tx_id = vout.tx_id AND tx.tree = 0 AND tx.tx_id != 1 
 			JOIN vin ON vin.tx_id = tx.tx_id AND vin.coinbase != \'\'
 			WHERE a.address = $1) AS coinbase,
 			-- All stakegen inputs
 			(SELECT COALESCE(SUM(vout.value), 0)
 			FROM address a 
-			JOIN vout_address va ON va.address_id = a.address_id 
-			JOIN vout ON vout.vout_id = va.vout_id AND vout.type = \'stakegen\'
+			--JOIN vout_address va ON va.address_id = a.address_id 
+			--JOIN vout ON vout.vout_id = va.vout_id AND vout.type = \'stakegen\'
+			JOIN vout ON vout.address_id = a.address_id AND vout.type = \'stakegen\'
 			WHERE a.address = $1) AS stakebase,
 			-- All stakesubmission inputs
 			(SELECT COALESCE(SUM(vout.value), 0)
 			FROM address a 
-			JOIN vout_address va ON va.address_id = a.address_id 
-			JOIN vout ON vout.vout_id = va.vout_id AND vout.type = \'stakesubmission\'
+			--JOIN vout_address va ON va.address_id = a.address_id 
+			--JOIN vout ON vout.vout_id = va.vout_id AND vout.type = \'stakesubmission\'
+			JOIN vout ON vout.address_id = a.address_id AND vout.type = \'stakesubmission\'
 			WHERE a.address = $1) AS stakesubmission,
 			-- All genesis inputs
 			(SELECT COALESCE(SUM(vout.value), 0)
 			FROM address a 
-			JOIN vout_address va ON va.address_id = a.address_id 
-			JOIN vout ON vout.vout_id = va.vout_id AND vout.tx_id = 1
+			--JOIN vout_address va ON va.address_id = a.address_id 
+			--JOIN vout ON vout.vout_id = va.vout_id AND vout.tx_id = 1
+			JOIN vout ON vout.address_id = a.address_id AND vout.tx_id = 1
 			WHERE a.address = $1) AS genesis,
 			-- All inputs from an exchange
 			(SELECT COALESCE(SUM(vout.value), 0)
 			FROM address a 
-			JOIN vout_address va ON va.address_id = a.address_id 
-			JOIN vout ON vout.vout_id = va.vout_id 
+			--JOIN vout_address va ON va.address_id = a.address_id 
+			--JOIN vout ON vout.vout_id = va.vout_id 
+			JOIN vout ON vout.address_id = a.address_id
 			JOIN vin ON vin.tx_id = vout.tx_id 
-			JOIN vout_address origin_vout_address ON origin_vout_address.vout_id = vin.vout_id
+			--JOIN vout_address origin_vout_address ON origin_vout_address.vout_id = vin.vout_id
+			JOIN vout origin_vout ON origin_vout.vout_id = vin.vout_id
 			JOIN address origin_address ON 
-				origin_address.address_id = origin_vout_address.address_id AND 
+				--origin_address.address_id = origin_vout_address.address_id AND 
+				origin_address.address_id = origin_vout.address_id AND 
 				origin_address.identifier IN (\'Poloniex\', \'Bittrex\')
 			WHERE a.address = $1 AND a.identifier NOT IN (\'Poloniex\', \'Bittrex\')) AS direct_from_exchange
 		';
@@ -413,8 +420,9 @@ class Address extends \Scrollio\Service\AbstractService
 			(SELECT COALESCE(SUM(vout.value), 0) 
 			FROM address a 
 			JOIN address this ON this.address = $1
-			JOIN vout_address va ON va.address_id = a.address_id 
-			JOIN vout ON vout.vout_id = va.vout_id 
+			--JOIN vout_address va ON va.address_id = a.address_id 
+			--JOIN vout ON vout.vout_id = va.vout_id 
+			JOIN vout ON vout.address_id = a.address_id 
 			JOIN tx ON tx.tx_id = vout.tx_id AND tx.tree = 0 AND tx.tx_id != 1 
 			JOIN vin ON vin.tx_id = tx.tx_id AND vin.coinbase != \'\'
 			WHERE a.network = this.network) AS coinbase,
@@ -422,33 +430,39 @@ class Address extends \Scrollio\Service\AbstractService
 			(SELECT COALESCE(SUM(vout.value), 0)
 			FROM address a 
 			JOIN address this ON this.address = $1
-			JOIN vout_address va ON va.address_id = a.address_id 
-			JOIN vout ON vout.vout_id = va.vout_id AND vout.type = \'stakegen\'
+			--JOIN vout_address va ON va.address_id = a.address_id 
+			--JOIN vout ON vout.vout_id = va.vout_id AND vout.type = \'stakegen\'
+			JOIN vout ON vout.address_id = a.address_id AND vout.type = \'stakegen\'
 			WHERE a.network = this.network) AS stakebase,
 			-- All stakesubmission inputs
 			(SELECT COALESCE(SUM(vout.value), 0)
 			FROM address a 
 			JOIN address this ON this.address = $1
-			JOIN vout_address va ON va.address_id = a.address_id 
-			JOIN vout ON vout.vout_id = va.vout_id AND vout.type = \'stakesubmission\'
+			--JOIN vout_address va ON va.address_id = a.address_id 
+			--JOIN vout ON vout.vout_id = va.vout_id AND vout.type = \'stakesubmission\'
+			JOIN vout ON vout.address_id = a.address_id AND vout.type = \'stakesubmission\'
 			WHERE a.network = this.network) AS stakesubmission,
 			-- All genesis inputs
 			(SELECT COALESCE(SUM(vout.value), 0)
 			FROM address a 
 			JOIN address this ON this.address = $1
-			JOIN vout_address va ON va.address_id = a.address_id 
-			JOIN vout ON vout.vout_id = va.vout_id AND vout.tx_id = 1
+			--JOIN vout_address va ON va.address_id = a.address_id 
+			--JOIN vout ON vout.vout_id = va.vout_id AND vout.tx_id = 1
+			JOIN vout ON vout.address_id = a.address_id AND vout.tx_id = 1
 			WHERE a.network = this.network) AS genesis,
 			-- All inputs from an exchange
 			(SELECT COALESCE(SUM(vout.value), 0)
 			FROM address a 
 			JOIN address this ON this.address = $1
-			JOIN vout_address va ON va.address_id = a.address_id 
-			JOIN vout ON vout.vout_id = va.vout_id 
+			--JOIN vout_address va ON va.address_id = a.address_id 
+			--JOIN vout ON vout.vout_id = va.vout_id 
+			JOIN vout ON vout.address_id = a.address_id 
 			JOIN vin ON vin.tx_id = vout.tx_id 
-			JOIN vout_address origin_vout_address ON origin_vout_address.vout_id = vin.vout_id
+			--JOIN vout_address origin_vout_address ON origin_vout_address.vout_id = vin.vout_id
+			JOIN vout origin_vout ON origin_vout.vout_id = vin.vout_id
 			JOIN address origin_address ON 
-				origin_address.address_id = origin_vout_address.address_id AND 
+				--origin_address.address_id = origin_vout_address.address_id AND 
+				origin_address.address_id = origin_vout.address_id AND 
 				origin_address.identifier IN (\'Poloniex\', \'Bittrex\')
 			WHERE a.network = this.network AND a.identifier NOT IN (\'Poloniex\', \'Bittrex\')) AS direct_from_exchange
 		';
