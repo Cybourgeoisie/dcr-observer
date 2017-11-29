@@ -71,11 +71,12 @@
 					</div>
 				</li>
 				<li class="nav-item dropdown">
-					<a class="nav-link dropdown-toggle" href="#" id="dcr-voting-dropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Voters</a>
+					<a class="nav-link dropdown-toggle" href="#" id="dcr-voting-dropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Agendas</a>
 					<div class="dropdown-menu" aria-labelledby="dcr-voting-dropdown">
-						<a class="dropdown-item page-toggle" href="#voting">Top Voting Address</a>
-						<a class="dropdown-item page-toggle" href="#voting-hd">Top Voting HD Wallets</a>
-						<a class="dropdown-item page-toggle" href="#voting-stakesubmission">Top Voting Stake Pools</a>
+						<a class="dropdown-item page-toggle" href="#vote-results">Vote Results</a>
+						<a class="dropdown-item page-toggle" href="#voting">Top Addresses by Votes</a>
+						<a class="dropdown-item page-toggle" href="#voting-hd">Top HD Wallets by Votes</a>
+						<a class="dropdown-item page-toggle" href="#voting-stakesubmission">Top Stake Pools</a>
 					</div>
 				</li>
 			</ul>
@@ -775,7 +776,6 @@
 				</tbody>
 			</table>
 			-->
-
 		</div>
 
 		<!-- HD Wallet Page -->
@@ -952,7 +952,115 @@
 			</p>
 
 			<p><small>(*) Showing all addresses might be very slow for HD wallets with more than 500 addresses.</small></p>
+		</div>
 
+		<!-- Vote Results Page -->
+		<div class="dcr-page dcr-page-vote-results address-body" style="display:none;">
+			<h1>
+				Vote Results: <span class="vote-results-range">All Time</span>
+			</h1>
+
+			<p class="lead vote-results-range-description">
+				The Decred agenda vote results for blocks 4,096 to now.
+			</p>
+
+			<h5>Version Overview</h5>
+
+			<div class="container vote-results-version-overview">
+				<div class="row">
+					<div class="col-6 text-right vote-results-version-title" style="font-weight:bold;">
+						Version 0
+					</div>
+					<div class="col-6 text-left vote-results-version-value" style="color:rgba(0,0,0,.5);">
+						10 (100%)
+					</div>
+				</div>
+			</div>
+			<br />
+
+			<h5>Vote Summary</h5>
+
+			<table class="table table-hover table-vote-results-summary table-responsive-sm">
+				<thead>
+					<tr>
+						<th>Version</th>
+						<th>Issue</th>
+						<th>Yes</th>
+						<th>No</th>
+						<th>Abstain</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr>
+						<th class="vote-results-summary-version" scope="row">V0</th>
+						<td class="vote-results-summary-issue" scope="row">lnfeatures</th>
+						<td class="vote-results-summary-yes">0 (0.00%)</td>
+						<td class="vote-results-summary-no">20 (50.00%)</td>
+						<td class="vote-results-summary-abstain">20 (50.00%)</td>
+					</tr>
+				</tbody>
+			</table>
+
+		<!--
+			<h5>Vote Record</h5>
+
+			<table class="table table-hover table-vote-results-record table-responsive-sm">
+				<thead>
+					<tr>
+						<th>Row</th>
+						<th>Address</th>
+						<th>Balance</th>
+						<th>
+							<span class="d-none d-md-inline d-l-inline d-xl-inline">Shared TX</span>
+							<span class="d-inline d-md-none d-l-none d-xl-none">TX</span>
+						</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr>
+						<th scope="row"></th>
+						<td class="vote-results-record-address">
+							<a class="page-toggle" href="#addr">X</a>
+							<small>
+								<span class="badge badge-pill badge-info hd-badge-address-identifier" style="vertical-align:text-top;display:none;">
+									<span class="hd-addr-identifier"></span>
+								</span>
+							</small>
+						</td>
+						<td class="vote-results-record">
+							<span class="hd-addr-balance-value">X</span>
+							<span class="d-none d-md-inline d-l-inline d-xl-inline"> DCR</span>
+						</td>
+						<td class="hd-addr-tx-link"><a href="#" target="blank">View</a></td>
+					</tr>
+				</tbody>
+			</table>
+
+			<p class="lead" style="text-align:center;">
+				<button class="btn btn-primary my-2 my-sm-0 show-all-hd">Show All Addresses*</button>
+			</p>
+
+			<p><small>(*) Showing all addresses tends to be very slow.</small></p>
+		-->
+		</div>
+
+		<!-- Historical Vote Results Data Slider -->
+		<div class="dcr-page dcr-page-vote-results slider-body" style="display:none;">
+			<h1>Historical Vote Results</h1>
+			<p class="lead">
+				<input class="historical-vote-results-slider-input"
+					data-slider-id="historical-vote-results-slider" 
+					type="text" data-slider-min="4096" data-slider-max="189568"
+					data-slider-step="8064" data-slider-value="189568"/>
+			</p>
+			<p class="lead" style="text-align:center;">
+				<button class="btn btn-primary my-2 my-sm-0 historical-vote-results-slider-button">
+					View Block #<span class="historical-vote-results-slider-value"></span> (RCI #<span class="historical-vote-results-slider-rci"></span> )
+				</button>
+				<button class="btn btn-info my-2 my-sm-0 historical-vote-results-slider-all-time">
+					View All Time
+				</button>
+			</p>
 		</div>
 
 		<!-- 404 Address Page -->

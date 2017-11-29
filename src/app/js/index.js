@@ -1,5 +1,5 @@
 // Configuration
-var valid_uri_hashes = ['home', 'top-hd', 'dist', 'dist-hd', 'addr', 'hd-addr', 'voting', 'voting-hd', 'voting-stakesubmission', '404', 'maintenance'];
+var valid_uri_hashes = ['home', 'top-hd', 'dist', 'dist-hd', 'addr', 'hd-addr', 'vote-results', 'voting', 'voting-hd', 'voting-stakesubmission', '404', 'maintenance'];
 var dcr_price = 30.0;
 var total_dcr = 6651899.447322492;
 var current_block_height = 189416;
@@ -19,6 +19,16 @@ function boot() {
 		$('span.historical-slider-value').html(parseInt(current_block_height).toLocaleString());
 		$('span.dcr-current-total-supply').html(parseFloat(total_dcr).toLocaleString());
 
+		// Display current RCI
+		var max_rci   = parseInt((current_block_height-4096)/8064)+1;
+		var max_block = (max_rci-1) * 8064 + 4096;
+		$('span.historical-vote-results-slider-value').html(max_block.toLocaleString());
+		$('span.historical-vote-results-slider-rci').html(max_rci.toLocaleString());
+		$('.historical-vote-results-slider-input').data('slider-max', max_block);
+		$('.historical-vote-results-slider-input').data('slider-value', max_block);
+
+		setHistoricalSliderEvents();
+
 		handleNavigation(window.location.hash.substr(1) || "home");
 		return;
 	}
@@ -33,6 +43,16 @@ function boot() {
 	 		$('span.dcr-current-block-height').html(parseInt(current_block_height).toLocaleString());
 	 		$('span.historical-slider-value').html(parseInt(current_block_height).toLocaleString());
 	 		$('span.dcr-current-total-supply').html(parseFloat(total_dcr).toLocaleString());
+
+	 		// Display current RCI
+			var max_rci   = parseInt((current_block_height-4096)/8064)+1;
+			var max_block = (max_rci-1) * 8064 + 4096;
+			$('span.historical-vote-results-slider-value').html(max_block.toLocaleString());
+			$('span.historical-vote-results-slider-rci').html(max_rci.toLocaleString());
+			$('.historical-vote-results-slider-input').attr('data-slider-max', max_block);
+			$('.historical-vote-results-slider-input').attr('data-slider-value', max_block);
+
+			setHistoricalSliderEvents();
 
 	 		$.getJSON('https://api.coinmarketcap.com/v1/ticker/decred/', function(data) {
 	 			dcr_price = parseFloat(data[0].price_usd);
@@ -90,6 +110,12 @@ function handleNavigation(uri_hash) {
 		pullTopNetworks(function() { showPage('top-hd'); });
 	} else if (uri == 'dist-hd') {
 		pullWealthDistributionNetworks(function() { showPage('dist-hd'); });
+	} else if (uri == 'vote-results') {
+		if (MAINTENANCE_MODE) {
+			showPage('maintenance');
+		} else {
+			pullVoteResultsFromApi(0, function() { showPage('vote-results'); });
+		}
 	} else if (uri == 'voting') {
 		if (MAINTENANCE_MODE) {
 			showPage('maintenance');
@@ -126,31 +152,8 @@ function showPage(uri) {
 	$parent_li.addClass('active');
 }
 
-function setEvents() {
-	// Find all internal links, bind to handle navigation
-	$('a.page-toggle').click(function(event) {
-		$('.navbar-collapse').collapse('hide');
-	});
-
-	// Hash change - change page
-	window.onhashchange = function() {
-		handleNavigation.call(this, window.location.hash.substr(1) || "home");
-	}
-
-	// Address searching
-	$('#dcr-address-search').submit(function(event) {
-		event.preventDefault();
-		var address = $(this).find('input#dcr-address-input').val();
-		if (!address) {
-			return;
-		}
-
-		$('.navbar-collapse').collapse('hide');
-		window.location.hash = '#addr=' + address;
-		handleNavigation.call(this, 'addr=' + address);
-	});
-
-	// Attach logic to the slider
+function setHistoricalSliderEvents() {
+		// Attach logic to the slider
 	$('.historical-slider-input').slider({
 		"formatter": function(value) {
 			return 'Block: ' + value;
@@ -176,6 +179,71 @@ function setEvents() {
 		} else if (uri == 'dist-hd') {
 			pullWealthDistributionNetworks();
 		}
+	});
+
+	// Attach logic to the slider
+	$('.historical-vote-results-slider-input').slider({
+		"formatter": function(value) {
+			return 'Block: ' + value;
+		}
+	});
+
+	$('.historical-vote-results-slider-input').on("slide", function(slideEvt) {
+		var block = slideEvt.value;
+		var rci = parseInt((block-4096)/8064)+1;
+		$('.historical-vote-results-slider-value').html(block.toLocaleString());
+		$('.historical-vote-results-slider-rci').html(rci);
+	});
+
+	$('.historical-vote-results-slider-button').click(function(event) {
+		// Get the RCI
+		var rci = parseInt(($('.historical-vote-results-slider-input').val()-4096)/8064)+1;
+
+		// Reload the data
+		var uri = window.location.hash.substr(1) || "vote-results";
+		if (uri == 'vote-results') {
+			pullVoteResultsFromApi(rci);
+		}
+	});
+
+	$('.historical-vote-results-slider-all-time').click(function(event) { 
+		// Reload the data
+		var uri = window.location.hash.substr(1) || "vote-results";
+		if (uri == 'vote-results') {
+			pullVoteResultsFromApi(0);
+		}
+	});
+}
+
+function setEvents() {
+	// Find all internal links, bind to handle navigation
+	$('a.page-toggle').click(function(event) {
+		$('.navbar-collapse').collapse('hide');
+	});
+
+	// Hash change - change page
+	window.onhashchange = function() {
+		handleNavigation.call(this, window.location.hash.substr(1) || "home");
+	}
+
+	// Address searching
+	$('#dcr-address-search').submit(function(event) {
+		event.preventDefault();
+		var address = $(this).find('input#dcr-address-input').val();
+		if (!address) {
+			return;
+		}
+
+		$('.navbar-collapse').collapse('hide');
+		window.location.hash = '#addr=' + address;
+		handleNavigation.call(this, 'addr=' + address);
+	});
+
+	// Clear the data modal
+	$('.modal').on('show.bs.modal', function (e) {
+		// Kill the data view
+		var modal_loader = $('.modal-data-loading').show();
+		$('#modal-d3').html('').html(modal_loader);
 	});
 
 	// Handle the data modal

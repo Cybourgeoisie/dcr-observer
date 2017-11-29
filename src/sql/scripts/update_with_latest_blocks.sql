@@ -99,6 +99,7 @@ WHERE
   balance.address_id = sq.address_id;
 
 -- stx
+-- BROKEN!!!!!!!
 UPDATE
   balance
 SET

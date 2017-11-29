@@ -6,6 +6,147 @@ namespace Service;
 
 class Voting extends \Scrollio\Service\AbstractService
 {
+	public function getVotingResults(int $rci = 0)
+	{
+		// Validation - all time if invalid
+		if ($rci <= 0) { $rci = 0; }
+
+		// If we're showing all, omit the tx clause to speed things up
+		if ($rci <= 0) {
+			// Get the vote results for the given block period
+			$sql = '
+				SELECT
+					tv.version,
+					tv.votes,
+					COUNT(tv.tx_vote_id) AS count
+				FROM
+					tx_vote tv
+				GROUP BY
+					tv.version, tv.votes;
+			';
+			$db_handler = \Geppetto\DatabaseHandler::init();
+			$res = $db_handler->query($sql, array());
+		} else {
+			// Get the vote results for the given block period
+			$sql = '
+				SELECT
+					tv.version,
+					tv.votes,
+					COUNT(tv.tx_vote_id) AS count
+				FROM
+					tx_vote tv
+				JOIN
+					tx ON tx.tx_id = tv.tx_id
+				JOIN
+					block ON block.block_id = tx.block_id AND block.height >= $1 AND block.height < $2
+				GROUP BY
+					tv.version, tv.votes;
+			';
+			$db_handler = \Geppetto\DatabaseHandler::init();
+			$res = $db_handler->query($sql, array(($rci-1)*8064+4096, ($rci)*8064+4096));
+		}
+
+		if (empty($res) || !array_key_exists(0, $res)) {
+			throw new \Exception('Could not collect voting results.');
+		}
+
+		return array(
+			'results' => $this->formatVoteResults($res),
+			'rci' => $rci,
+			'block_start' => ($rci <= 0) ? 4096 : ($rci-1)*8064+4096,
+			'block_end' => ($rci <= 0) ? 0 : $rci*8064+4096-1
+		);
+	}
+
+	protected function formatVoteResults($res) {
+		// Format the voting record
+		$versions = array();
+		$tickets_staked = 0;
+		$vote_summary = array(
+			'v0' => array('version' => 'V0', 'issue' => 'N/A', 'abstain' => 0, 'yes' => 0, 'no' => 0),
+			'v1' => array('version' => 'V1', 'issue' => 'N/A', 'abstain' => 0, 'yes' => 0, 'no' => 0),
+			'v2' => array('version' => 'V2', 'issue' => 'N/A', 'abstain' => 0, 'yes' => 0, 'no' => 0),
+			'v3' => array('version' => 'V3', 'issue' => 'N/A', 'abstain' => 0, 'yes' => 0, 'no' => 0),
+			'v4-sdiff' => array(
+				'version' => 'V4', 'issue' => 'sdiffalgorithm', 'yes' => 0, 'no' => 0, 'abstain' => 0
+			),
+			'v4-lnsupport' => array(
+				'version' => 'V4', 'issue' => 'lnsupport', 'yes' => 0, 'no' => 0, 'abstain' => 0
+			),
+			'v5-lnfeatures' => array(
+				'version' => 'V5', 'issue' => 'lnfeatures', 'yes' => 0, 'no' => 0, 'abstain' => 0
+			),
+			'v6' => array('version' => 'V6', 'issue' => 'N/A', 'abstain' => 0, 'yes' => 0, 'no' => 0)
+		);
+
+		foreach ($res as $row) {
+			$version = strval(intval($row['version']));
+
+			if (!array_key_exists($version, $versions)) {
+				$versions[$version] = 0;
+			}
+
+			$tickets_staked += $row['count'];
+			$versions[$version] += $row['count'];
+
+			switch($row['version']) {
+				case '0000':
+					$vote_summary['v0']['abstain'] += $row['count'];
+					break;
+				case '0001':
+					$vote_summary['v1']['abstain'] += $row['count'];
+					break;
+				case '0002':
+					$vote_summary['v2']['abstain'] += $row['count'];
+					break;
+				case '0003':
+					$vote_summary['v3']['abstain'] += $row['count'];
+					break;
+				case '0004':
+					$votes = intval($row['votes']);
+
+					if ($votes >> 1 & 0b10) {
+						$vote_summary['v4-sdiff']['yes'] += $row['count'];
+					} else if ($votes >> 1 & 0b01) {
+						$vote_summary['v4-sdiff']['no'] += $row['count'];
+					} else if ($votes >> 1 & 0b00) {
+						$vote_summary['v4-sdiff']['abstain'] += $row['count'];
+					}
+
+					if ($votes >> 3 & 0b10) {
+						$vote_summary['v4-lnsupport']['yes'] += $row['count'];
+					} else if ($votes >> 3 & 0b01) {
+						$vote_summary['v4-lnsupport']['no'] += $row['count'];
+					} else if ($votes >> 3 & 0b00) {
+						$vote_summary['v4-lnsupport']['abstain'] += $row['count'];
+					}
+					break;
+				case '0005':
+					$votes = intval($row['votes']);
+
+					if ($votes >> 1 & 0b10) {
+						$vote_summary['v5-lnfeatures']['yes'] += $row['count'];
+					} else if ($votes >> 1 & 0b01) {
+						$vote_summary['v5-lnfeatures']['no'] += $row['count'];
+					} else if ($votes >> 1 & 0b00) {
+						$vote_summary['v5-lnfeatures']['abstain'] += $row['count'];
+					}
+					break;
+				case '0006':
+					$vote_summary['v6']['abstain'] += $row['count'];
+					break;
+				default:
+					break;
+			}
+		}
+
+		return array(
+			'versions' => $versions,
+			'vote_summary' => $vote_summary,
+			'tickets_staked' => $tickets_staked
+		);
+	}
+
 	public function getTopAddresses(int $start = 0, int $end = 0)
 	{
 		// Get the starting block

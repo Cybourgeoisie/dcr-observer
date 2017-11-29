@@ -46,7 +46,9 @@ body {
 .table-addr-votes td,
 .table-addr-votes th,
 .table-hd-addr-votes td,
-.table-hd-addr-votes th {
+.table-hd-addr-votes th,
+.table-vote-results-summary td,
+.table-vote-results-summary th {
 	font-size:80%;
 }
 

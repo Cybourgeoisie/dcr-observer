@@ -48,8 +48,12 @@ CREATE TABLE "vout" (
 	"version"     BIGINT,
 	"type"        TEXT,
 	"reqSigs"     INTEGER,
+	"address_id"  BIGINT REFERENCES "address" (address_id),
 	"key"         VARCHAR(22) -- Used for definitive insert matching ("{blockheight}-{tree}-{blockindex}-{n}")
 );
+
+-- ALTER TABLE vout ADD COLUMN address_id BIGINT REFERENCES "address" (address_id);
+-- CREATE INDEX vout_address_id_key ON vout (address_id);
 
 -- CREATE INDEX vout_tx_id_key ON vout (tx_id);
 -- CREATE INDEX vout_type_key ON vout (type);

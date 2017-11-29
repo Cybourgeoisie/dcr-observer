@@ -26,6 +26,9 @@ X Additional address details: Map portion of inputs from mining, genesis block, 
 X Mobile-friendly UI
 X Optimize database updates
 
+Important:
+- Update produce_db_inserts to include address_id with vouts
+
 
 Additional Todo:
 - Add caching on PHP side to common DB queries
