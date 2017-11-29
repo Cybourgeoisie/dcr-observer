@@ -24,15 +24,24 @@ function pullVoteResultsFromApi(rci, callback) {
 	 		$container.html('');
 
 	 		// Version overview
-	 		var versions = results.versions;
+	 		var versions = results.versions, version_data = [];
 	 		for (var version in versions) {
 	 			if (versions.hasOwnProperty(version)) {
+	 				version_data.push({"label" : 'Version ' + version, "value": parseInt(versions[version])});
+
 	 				var $new_row = $row.clone(true);
 	 				$new_row.find('.vote-results-version-title').html('Version ' + version);
-	 				$new_row.find('.vote-results-version-value').html(versions[version]);
+	 				$new_row.find('.vote-results-version-value').html(versions[version].toLocaleString());
 	 				$container.append($new_row);
 	 			}
 	 		}
+
+	 		var rci_str = '';
+	 		if (data.rci > 0) {
+	 			rci_str = data.rci;
+	 		}
+
+	 		$('.vote-results-summary-versions').data('rci', rci_str).data('results', JSON.stringify(version_data));
 
 	 		// Clear vote summary
 			var $table = $('.table-vote-results-summary');
@@ -47,16 +56,29 @@ function pullVoteResultsFromApi(rci, callback) {
 			for (var item in summary) {
 				if (summary.hasOwnProperty(item)) {
 					// If there's something worth showing, let's show it
-					if ((summary[item].abstain + summary[item].yes + summary[item].no) <= 0) {
+					var sum = (summary[item].abstain + summary[item].yes + summary[item].no);
+					if (sum <= 0) {
 						continue;
 					}
+
+					var yes_pct     = (parseFloat(summary[item].yes)     / sum)*100;
+					var no_pct      = (parseFloat(summary[item].no)      / sum)*100;
+					var abstain_pct = (parseFloat(summary[item].abstain) / sum)*100;
 
 					var $new_row = $row.clone(false);
 					$new_row.find('th.vote-results-summary-version').html(summary[item].version);
 					$new_row.find('td.vote-results-summary-issue').html(summary[item].issue);
-					$new_row.find('td.vote-results-summary-yes').html(summary[item].yes);
-					$new_row.find('td.vote-results-summary-no').html(summary[item].no);
-					$new_row.find('td.vote-results-summary-abstain').html(summary[item].abstain);
+					$new_row.find('td.vote-results-summary-yes').html(summary[item].yes.toLocaleString() + ' (' + yes_pct.toLocaleString() + '%)');
+					$new_row.find('td.vote-results-summary-no').html(summary[item].no.toLocaleString() + ' (' + no_pct.toLocaleString() + '%)');
+					$new_row.find('td.vote-results-summary-abstain').html(summary[item].abstain.toLocaleString() + ' (' + abstain_pct.toLocaleString() + '%)');
+					
+					// Attach the data for graphing
+					var data = [
+						{"label" : 'Yes', "value" : parseInt(summary[item].yes)},
+						{"label" : 'No', "value" : parseInt(summary[item].no)},
+						{"label" : 'Abstain', "value" : parseInt(summary[item].abstain)}
+					]
+					$new_row.find('.vote-results-summary-graph-issue').data('issue', summary[item].issue).data('version', summary[item].version).data('results', JSON.stringify(data));
 
 					$tbody.append($new_row);
 				}
@@ -291,6 +313,114 @@ function pullTicketStakePoolDistributionFromApi(callback) {
 
 			var sum_percent_vote_addresses = ((top_hardcode / total_addresses) * 100).toFixed(2);
 			$('.top-stakesubmission-voters-percent').html(sum_percent_vote_addresses + '%');
+		}
+	});
+}
+
+function getIssueVoteResultsPie($modal, $source) {
+	// Display the loader
+	$modal.find('.modal-data-loading').hide();
+
+	var issue = $source.data('issue');
+
+	// Show the title
+	if (issue == 'N/A') {
+		$modal.find('.modal-title').html('Vote Breakdown for ' + $source.data('version'));
+	} else {
+		$modal.find('.modal-title').html('Vote Breakdown for ' + $source.data('issue'));		
+	}
+
+	// Pull the results
+	var data = JSON.parse($source.data('results'));
+	var title = $source.data('version');
+	var subtitle = (issue == 'N/A') ? '' : $source.data('issue');
+
+	displayVotePie(title, subtitle, data);
+}
+
+function getVersionVoteResultsPie($modal, $source) {
+	// Display the loader
+	$modal.find('.modal-data-loading').hide();
+	var rci = $source.data('rci');
+
+	var range = 'All Time';
+	if (rci) {
+		range = 'RCI #' + rci;
+	}
+
+	// Show the title
+	$modal.find('.modal-title').html('Version Breakdown for ' + range);
+
+	// Pull the results
+	var data = JSON.parse($source.data('results'));
+	var title = 'Version Breakdown';
+	var subtitle = range;
+
+	displayVotePie(title, subtitle, data);
+}
+
+function displayVotePie(title, subtitle, data) {
+	// Determine the size of the pie
+	var e = document.documentElement,
+		g = document.getElementsByTagName('body')[0],
+		x = window.innerWidth || e.clientWidth || g.clientWidth;
+	var pieSize         = (x < 768) ? 240 : ((x < 992) ? 320 : 440);
+	var fontSize        = (x < 768) ? 11 : ((x < 992) ? 15 : 20);
+	var subFontSize     = (x < 768) ? 9 : ((x < 992) ? 11 : 12);
+	var subtitlePadding = (x < 768) ? 8 : ((x < 992) ? 10 : 12);
+	var labelFontSize   = (x < 768) ? 9 : ((x < 992) ? 10 : 11);
+	var truncateLength  = (x < 992) ? 10 : 12;
+	var widthBuffer     = (x < 768) ? 130 : 220;
+
+	// Generate colors for this data
+	var gradient, colorsHsv;
+	if (data.length > 2) {
+		gradient = tinygradient([
+			{color: '#2971FF', pos: 0},
+			{color: '#69D3F5', pos: 0.5},
+			{color: '#2ED6A1', pos: 1}
+		]);
+		colorsHsv = gradient.rgb(data.length);
+		for (var i = 0; i < data.length; i++) {
+			colorsHsv[i] = colorsHsv[i].toHexString();
+		}
+	} else if (data.length <= 2) {
+		colorsHsv = ['#2971FF','#2ED6A1'];
+	}
+
+	// Display the pie
+	d3pie("modal-d3", {
+		"header": {
+			"title": { "text": title, "fontSize": fontSize},
+			"subtitle": { "text": subtitle, "color": "#999999", "fontSize": subFontSize},
+			"location": "pie-center",
+			"titleSubtitlePadding": subtitlePadding
+		},
+		"size": { "canvasHeight": pieSize, "canvasWidth": pieSize+widthBuffer, "pieInnerRadius": "53%", "pieOuterRadius": "90%" },
+		"data": {
+			"sortOrder": "none",
+			"content": data
+		},
+		"labels": {
+			"outer": { "format": "label-value2", "pieDistance": 12, "hideWhenLessThanPercentage": 1 },
+			"inner": { "hideWhenLessThanPercentage": 1 },
+			"mainLabel": { "fontSize": labelFontSize },
+			"percentage": { "color": "#ffffff", "decimalPlaces": 2 },
+			"value": { "color": "#adadad", "fontSize": labelFontSize },
+			"lines": { "enabled": false },
+			"truncation": { "enabled": true, "truncateLength":truncateLength }
+		},
+		"effects": { "load": {
+			"effect": "default", // none / default
+			"speed": 750
+		}, "pullOutSegmentOnClick": { "effect": "linear", "speed": 400, "size": 8 } },
+		"misc": {
+			"colors": {
+				"background": null,
+				"segments": colorsHsv,
+				"segmentStroke": "#ffffff"
+			},
+			"gradient": { "enabled": false, "percentage": 100 }
 		}
 	});
 }

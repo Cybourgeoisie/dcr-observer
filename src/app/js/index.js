@@ -259,6 +259,10 @@ function setEvents() {
 			getAddressDistributionPie($(this), $source);
 		} else if ($source.data('origin') == 'addr-input' || $source.data('origin') == 'hd-addr-input') {
 			getAddressInputPie($(this), $source);
+		} else if ($source.data('origin') == 'vote-results-issue') {
+			getIssueVoteResultsPie($(this), $source);
+		} else if ($source.data('origin') == 'vote-results-versions') {
+			getVersionVoteResultsPie($(this), $source);
 		}
 	});
 

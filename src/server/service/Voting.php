@@ -103,13 +103,13 @@ class Voting extends \Scrollio\Service\AbstractService
 					$vote_summary['v3']['abstain'] += $row['count'];
 					break;
 				case '0004':
-					$votes = intval($row['votes']);
+					$votes = intval($row['votes'], 16);
 
 					if ($votes >> 1 & 0b10) {
 						$vote_summary['v4-sdiff']['yes'] += $row['count'];
 					} else if ($votes >> 1 & 0b01) {
 						$vote_summary['v4-sdiff']['no'] += $row['count'];
-					} else if ($votes >> 1 & 0b00) {
+					} else if (~($votes >> 1) & 0b11) {
 						$vote_summary['v4-sdiff']['abstain'] += $row['count'];
 					}
 
@@ -117,18 +117,18 @@ class Voting extends \Scrollio\Service\AbstractService
 						$vote_summary['v4-lnsupport']['yes'] += $row['count'];
 					} else if ($votes >> 3 & 0b01) {
 						$vote_summary['v4-lnsupport']['no'] += $row['count'];
-					} else if ($votes >> 3 & 0b00) {
+					} else if (~($votes >> 3) & 0b11) {
 						$vote_summary['v4-lnsupport']['abstain'] += $row['count'];
 					}
 					break;
 				case '0005':
-					$votes = intval($row['votes']);
+					$votes = intval($row['votes'], 16);
 
 					if ($votes >> 1 & 0b10) {
 						$vote_summary['v5-lnfeatures']['yes'] += $row['count'];
 					} else if ($votes >> 1 & 0b01) {
 						$vote_summary['v5-lnfeatures']['no'] += $row['count'];
-					} else if ($votes >> 1 & 0b00) {
+					} else if (~($votes >> 1) & 0b11) {
 						$vote_summary['v5-lnfeatures']['abstain'] += $row['count'];
 					}
 					break;

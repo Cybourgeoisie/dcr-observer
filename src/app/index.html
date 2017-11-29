@@ -964,7 +964,14 @@
 				The Decred agenda vote results for blocks 4,096 to now.
 			</p>
 
-			<h5>Version Overview</h5>
+			<h5>
+				Version Overview
+				<button class="btn btn-default vote-results-summary-versions" style="padding:2px 6px;margin:0;font-size:80%;"
+					data-toggle="modal" data-target=".data-modal" 
+					data-origin="vote-results-versions" data-rci="" data-results="">
+					<i class="fa fa-pie-chart" aria-hidden="true"></i>
+				</button>
+			</h5>
 
 			<div class="container vote-results-version-overview">
 				<div class="row">
@@ -997,6 +1004,13 @@
 						<td class="vote-results-summary-yes">0 (0.00%)</td>
 						<td class="vote-results-summary-no">20 (50.00%)</td>
 						<td class="vote-results-summary-abstain">20 (50.00%)</td>
+						<td class="vote-results-summary-graph">
+							<button class="btn btn-default vote-results-summary-graph-issue" style="padding:2px 6px;margin:0;font-size:80%;"
+								data-toggle="modal" data-target=".data-modal" 
+								data-origin="vote-results-issue" data-version="" data-issue="" data-results="">
+								<i class="fa fa-pie-chart" aria-hidden="true"></i>
+							</button>
+						</td>
 					</tr>
 				</tbody>
 			</table>
