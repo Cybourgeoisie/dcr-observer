@@ -116,11 +116,9 @@ class Address extends \Scrollio\Service\AbstractService
 			FROM
 				address a
 			JOIN
-				vout_address va ON va.address_id = a.address_id
+				tx_vote_address tva ON tva.address_id = a.address_id
 			JOIN
-				vin ON vin.vout_id = va.vout_id
-			JOIN
-				tx_vote tv ON tv.origin_tx_id = vin.tx_id
+				tx_vote tv ON tv.tx_vote_id = tva.tx_vote_id
 			WHERE
 				a.address = $1
 			GROUP BY
@@ -151,11 +149,9 @@ class Address extends \Scrollio\Service\AbstractService
 			JOIN
 				address a ON a.network = a_network.network
 			JOIN
-				vout_address va ON va.address_id = a_network.address_id
+				tx_vote_address tva ON tva.address_id = a_network.address_id
 			JOIN
-				vin ON vin.vout_id = va.vout_id
-			JOIN
-				tx_vote tv ON tv.origin_tx_id = vin.tx_id
+				tx_vote tv ON tv.tx_vote_id = tva.tx_vote_id
 			WHERE
 				a.address = $1
 			GROUP BY

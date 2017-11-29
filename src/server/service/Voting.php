@@ -28,15 +28,13 @@ class Voting extends \Scrollio\Service\AbstractService
 		$sql = '
 			SELECT
 				COUNT(tv.tx_vote_id) AS total,
-				COUNT(DISTINCT origin_vout_address.address_id) AS total_addresses
+				COUNT(DISTINCT tva.address_id) AS total_addresses
 			FROM
-				tx_vote tv
+				tx_vote_address tva
 			JOIN
-				tx ON tx.tx_id = tv.tx_id AND tx.block_id > $1
+				tx_vote tv ON tv.tx_vote_id = tva.tx_vote_id
 			JOIN
-				vin origin_vin ON origin_vin.tx_id = tv.origin_tx_id
-			JOIN
-				vout_address origin_vout_address ON origin_vout_address.vout_id = origin_vin.vout_id;
+				tx ON tx.tx_id = tv.tx_id AND tx.block_id > $1;
 		';
 		$db_handler = \Geppetto\DatabaseHandler::init();
 		$res = $db_handler->query($sql, array($start_block_id));
@@ -54,15 +52,13 @@ class Voting extends \Scrollio\Service\AbstractService
 				a.address,
 				COUNT(tv.tx_vote_id) AS num
 			FROM
-				tx_vote tv
+				tx_vote_address tva
+			JOIN
+				tx_vote tv ON tv.tx_vote_id = tva.tx_vote_id
 			JOIN
 				tx ON tx.tx_id = tv.tx_id AND tx.block_id > $1
 			JOIN
-				vin origin_vin ON origin_vin.tx_id = tv.origin_tx_id
-			JOIN
-				vout_address origin_vout_address ON origin_vout_address.vout_id = origin_vin.vout_id
-			JOIN
-				address a ON a.address_id = origin_vout_address.address_id
+				address a ON a.address_id = tva.address_id
 			GROUP BY
 				a.address_id
 			ORDER BY
@@ -112,11 +108,9 @@ class Voting extends \Scrollio\Service\AbstractService
 			JOIN
 				tx ON tx.tx_id = tv.tx_id AND tx.block_id > $1
 			JOIN
-				vin origin_vin ON origin_vin.tx_id = tv.origin_tx_id
+				tx_vote_address tva ON tva.tx_vote_id = tv.tx_vote_id
 			JOIN
-				vout_address origin_vout_address ON origin_vout_address.vout_id = origin_vin.vout_id
-			JOIN
-				address a ON a.address_id = origin_vout_address.address_id;
+				address a ON a.address_id = tva.address_id;
 		';
 		$db_handler = \Geppetto\DatabaseHandler::init();
 		$res = $db_handler->query($sql, array($start_block_id));
@@ -138,11 +132,9 @@ class Voting extends \Scrollio\Service\AbstractService
 			JOIN
 				tx ON tx.tx_id = tv.tx_id AND tx.block_id > $1
 			JOIN
-				vin origin_vin ON origin_vin.tx_id = tv.origin_tx_id
+				tx_vote_address tva ON tva.tx_vote_id = tv.tx_vote_id
 			JOIN
-				vout_address origin_vout_address ON origin_vout_address.vout_id = origin_vin.vout_id
-			JOIN
-				address a ON a.address_id = origin_vout_address.address_id
+				address a ON a.address_id = tva.address_id
 			JOIN
 				hd_network hn ON hn.network = a.network
 			JOIN

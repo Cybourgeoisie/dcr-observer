@@ -4,12 +4,14 @@ BEGIN;
 ALTER TABLE balance DISABLE TRIGGER ALL;
 
 -- Add new addresses
-INSERT INTO balance (address_id)
-SELECT a.address_id 
+INSERT INTO balance (address_id, first_block_id)
+SELECT a.address_id, min(tx.block_id),
 FROM address a
 JOIN database_blockchain_state dbs ON dbs.last_address_id < a.address_id
+JOIN vout_address va ON va.address_id = a.address_id
+JOIN vout ON vout.vout_id = va.vout_id
+JOIN tx ON tx.tx_id = vout.tx_id
 ON CONFLICT DO NOTHING;
-
 
 -- These updates for vout, vin, and counts are incorrect
 

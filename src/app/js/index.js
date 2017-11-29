@@ -305,7 +305,7 @@ function showVotingRecord(addr_or_hd, voting_tally, voting_record, tickets_stake
 
 			$('.' + prefix + '-voting-record-container').append($row);
 		}
-		
+
 		if (voting_tally.v5 > 0) {
 			$row = $vr_row.clone(true);
 			$row.find('.' + prefix + '-staking-version').html('V5 Votes'); // Set the header
