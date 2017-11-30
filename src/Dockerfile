@@ -11,6 +11,9 @@ EXPOSE 80
 
 VOLUME ["/var/log/apache2"]
 
+RUN mkdir /var/www/cache/
+RUN chmod 777 /var/www/cache/
+
 RUN a2enmod rewrite
 RUN a2ensite apache.conf
 RUN a2dissite 000-default.conf

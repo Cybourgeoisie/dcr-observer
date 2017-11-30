@@ -52,6 +52,9 @@ define('ROOT_PATH', dirname(realpath(__FILE__)) . '/../');
 define('APP_PATH',  ROOT_PATH . 'app/');
 define('SERVER_PATH',  ROOT_PATH . 'server/');
 
+// Cache
+define('CACHE_PATH', ROOT_PATH . 'cache/');
+
 // Common Files
 define('GATEWAY_PATH', SERVER_PATH . 'gateway.php');
 

@@ -15,7 +15,66 @@ WHERE dbs.database_blockchain_state_id = 1
 GROUP BY a.address_id
 ON CONFLICT DO NOTHING;
 
--- These updates for vout, vin, and counts are incorrect
+
+-- Add the new address values to the vout table
+UPDATE
+  vout
+SET
+  address_id = sq.address_id
+FROM (
+  SELECT
+    vout_id,
+    address_id
+  FROM
+    vout_address 
+  JOIN
+    database_blockchain_state dbs ON dbs.database_blockchain_state_id = 1
+  WHERE
+    vout_id > dbs.last_vout_id
+) AS sq
+WHERE
+  vout.vout_id = sq.vout_id;
+
+-- Add the origin_tx_id to the tx_vote table
+UPDATE
+  tx_vote
+SET
+  origin_tx_id = sq.origin_tx_id
+FROM (
+  SELECT
+    tv.tx_vote_id,
+    origin_ss_vout.tx_id AS origin_tx_id
+  FROM
+    tx_vote tv
+  JOIN
+    vin ON vin.tx_id = tv.tx_id
+  JOIN
+    vout origin_ss_vout ON
+      origin_ss_vout.vout_id = vin.vout_id AND
+      origin_ss_vout.type = 'stakesubmission'
+  WHERE
+    tv.origin_tx_id IS NULL
+) AS sq
+WHERE
+  tx_vote.tx_vote_id = sq.tx_vote_id;
+
+-- Now tie the addresses to the tx_vote table via tx_vote_address
+INSERT INTO
+  tx_vote_address (tx_vote_id, address_id)
+SELECT
+  tv.tx_vote_id,
+  va.address_id
+FROM
+  tx_vote tv
+JOIN
+  vin origin_vin ON origin_vin.tx_id = tv.origin_tx_id
+JOIN
+  vout_address va ON va.vout_id = origin_vin.vout_id
+LEFT JOIN
+  tx_vote_address tva ON tva.tx_vote_id = tv.tx_vote_id
+WHERE
+  tva.tx_vote_address_id IS NULL
+ON CONFLICT DO NOTHING;
 
 
 -- From the state, update the entries in the balance table

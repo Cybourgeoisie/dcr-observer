@@ -469,8 +469,8 @@ function displayVotePie(title, subtitle, data) {
 			"content": data
 		},
 		"labels": {
-			"outer": { "format": "label-value2", "pieDistance": 12, "hideWhenLessThanPercentage": 1 },
-			"inner": { "hideWhenLessThanPercentage": 1 },
+			"outer": { "format": "label-value2", "pieDistance": 12, "hideWhenLessThanPercentage": 0 },
+			"inner": { "hideWhenLessThanPercentage": 0 },
 			"mainLabel": { "fontSize": labelFontSize },
 			"percentage": { "color": "#ffffff", "decimalPlaces": 2 },
 			"value": { "color": "#adadad", "fontSize": labelFontSize },
