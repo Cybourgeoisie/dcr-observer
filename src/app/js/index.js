@@ -120,7 +120,9 @@ function handleNavigation(uri_hash) {
 		if (MAINTENANCE_MODE) {
 			showPage('maintenance');
 		} else {
-			pullIssueResultsFromApi(uri_param, 0, function() { showPage('issue-results'); });
+			// Get the RCI
+			var rci = parseInt(($('.historical-vote-results-slider-input').val()-4096)/8064)+1;
+			pullIssueResultsFromApi(uri_param, rci, function() { showPage('issue-results'); });
 		}
 	} else if (uri == 'voting') {
 		if (MAINTENANCE_MODE) {
