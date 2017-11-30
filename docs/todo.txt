@@ -22,7 +22,7 @@ X Additional address details: List all addresses linked together, and from which
 X Historical snapshots of rich list & wealth distribution (slider)
 X Additional address details: Map portion of inputs from mining, genesis block, exchange, or staking
 - Flag addresses that are actively staking
-- Voting Distribution Page: show distribution of voters' tickets & relative influence that their tickets have on vote outcome (onchain)
+X Voting Distribution Page: show distribution of voters' tickets & relative influence that their tickets have on vote outcome (onchain)
 X Mobile-friendly UI
 X Optimize database updates
 

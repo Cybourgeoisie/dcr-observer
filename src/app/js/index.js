@@ -1,5 +1,5 @@
 // Configuration
-var valid_uri_hashes = ['home', 'top-hd', 'dist', 'dist-hd', 'addr', 'hd-addr', 'vote-results', 'voting', 'voting-hd', 'voting-stakesubmission', '404', 'maintenance'];
+var valid_uri_hashes = ['home', 'top-hd', 'dist', 'dist-hd', 'addr', 'hd-addr', 'vote-results', 'issue-results', 'voting', 'voting-hd', 'voting-stakesubmission', '404', 'maintenance'];
 var dcr_price = 30.0;
 var total_dcr = 6651899.447322492;
 var current_block_height = 189416;
@@ -116,6 +116,12 @@ function handleNavigation(uri_hash) {
 		} else {
 			pullVoteResultsFromApi(0, function() { showPage('vote-results'); });
 		}
+	} else if (uri == 'issue-results' && uri_param && uri_param.length) {
+		if (MAINTENANCE_MODE) {
+			showPage('maintenance');
+		} else {
+			pullIssueResultsFromApi(uri_param, 0, function() { showPage('issue-results'); });
+		}
 	} else if (uri == 'voting') {
 		if (MAINTENANCE_MODE) {
 			showPage('maintenance');
@@ -200,17 +206,29 @@ function setHistoricalSliderEvents() {
 		var rci = parseInt(($('.historical-vote-results-slider-input').val()-4096)/8064)+1;
 
 		// Reload the data
-		var uri = window.location.hash.substr(1) || "vote-results";
+		var uri_hash = window.location.hash.substr(1) || "vote-results";
+		var uri_hash_els = uri_hash.split('=');
+		var uri = uri_hash_els[0];
+		var uri_param = uri_hash_els[1];
+
 		if (uri == 'vote-results') {
 			pullVoteResultsFromApi(rci);
+		} else if (uri == 'issue-results') {
+			pullIssueResultsFromApi(uri_param, rci);
 		}
 	});
 
 	$('.historical-vote-results-slider-all-time').click(function(event) { 
 		// Reload the data
-		var uri = window.location.hash.substr(1) || "vote-results";
+		var uri_hash = window.location.hash.substr(1) || "vote-results";
+		var uri_hash_els = uri_hash.split('=');
+		var uri = uri_hash_els[0];
+		var uri_param = uri_hash_els[1];
+
 		if (uri == 'vote-results') {
 			pullVoteResultsFromApi(0);
+		} else if (uri == 'issue-results') {
+			pullIssueResultsFromApi(uri_param, 0);
 		}
 	});
 }

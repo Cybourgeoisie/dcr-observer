@@ -67,7 +67,11 @@ function pullVoteResultsFromApi(rci, callback) {
 
 					var $new_row = $row.clone(false);
 					$new_row.find('th.vote-results-summary-version').html(summary[item].version);
-					$new_row.find('td.vote-results-summary-issue').html(summary[item].issue);
+					if (summary[item].issue != 'N/A') {
+						$new_row.find('.vote-results-summary-issue-href').html(summary[item].issue).attr('href', '#issue-results=' + summary[item].issue);						
+					} else {
+						$new_row.find('.vote-results-summary-issue-href').html(summary[item].issue).removeAttr('href');
+					}
 					$new_row.find('td.vote-results-summary-yes').html(summary[item].yes.toLocaleString() + ' (' + yes_pct.toLocaleString() + '%)');
 					$new_row.find('td.vote-results-summary-no').html(summary[item].no.toLocaleString() + ' (' + no_pct.toLocaleString() + '%)');
 					$new_row.find('td.vote-results-summary-abstain').html(summary[item].abstain.toLocaleString() + ' (' + abstain_pct.toLocaleString() + '%)');
@@ -83,34 +87,86 @@ function pullVoteResultsFromApi(rci, callback) {
 					$tbody.append($new_row);
 				}
 			}
-
-			/*
-			// Reset the "show all 200" button
-			$('button.show-all-voting-200').removeAttr('disabled').html('Show All 200');
-
-			// Set the "show all 500" button to do something
-			$('button.show-all-voting-200').click(function(event) {
-				$('.table-distribution-voting tr').show();
-				$('button.show-all-voting-200').attr("disabled", "disabled").html('Showing All 200');
-			});
-
-			// Top number
-			var top_hardcode = 200;
-
-			// Show totals and percentages
-			$('.top-votes').html(parseInt(top_count).toLocaleString());
-			$('.total-votes').html(parseInt(total).toLocaleString());
-			$('.top-voters').html(top_hardcode);
-			$('.total-voters').html(parseInt(total_addresses).toLocaleString());
-
-			var sum_percent_votes = ((top_count / total) * 100).toFixed(2);
-			$('.top-votes-percent').html(sum_percent_votes + '%');
-
-			var sum_percent_vote_addresses = ((top_hardcode / total_addresses) * 100).toFixed(2);
-			$('.top-voters-percent').html(sum_percent_vote_addresses + '%');
-			*/
 		}
 	});
+}
+
+function pullIssueResultsFromApi(issue, rci, callback) {
+	$.post('api/Voting/getIssueResults', {issue : issue, rci : rci})
+	 .done(function(data) {
+	 	if (data.hasOwnProperty('success') && data.success) {
+	 		// Handle callbacks
+	 		if (callback && typeof callback === 'function') {
+	 			callback.call(this);
+	 		}
+
+	 		// Set the issue
+	 		$('.issue-results-issue').html(issue);
+
+	 		if (data.rci <= 0) {
+	 			$('.issue-results-issue-description').html('Vote results for ' + issue + ' between blocks 4,096 to now.');
+	 		} else {
+	 			$('.issue-results-issue-description').html('Vote results for ' + issue + ' between blocks ' + (parseInt(data.block_start)).toLocaleString() + ' to ' + (parseInt(data.block_end)).toLocaleString() + '.');
+	 		}
+
+	 		// Get the vote results
+	 		var results = data.results;
+	 		var total_votes = results.issue_summary.yes + results.issue_summary.no + results.issue_summary.abstain;
+	 		var num_voters = results.issue_summary.num_voters;
+
+	 		$('.issue-results-overview-yes').html(results.issue_summary.yes.toLocaleString());
+	 		$('.issue-results-overview-no').html(results.issue_summary.no.toLocaleString());
+	 		$('.issue-results-overview-abstain').html(results.issue_summary.abstain.toLocaleString());
+			$('.issue-results-overview-total-votes').html(total_votes.toLocaleString());
+			$('.issue-results-overview-total-voters').html(num_voters.toLocaleString());
+
+	 		// Clear vote summary
+			var $table = $('.table-issue-results');
+			var $tbody = $table.find('tbody');
+			var $row = $table.find('tr:last').clone(false).show();
+
+			// Clear the existing data
+			$tbody.html('');
+
+			// Now display them all
+			var records = results.vote_summary;
+			for (var i = 0; i < Math.min(records.length, 25); i++) {
+				addAddressRowToIssueResults(i, records[i], total_votes, $row, $tbody);
+			}
+
+			// Reset the "show all" button
+			$('button.show-all-issue-voting').removeAttr('disabled').html('Show All ' + num_voters.toLocaleString());
+
+			// Set the "show all" button to do something
+			$('button.show-all-issue-voting').click(function(event) {
+				for (var i = 10; i < records.length; i++) {
+					addAddressRowToIssueResults(i, records[i], total_votes, $row, $tbody);
+				}
+
+				$('button.show-all-issue-voting').attr("disabled", "disabled").html('Showing All');
+			});
+		}
+	});
+}
+
+function addAddressRowToIssueResults(i, record, total_votes, $row, $tbody) {
+	// If there's something worth showing, let's show it
+	var sum = (record.abstain + record.yes + record.no);
+	if (sum <= 0) {
+		return;
+	}
+
+	var pct = (parseFloat(sum)/total_votes)*100;
+
+	var $new_row = $row.clone(false);
+	$new_row.find('th').html(i + 1);
+	$new_row.find('td.issue-results-address > a').html(record.address).attr('href', '#addr=' + record.address);
+	$new_row.find('td.issue-results-influence').html(pct.toLocaleString() + '%');
+	$new_row.find('td.issue-results-yes').html(record.yes.toLocaleString());
+	$new_row.find('td.issue-results-no').html(record.no.toLocaleString());
+	$new_row.find('td.issue-results-abstain').html(record.abstain.toLocaleString());
+
+	$tbody.append($new_row);
 }
 
 function pullTicketDistributionFromApi(callback) {

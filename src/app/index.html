@@ -995,12 +995,15 @@
 						<th>Yes</th>
 						<th>No</th>
 						<th>Abstain</th>
+						<th>View</th>
 					</tr>
 				</thead>
 				<tbody>
 					<tr>
 						<th class="vote-results-summary-version" scope="row">V0</th>
-						<td class="vote-results-summary-issue" scope="row">lnfeatures</th>
+						<td class="vote-results-summary-issue" scope="row">
+							<a class="vote-results-summary-issue-href" href="#issue-results=">lnfeatures</a>
+						</th>
 						<td class="vote-results-summary-yes">0 (0.00%)</td>
 						<td class="vote-results-summary-no">20 (50.00%)</td>
 						<td class="vote-results-summary-abstain">20 (50.00%)</td>
@@ -1014,52 +1017,105 @@
 					</tr>
 				</tbody>
 			</table>
+		</div>
 
-		<!--
-			<h5>Vote Record</h5>
+		<!-- Issue Results Page -->
+		<div class="dcr-page dcr-page-issue-results address-body" style="display:none;">
+			<h1>
+				Issue Results: <span class="issue-results-issue">lnsupport</span>
+			</h1>
 
-			<table class="table table-hover table-vote-results-record table-responsive-sm">
+			<p class="lead issue-results-issue-description">
+				Vote results for lnsupport between blocks 4,096 to now.
+			</p>
+
+			<h5>
+				Vote Overview
+				<!--<button class="btn btn-default issue-results-vote" style="padding:2px 6px;margin:0;font-size:80%;"
+					data-toggle="modal" data-target=".data-modal" 
+					data-origin="issue-results-vote" data-rci="" data-results="">
+					<i class="fa fa-pie-chart" aria-hidden="true"></i>
+				</button>-->
+			</h5>
+
+			<div class="container">
+				<div class="row">
+					<div class="col-6 text-right" style="font-weight:bold;">
+						Yes
+					</div>
+					<div class="col-6 text-left issue-results-overview-yes" style="color:rgba(0,0,0,.5);">
+						10 (33.333%)
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-6 text-right" style="font-weight:bold;">
+						No
+					</div>
+					<div class="col-6 text-left issue-results-overview-no" style="color:rgba(0,0,0,.5);">
+						10 (33.333%)
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-6 text-right" style="font-weight:bold;">
+						Abstain
+					</div>
+					<div class="col-6 text-left issue-results-overview-abstain" style="color:rgba(0,0,0,.5);">
+						10 (33.333%)
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-6 text-right" style="font-weight:bold;">
+						Total Votes
+					</div>
+					<div class="col-6 text-left issue-results-overview-total-votes" style="color:rgba(0,0,0,.5);">
+						1
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-6 text-right" style="font-weight:bold;">
+						Addresses
+					</div>
+					<div class="col-6 text-left issue-results-overview-total-voters" style="color:rgba(0,0,0,.5);">
+						1
+					</div>
+				</div>
+			</div>
+			<br />
+
+			<h5>Vote Results</h5>
+
+			<table class="table table-hover table-issue-results table-responsive-sm">
 				<thead>
 					<tr>
-						<th>Row</th>
+						<th>Rank</th>
 						<th>Address</th>
-						<th>Balance</th>
-						<th>
-							<span class="d-none d-md-inline d-l-inline d-xl-inline">Shared TX</span>
-							<span class="d-inline d-md-none d-l-none d-xl-none">TX</span>
-						</th>
+						<th>Influence</th>
+						<th>Yes</th>
+						<th>No</th>
+						<th>Abstain</th>
 					</tr>
 				</thead>
 				<tbody>
 					<tr>
-						<th scope="row"></th>
-						<td class="vote-results-record-address">
-							<a class="page-toggle" href="#addr">X</a>
-							<small>
-								<span class="badge badge-pill badge-info hd-badge-address-identifier" style="vertical-align:text-top;display:none;">
-									<span class="hd-addr-identifier"></span>
-								</span>
-							</small>
+						<th></th>
+						<td class="issue-results-address" scope="row">
+							<a href="#addr">address</a>
 						</td>
-						<td class="vote-results-record">
-							<span class="hd-addr-balance-value">X</span>
-							<span class="d-none d-md-inline d-l-inline d-xl-inline"> DCR</span>
-						</td>
-						<td class="hd-addr-tx-link"><a href="#" target="blank">View</a></td>
+						<td class="issue-results-influence">0.00%</td>
+						<td class="issue-results-yes">0 (0.00%)</td>
+						<td class="issue-results-no">20 (50.00%)</td>
+						<td class="issue-results-abstain">20 (50.00%)</td>
 					</tr>
 				</tbody>
 			</table>
 
 			<p class="lead" style="text-align:center;">
-				<button class="btn btn-primary my-2 my-sm-0 show-all-hd">Show All Addresses*</button>
+				<button class="btn btn-primary my-2 my-sm-0 show-all-issue-voting">Show All</button>
 			</p>
-
-			<p><small>(*) Showing all addresses tends to be very slow.</small></p>
-		-->
 		</div>
 
 		<!-- Historical Vote Results Data Slider -->
-		<div class="dcr-page dcr-page-vote-results slider-body" style="display:none;">
+		<div class="dcr-page dcr-page-vote-results dcr-page-issue-results slider-body" style="display:none;">
 			<h1>Historical Vote Results</h1>
 			<p class="lead">
 				<input class="historical-vote-results-slider-input"

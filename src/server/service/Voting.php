@@ -147,6 +147,171 @@ class Voting extends \Scrollio\Service\AbstractService
 		);
 	}
 
+	public function getIssueResults(string $issue, int $rci = 0)
+	{
+		// Validation - only known issues allowed
+		$issues = array('lnsupport' => '0004', 'sdiffalgorithm' => '0004', 'lnfeatures' => '0005');
+		if (!array_key_exists($issue, $issues)) {
+			throw new \Exception('Issue not found.');
+		}
+		$version = $issues[$issue];
+
+		// Validation - all time if invalid
+		if ($rci <= 0) { $rci = 0; }
+
+		// TESTING ONLY
+		$version = '00';
+
+		// If we're showing all, omit the tx clause to speed things up
+		if ($rci <= 0) {
+			// Get the vote results for the given block period
+			$sql = '
+				SELECT
+					tv.votes,
+					a.address,
+					COUNT(tv.tx_vote_id) AS count
+				FROM
+					tx_vote tv
+				JOIN
+					tx_vote_address tva ON tva.tx_vote_id = tv.tx_vote_id
+				JOIN
+					address a ON a.address_id = tva.address_id
+				WHERE
+					tv.version = $1
+				GROUP BY
+					tv.votes, a.address
+				ORDER BY
+					3 DESC;
+			';
+			/* wallets
+			$sql = '
+				SELECT
+					tv.votes,
+					primary_a.address,
+					COUNT(tv.tx_vote_id) AS count
+				FROM
+					tx_vote tv
+				JOIN
+					tx_vote_address tva ON tva.tx_vote_id = tv.tx_vote_id
+				JOIN
+					address a ON a.address_id = tva.address_id
+				JOIN
+					hd_network hn ON hn.network = a.network
+				JOIN
+					address primary_a ON primary_a.address_id = hn.address_id
+				WHERE
+					tv.version = $1
+				GROUP BY
+					tv.votes, primary_a.address
+				ORDER BY
+					3 DESC;
+			';
+			//*/
+			$db_handler = \Geppetto\DatabaseHandler::init();
+			$res = $db_handler->query($sql, array($version));
+		} else {
+			// Get the vote results for the given block period
+			$sql = '
+				SELECT
+					tv.votes,
+					a.address,
+					COUNT(tv.tx_vote_id) AS count
+				FROM
+					tx_vote tv
+				JOIN
+					tx_vote_address tva ON tva.tx_vote_id = tv.tx_vote_id
+				JOIN
+					address a ON a.address_id = tva.address_id
+				JOIN
+					tx ON tx.tx_id = tv.tx_id
+				JOIN
+					block ON block.block_id = tx.block_id AND block.height >= $2 AND block.height < $3
+				WHERE
+					tv.version = $1
+				GROUP BY
+					tv.votes, a.address
+				ORDER BY
+					3 DESC;
+			';
+			/* wallets
+			$sql = '
+				SELECT
+					tv.votes,
+					primary_a.address,
+					COUNT(tv.tx_vote_id) AS count
+				FROM
+					tx_vote tv
+				JOIN
+					tx_vote_address tva ON tva.tx_vote_id = tv.tx_vote_id
+				JOIN
+					address a ON a.address_id = tva.address_id
+				JOIN
+					hd_network hn ON hn.network = a.network
+				JOIN
+					address primary_a ON primary_a.address_id = hn.address_id
+				JOIN
+					tx ON tx.tx_id = tv.tx_id
+				JOIN
+					block ON block.block_id = tx.block_id AND block.height >= $2 AND block.height < $3
+				WHERE
+					tv.version = $1
+				GROUP BY
+					tv.votes, primary_a.address
+				ORDER BY
+					3 DESC;
+			';
+			//*/
+			$db_handler = \Geppetto\DatabaseHandler::init();
+			$res = $db_handler->query($sql, array($version, ($rci-1)*8064+4096, ($rci)*8064+4096));
+		}
+
+		if (empty($res) || !array_key_exists(0, $res)) {
+			throw new \Exception('Could not collect issue results.');
+		}
+
+		return array(
+			'results' => $this->formatIssueResults($res, $issue),
+			'rci' => $rci,
+			'block_start' => ($rci <= 0) ? 4096 : ($rci-1)*8064+4096,
+			'block_end' => ($rci <= 0) ? 0 : $rci*8064+4096-1
+		);
+	}
+
+	protected function formatIssueResults($res, $issue) {
+		// Format the voting record
+		$issue_summary = array('abstain' => 0, 'yes' => 0, 'no' => 0, 'num_voters' => 0);
+		$vote_summary = array();
+
+		foreach ($res as $row) {
+			$votes = intval($row['votes'], 16);
+			if ($issue == 'lnsupport') {
+				$votes = $votes >> 3;
+			} else {
+				$votes = $votes >> 1;
+			}
+
+			$addr_votes = array('address' => $row['address'], 'abstain' => 0, 'yes' => 0, 'no' => 0);
+			if ($votes & 0b10) {
+				$addr_votes['yes']        += $row['count'];
+				$issue_summary['yes']     += $row['count']; 
+			} else if ($votes & 0b01) {
+				$addr_votes['no']         += $row['count'];
+				$issue_summary['no']      += $row['count']; 
+			} else if (~($votes) & 0b11) {
+				$addr_votes['abstain']    += $row['count'];
+				$issue_summary['abstain'] += $row['count']; 
+			}
+
+			$vote_summary[] = $addr_votes;
+			$issue_summary['num_voters']++;
+		}
+
+		return array(
+			'issue_summary' => $issue_summary,
+			'vote_summary' => $vote_summary
+		);
+	}
+
 	public function getTopAddresses(int $start = 0, int $end = 0)
 	{
 		// Get the starting block
