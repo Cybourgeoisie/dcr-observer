@@ -156,11 +156,8 @@ class Voting extends \Scrollio\Service\AbstractService
 		}
 		$version = $issues[$issue];
 
-		// Validation - all time if invalid
-		if ($rci <= 0) { $rci = 0; }
-
-		// TESTING ONLY
-		$version = '00';
+		// Validation - hmm
+		if ($rci <= 0) { $rci = 23; }
 
 		// If we're showing all, omit the tx clause to speed things up
 		if ($rci <= 0) {
@@ -181,7 +178,9 @@ class Voting extends \Scrollio\Service\AbstractService
 				GROUP BY
 					tv.votes, a.address
 				ORDER BY
-					3 DESC;
+					3 DESC
+				LIMIT
+					250;
 			';
 			/* wallets
 			$sql = '
@@ -204,7 +203,9 @@ class Voting extends \Scrollio\Service\AbstractService
 				GROUP BY
 					tv.votes, primary_a.address
 				ORDER BY
-					3 DESC;
+					3 DESC
+				LIMIT
+					250;
 			';
 			//*/
 			$db_handler = \Geppetto\DatabaseHandler::init();
