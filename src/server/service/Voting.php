@@ -9,7 +9,7 @@ class Voting extends \Scrollio\Service\AbstractService
 	public function getVotingResults(int $rci = 0)
 	{
 		// Validation - all time if invalid
-		if ($rci <= 0) { $rci = 0; }
+		if ($rci <= 0) { $rci = 1; }
 
 		// If we're showing all, omit the tx clause to speed things up
 		if ($rci <= 0) {
@@ -157,7 +157,7 @@ class Voting extends \Scrollio\Service\AbstractService
 		$version = $issues[$issue];
 
 		// Validation - hmm
-		if ($rci <= 0) { $rci = 23; }
+		if ($rci <= 0) { $rci = 1; }
 
 		// If we're showing all, omit the tx clause to speed things up
 		if ($rci <= 0) {
@@ -267,12 +267,22 @@ class Voting extends \Scrollio\Service\AbstractService
 		}
 
 		if (empty($res) || !array_key_exists(0, $res)) {
-			throw new \Exception('Could not collect issue results.');
+			return array(
+				'results' => array(
+					'issue_summary' => array('abstain' => 0, 'yes' => 0, 'no' => 0, 'num_voters' => 0),
+					'vote_summary' => array()
+				),
+				'empty' => true,
+				'rci' => $rci,
+				'block_start' => ($rci <= 0) ? 4096 : ($rci-1)*8064+4096,
+				'block_end' => ($rci <= 0) ? 0 : $rci*8064+4096-1
+			);
 		}
 
 		return array(
 			'results' => $this->formatIssueResults($res, $issue),
 			'rci' => $rci,
+			'empty' => false,
 			'block_start' => ($rci <= 0) ? 4096 : ($rci-1)*8064+4096,
 			'block_end' => ($rci <= 0) ? 0 : $rci*8064+4096-1
 		);

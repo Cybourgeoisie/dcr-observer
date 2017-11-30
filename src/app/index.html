@@ -1029,89 +1029,95 @@
 				Vote results for lnsupport between blocks 4,096 to now.
 			</p>
 
-			<h5>
-				Vote Overview
-				<!--<button class="btn btn-default issue-results-vote" style="padding:2px 6px;margin:0;font-size:80%;"
-					data-toggle="modal" data-target=".data-modal" 
-					data-origin="issue-results-vote" data-rci="" data-results="">
-					<i class="fa fa-pie-chart" aria-hidden="true"></i>
-				</button>-->
-			</h5>
-
-			<div class="container">
-				<div class="row">
-					<div class="col-6 text-right" style="font-weight:bold;">
-						Yes
-					</div>
-					<div class="col-6 text-left issue-results-overview-yes" style="color:rgba(0,0,0,.5);">
-						10 (33.333%)
-					</div>
-				</div>
-				<div class="row">
-					<div class="col-6 text-right" style="font-weight:bold;">
-						No
-					</div>
-					<div class="col-6 text-left issue-results-overview-no" style="color:rgba(0,0,0,.5);">
-						10 (33.333%)
-					</div>
-				</div>
-				<div class="row">
-					<div class="col-6 text-right" style="font-weight:bold;">
-						Abstain
-					</div>
-					<div class="col-6 text-left issue-results-overview-abstain" style="color:rgba(0,0,0,.5);">
-						10 (33.333%)
-					</div>
-				</div>
-				<div class="row">
-					<div class="col-6 text-right" style="font-weight:bold;">
-						Total Votes
-					</div>
-					<div class="col-6 text-left issue-results-overview-total-votes" style="color:rgba(0,0,0,.5);">
-						1
-					</div>
-				</div>
-				<div class="row">
-					<div class="col-6 text-right" style="font-weight:bold;">
-						Addresses
-					</div>
-					<div class="col-6 text-left issue-results-overview-total-voters" style="color:rgba(0,0,0,.5);">
-						1
-					</div>
-				</div>
+			<div class="issue-results-not-available" style="display:none;">
+				<strong>Notice:</strong> This issue has no votes during this RCI.
 			</div>
-			<br />
 
-			<h5>Vote Results</h5>
+			<div class="issue-results-available">
+				<h5>
+					Vote Overview
+					<!--<button class="btn btn-default issue-results-vote" style="padding:2px 6px;margin:0;font-size:80%;"
+						data-toggle="modal" data-target=".data-modal" 
+						data-origin="issue-results-vote" data-rci="" data-results="">
+						<i class="fa fa-pie-chart" aria-hidden="true"></i>
+					</button>-->
+				</h5>
 
-			<table class="table table-hover table-issue-results table-responsive-sm">
-				<thead>
-					<tr>
-						<th>Rank</th>
-						<th>Address</th>
-						<th>Influence</th>
-						<th>Yes</th>
-						<th>No</th>
-						<th>Abstain</th>
-					</tr>
-				</thead>
-				<tbody>
-					<tr>
-						<th></th>
-						<td class="issue-results-address" scope="row">
-							<a href="#addr">address</a>
-						</td>
-						<td class="issue-results-influence">0.00%</td>
-						<td class="issue-results-yes">0 (0.00%)</td>
-						<td class="issue-results-no">20 (50.00%)</td>
-						<td class="issue-results-abstain">20 (50.00%)</td>
-					</tr>
-				</tbody>
-			</table>
+				<div class="container">
+					<div class="row">
+						<div class="col-6 text-right" style="font-weight:bold;">
+							Yes
+						</div>
+						<div class="col-6 text-left issue-results-overview-yes" style="color:rgba(0,0,0,.5);">
+							10 (33.333%)
+						</div>
+					</div>
+					<div class="row">
+						<div class="col-6 text-right" style="font-weight:bold;">
+							No
+						</div>
+						<div class="col-6 text-left issue-results-overview-no" style="color:rgba(0,0,0,.5);">
+							10 (33.333%)
+						</div>
+					</div>
+					<div class="row">
+						<div class="col-6 text-right" style="font-weight:bold;">
+							Abstain
+						</div>
+						<div class="col-6 text-left issue-results-overview-abstain" style="color:rgba(0,0,0,.5);">
+							10 (33.333%)
+						</div>
+					</div>
+					<div class="row">
+						<div class="col-6 text-right" style="font-weight:bold;">
+							Total Votes
+						</div>
+						<div class="col-6 text-left issue-results-overview-total-votes" style="color:rgba(0,0,0,.5);">
+							1
+						</div>
+					</div>
+					<div class="row">
+						<div class="col-6 text-right" style="font-weight:bold;">
+							Addresses
+						</div>
+						<div class="col-6 text-left issue-results-overview-total-voters" style="color:rgba(0,0,0,.5);">
+							1
+						</div>
+					</div>
+				</div>
+				<br />
 
-			<p class="lead" style="text-align:center;">
-				<button class="btn btn-primary my-2 my-sm-0 show-all-issue-voting">Show All</button>
-			</p>
+				<h5>Vote Results</h5>
+
+				<table class="table table-hover table-issue-results table-responsive-sm">
+					<thead>
+						<tr>
+							<th>Rank</th>
+							<th>Address</th>
+							<th>Influence</th>
+							<th>Yes</th>
+							<th>No</th>
+							<th>Abstain</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr>
+							<th></th>
+							<td class="issue-results-address" scope="row">
+								<a href="#addr">address</a>
+							</td>
+							<td class="issue-results-influence">0.00%</td>
+							<td class="issue-results-yes">0 (0.00%)</td>
+							<td class="issue-results-no">20 (50.00%)</td>
+							<td class="issue-results-abstain">20 (50.00%)</td>
+						</tr>
+					</tbody>
+				</table>
+
+				<p class="lead" style="text-align:center;">
+					<button class="btn btn-primary my-2 my-sm-0 show-all-issue-voting">Show All</button>
+				</p>
+			</div>
 		</div>
 
 		<!-- Historical Vote Results Data Slider -->
@@ -1127,9 +1133,9 @@
 				<button class="btn btn-primary my-2 my-sm-0 historical-vote-results-slider-button">
 					View Block #<span class="historical-vote-results-slider-value"></span> (RCI #<span class="historical-vote-results-slider-rci"></span> )
 				</button>
-				<button class="btn btn-info my-2 my-sm-0 historical-vote-results-slider-all-time">
+				<!--<button class="btn btn-info my-2 my-sm-0 historical-vote-results-slider-all-time">
 					View All Time
-				</button>
+				</button>-->
 			</p>
 		</div>
 

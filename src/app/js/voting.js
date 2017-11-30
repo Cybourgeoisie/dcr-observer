@@ -109,6 +109,17 @@ function pullIssueResultsFromApi(issue, rci, callback) {
 	 			$('.issue-results-issue-description').html('Vote results for ' + issue + ' between blocks ' + (parseInt(data.block_start)).toLocaleString() + ' to ' + (parseInt(data.block_end)).toLocaleString() + '.');
 	 		}
 
+	 		// If there are no results, then we show the "no results at this time" message
+	 		if (data.empty) {
+	 			$('.issue-results-not-available').show();
+	 			$('.issue-results-available').hide();
+	 			$('button.show-all-issue-voting').attr("disabled", "disabled").html('Showing None');
+	 			return;
+	 		} else {
+	 			$('.issue-results-not-available').hide();
+	 			$('.issue-results-available').show();
+	 		}
+
 	 		// Get the vote results
 	 		var results = data.results;
 	 		var total_votes = results.issue_summary.yes + results.issue_summary.no + results.issue_summary.abstain;
