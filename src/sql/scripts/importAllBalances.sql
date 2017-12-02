@@ -1,11 +1,7 @@
 -- create all address rows
 INSERT INTO balance (address_id) SELECT address_id FROM address ON CONFLICT DO NOTHING;
 
--- Stop autovacuum for the cluster
---ALTER SYSTEM SET autovacuum = off;
---SELECT * from pg_reload_conf();
-
---select * from pg_settings where name like 'autovacuum%';
+VACUUM FULL ANALYZE;
 
 ALTER TABLE balance DISABLE TRIGGER ALL;
 
@@ -31,6 +27,8 @@ FROM (
 ) AS sq
 WHERE
   balance.address_id = sq.address_id;
+
+VACUUM FULL ANALYZE balance;
 
 -- vin count, vin amountin
 UPDATE
@@ -86,6 +84,8 @@ FROM (
 WHERE
   balance.address_id = sq.address_id;
 
+VACUUM FULL ANALYZE balance;
+
 -- stx
 UPDATE
   balance
@@ -138,6 +138,8 @@ FROM (
 WHERE
   balance.address_id = sq.address_id;
 
+VACUUM FULL ANALYZE balance;
+
 -- svin count, svin amountin
 UPDATE
   balance
@@ -179,16 +181,18 @@ FROM (
   JOIN
     vout_address va ON va.address_id = a.address_id
   JOIN
-    vout ON vout.vout_id = va.vout_id AND vout.type != 'stakesubmission' 
-  LEFT JOIN
-    vin ON vin.vout_id = vout.vout_id 
+    vout ON vout.vout_id = va.vout_id AND vout.type != 'stakesubmission'
   WHERE
-    vin.vin_id IS NULL
+    NOT EXISTS (
+      SELECT vin.vin_id FROM vin WHERE vin.vout_id = vout.vout_id
+    )
   GROUP BY
     a.address_id
 ) AS sq
 WHERE
   balance.address_id = sq.address_id;
+
+VACUUM FULL ANALYZE balance;
 
 -- staking
 UPDATE
@@ -204,11 +208,11 @@ FROM (
   JOIN
     vout_address va ON va.address_id = a.address_id
   JOIN
-    vout ON vout.vout_id = va.vout_id AND vout.type = 'stakesubmission' 
-  LEFT JOIN
-    vin ON vin.vout_id = vout.vout_id 
+    vout ON vout.vout_id = va.vout_id AND vout.type = 'stakesubmission'
   WHERE
-    vin.vin_id IS NULL
+    NOT EXISTS (
+      SELECT vin.vin_id FROM vin WHERE vin.vout_id = vout.vout_id
+    )
   GROUP BY
     a.address_id
 ) AS sq
@@ -216,7 +220,6 @@ WHERE
   balance.address_id = sq.address_id;
 
 VACUUM FULL ANALYZE balance;
-
 
 -- now the tour de force
 UPDATE
@@ -256,8 +259,3 @@ WHERE
 ALTER TABLE balance ENABLE TRIGGER ALL;
 
 VACUUM FULL ANALYZE balance;
-
--- Start autovacuum for the cluster
--- I'm not a big fan of using the autovacuum right now.
---ALTER SYSTEM SET autovacuum = on;
---SELECT * from pg_reload_conf();
