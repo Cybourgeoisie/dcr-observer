@@ -606,28 +606,6 @@ function addHdAddressRow($hd_address_tbody, $hd_address_row, hd_address, row_num
 	$hd_address_tbody.append($new_row);
 }
 
-function getAddressDistributionPie($modal, $source) {
-	// Display the loader
-	$modal.find('.modal-data-loading').show();
-
-	// Pull the address from the data source
-	var address = $source.data('address');
-
-	// Set title
-	$modal.find('.modal-title').html('Address Breakdown for HD Wallet');
-
-	$.post('api/Address/getHdChartBreakdown', {'address': address})
-	 .done(function(data) {
-	 	if (data.hasOwnProperty('success') && data.success) {
-	 		// Hide the loader
-			$modal.find('.modal-data-loading').hide();
-
-	 		// Load the pie
-	 		showAddressDistributionPie(data);
-	 	}
-	});
-}
-
 function showAddressDistributionPie(results) {
 	var data = results.data
 

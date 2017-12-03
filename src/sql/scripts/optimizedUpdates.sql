@@ -6,4 +6,4 @@ for (var i = 3000000; i < 12449225; i += 200000) {
 }
 
 UPDATE vout SET address_id = sq.address_id FROM (SELECT vout_id, address_id FROM vout_address 
-WHERE vout_id >= 12449224 AND vout_id < 12600000) AS sq WHERE vout.vout_id = sq.vout_id;
+WHERE vout_id >= 12449224) AS sq WHERE vout.vout_id = sq.vout_id;

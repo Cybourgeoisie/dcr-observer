@@ -51,6 +51,41 @@ WHERE
 -- THEN RINSE AND REPEAT --
 ---------------------------
 
+
+-- (1b) Get all sstxcommitments, but only for transactions with a single sstxcommitment 
+-- (to avoid confusion with multisigs used for stakepools),
+-- set to lowest network, store to tx network
+UPDATE
+    tx_network
+SET
+    network = LEAST(tx_network.network, sq.network)
+FROM (
+    SELECT
+        tx.tx_id,
+        min(a.network) AS network
+    FROM
+        tx
+    JOIN
+        vout ON vout.tx_id = tx.tx_id AND (vout.type = 'sstxcommitment' OR vout.type = 'sstxchange')
+    JOIN
+        vin ON vin.tx_id = tx.tx_id
+    JOIN
+        vout_address va ON va.vout_id = vin.vout_id OR va.vout_id = vout.vout_id
+    JOIN
+        address a ON a.address_id = va.address_id
+    WHERE
+        tx.tree = 1 -- SSTX only
+        AND 
+    GROUP BY
+        tx.tx_id
+    ORDER BY
+        tx.tx_id
+) as sq
+WHERE
+    tx_network.tx_id = sq.tx_id;
+
+
+
 -------------------------------------
 -- And then update the identifiers --
 

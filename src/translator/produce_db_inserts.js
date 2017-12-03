@@ -36,12 +36,12 @@ function processBlocks(height) {
 		}
 
 		/*
-		if (height%8100==0) {
+		if (height%8300==0) {
 			console.log("Reached end.");
 			saveProgress(height);
 			process.exit();
 		}
-		*/
+		//*/
 
 		next_height = produceDbInserts(height);
 	}
@@ -169,18 +169,18 @@ function produceDbInserts(height) {
 				var vout = tx.vout[j];
 
 				// Set defaults if not provided
-				if (!vout.hasOwnProperty('commitamt')) vout.commitamt = 'NULL';
 				if (!vout.hasOwnProperty('scriptPubKey')) { 
-					vout.scriptPubKey = {type : '', reqSigs : 'NULL'};
+					vout.scriptPubKey = {type : '', reqSigs : 'NULL', commitamt : 'NULL'};
 				}
 				if (!vout.scriptPubKey.hasOwnProperty('reqSigs')) vout.scriptPubKey.reqSigs = 'NULL';
+				if (!vout.scriptPubKey.hasOwnProperty('commitamt')) vout.scriptPubKey.commitamt = 'NULL';
 
 				// Craft the vout key -- ("{blockheight}-{tree}-{blockindex}-{n}")
 				var vout_key = block.height + '-' + tree_branch + '-' + i + '-' + vout.n;
 
 				// Add the insert
 				db_inserts += 'INSERT INTO vout ("tx_id","value","commitamt","n","version","type","reqSigs", "key") ';
-				db_inserts += 'SELECT tx.tx_id,' + vout.value + ',' + vout.commitamt + ',' + vout.n + ',' + vout.version + ',\'' + vout.scriptPubKey.type + '\',' + vout.scriptPubKey.reqSigs + ',\'' + vout_key + '\' ';
+				db_inserts += 'SELECT tx.tx_id,' + vout.value + ',' + vout.scriptPubKey.commitamt + ',' + vout.n + ',' + vout.version + ',\'' + vout.scriptPubKey.type + '\',' + vout.scriptPubKey.reqSigs + ',\'' + vout_key + '\' ';
 				db_inserts += 'FROM tx WHERE tx.hash = \'' + tx.txid + '\' ORDER BY tx.tx_id DESC LIMIT 1;';
 
 				if (tx.vout[j].scriptPubKey.hasOwnProperty('addresses')) {

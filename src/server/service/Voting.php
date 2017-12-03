@@ -419,7 +419,7 @@ class Voting extends \Scrollio\Service\AbstractService
 		$sql = '
 			SELECT
 				COUNT(tv.tx_vote_id) AS total,
-				COUNT(DISTINCT a.network) AS total_networks
+				COUNT(DISTINCT anv.network) AS total_networks
 			FROM
 				tx_vote tv
 			JOIN
@@ -427,7 +427,9 @@ class Voting extends \Scrollio\Service\AbstractService
 			JOIN
 				tx_vote_address tva ON tva.tx_vote_id = tv.tx_vote_id
 			JOIN
-				address a ON a.address_id = tva.address_id;
+				address a ON a.address_id = tva.address_id
+			JOIN
+				address_network_view anv ON anv.address_id = a.address_id;
 		';
 		$db_handler = \Geppetto\DatabaseHandler::init();
 		$res = $db_handler->query($sql, array($start_block_id));
@@ -453,11 +455,14 @@ class Voting extends \Scrollio\Service\AbstractService
 			JOIN
 				address a ON a.address_id = tva.address_id
 			JOIN
-				hd_network hn ON hn.network = a.network
+				address_network_view anv ON anv.address_id = tva.address_id
+			--JOIN
+			--	hd_network hn ON hn.network = a.network
 			JOIN
-				address primary_address ON primary_address.address_id = hn.address_id
+				--address primary_address ON primary_address.address_id = hn.address_id
+				address primary_address ON primary_address.address_id = anv.network
 			GROUP BY
-				hn.network,
+				anv.network,
 				primary_address.address
 			ORDER BY
 				2 DESC

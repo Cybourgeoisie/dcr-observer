@@ -1,0 +1,25 @@
+Todo:
+X Clear liquid and active_stake_submissions again, then recalculate
+
+Open Questions:
+- Why negative balances?
+X Any negative vouts or vins?
+X After redoing everything, are we still getting bad liquids or stake submissions?
+X Why is Dcur2 not matching liquids and balance?
+- Are there any Dc* wallets that DON'T have two sets of sstxcommitments?
+- Are there any Ds* wallets that DO have two sets of sstxcommitments?
+
+If the balances look kosher, then we STANDARDIZE IT and move the fuck along.
+
+New Todo:
+X Replace all balances with address_summary_view
+X Replace all hd_network with network_summary_view
+X Fix the network creation SQL to capture EVERYTHING
+	- Almost everything. It's much better.
+- Finish migrating everything to views, get rid of old tables
+	X balance & balance_rank
+	- tx_network
+	- hd_network
+	X drop network column from address (alter table address drop column network;)
+- Implement vout_details in a materialized view
+- 

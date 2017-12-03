@@ -19,6 +19,15 @@
 
 	<!-- Local stylesheet -->
 	<link href="css/style.css" rel="stylesheet">
+
+	<!-- Global site tag (gtag.js) - Google Analytics -->
+	<script async src="https://www.googletagmanager.com/gtag/js?id=UA-110503379-1"></script>
+	<script>
+		window.dataLayer = window.dataLayer || [];
+		function gtag(){dataLayer.push(arguments);}
+		gtag('js', new Date());
+		gtag('config', 'UA-110503379-1');
+	</script>
 </head>
 <body>
 
@@ -574,7 +583,7 @@
 			</div>
 			<br />
 
-			<!--
+			
 			<h5>
 				Balance Details
 			</h5>
@@ -588,14 +597,14 @@
 						<span class="addr-liquid-balance">X</span> DCR
 					</div>
 				</div>
-				<div class="row">
+				<!--<div class="row">
 					<div class="col-6 text-right" style="font-weight:bold;">
 						Actively Staking
 					</div>
 					<div class="col-6 text-left" style="color:rgba(0,0,0,.5);">
 						<span class="addr-actively-staking">X</span> DCR
 					</div>
-				</div>
+				</div>-->
 				<div class="row">
 					<div class="col-6 text-right" style="font-weight:bold;">
 						Stake Submissions
@@ -613,7 +622,7 @@
 					</div>
 				</div>
 			</div><br />
-			-->
+			
 
 			<h5>Activity</h5>
 
@@ -651,22 +660,6 @@
 					<div class="col-6 text-left" style="color:rgba(0,0,0,.5);">
 						<span class="addr-num-stx">X</span>
 						(<span class="addr-pct-stx">X</span>%)
-					</div>
-				</div>
-				<div class="row">
-					<div class="col-6 text-right" style="font-weight:bold;">
-						Staking Received
-					</div>
-					<div class="col-6 text-left" style="color:rgba(0,0,0,.5);">
-						<span class="addr-staked-in">X</span> DCR
-					</div>
-				</div>
-				<div class="row">
-					<div class="col-6 text-right" style="font-weight:bold;">
-						Staking Sent
-					</div>
-					<div class="col-6 text-left" style="color:rgba(0,0,0,.5);">
-						<span class="addr-staked-out">X</span> DCR
 					</div>
 				</div>
 			</div><br />

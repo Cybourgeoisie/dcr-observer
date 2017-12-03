@@ -167,6 +167,13 @@ WHERE
 
 VACUUM FULL ANALYZE balance;
 
+-- liquid and active_stake_submissions simply won't touch any addresses
+-- that don't come back, which gives false liquids for newly-emptied accounts
+UPDATE balance SET liquid = 0, active_stake_submissions = 0;
+
+
+VACUUM FULL ANALYZE balance;
+
 -- liquid
 UPDATE
   balance

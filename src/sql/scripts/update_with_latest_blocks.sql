@@ -4,6 +4,7 @@ BEGIN;
 ALTER TABLE balance DISABLE TRIGGER ALL;
 
 -- Add new addresses
+-- WORKING AS INTENDED
 INSERT INTO balance (address_id, first_block_id)
 SELECT a.address_id, min(tx.block_id)
 FROM address a
@@ -17,6 +18,7 @@ ON CONFLICT DO NOTHING;
 
 
 -- Add the new address values to the vout table
+-- WORKING AS INTENDED, BUT REALLY NECESSARY?
 UPDATE
   vout
 SET
@@ -36,6 +38,7 @@ WHERE
   vout.vout_id = sq.vout_id;
 
 -- Add the origin_tx_id to the tx_vote table
+-- WORKING AS INTENDED
 UPDATE
   tx_vote
 SET
@@ -59,6 +62,7 @@ WHERE
   tx_vote.tx_vote_id = sq.tx_vote_id;
 
 -- Now tie the addresses to the tx_vote table via tx_vote_address
+-- WORKING AS INTENDED
 INSERT INTO
   tx_vote_address (tx_vote_id, address_id)
 SELECT
@@ -79,6 +83,7 @@ ON CONFLICT DO NOTHING;
 
 -- From the state, update the entries in the balance table
 -- vout count, vout value
+-- WORKING AS INTENDED
 UPDATE
   balance
 SET
@@ -104,6 +109,7 @@ WHERE
   balance.address_id = sq.address_id;
 
 -- vin count, vin amountin
+-- WORKING AS INTENDED
 UPDATE
   balance
 SET
@@ -129,6 +135,7 @@ WHERE
   balance.address_id = sq.address_id;
 
 -- last block and tx count
+-- NEED TO TEST
 UPDATE
   balance
 SET
@@ -187,6 +194,7 @@ WHERE
 
 
 -- svout count, svout value
+-- NEED TO TEST
 UPDATE
   balance
 SET
@@ -215,6 +223,7 @@ WHERE
 
 
 -- svin count, svin amountin
+-- NEED TO TEST
 UPDATE
   balance
 SET
@@ -241,63 +250,11 @@ FROM (
 WHERE
   balance.address_id = sq.address_id;
 
----- liquid
---UPDATE
---  balance
---SET
---  liquid = COALESCE(balance.liquid, 0) + COALESCE(sq.liquid_vout, 0) - COALESCE(sq.liquid_vin, 0)
---FROM (
---  SELECT
---    DISTINCT va.address_id,
---    COALESCE(SUM(vout.value), 0) AS liquid_vout,
---    COALESCE(SUM(vin.amountin), 0) AS liquid_vin
---  FROM
---    database_blockchain_state dbs
---  JOIN
---    vout ON vout.type != 'stakesubmission' AND vout.vout_id > dbs.last_vout_id
---  JOIN
---    vin ON vin.vin_id > dbs.last_vin_id
---  JOIN
---    vout prior_vout ON prior_vout.vout_id = vin.vout_id AND prior_vout.type != 'stakesubmission'
---  JOIN
---    vout_address va ON vout.vout_id = va.vout_id OR vin.vout_id = va.vout_id
---  WHERE
---    dbs.database_blockchain_state_id = 1
---  GROUP BY
---    va.address_id
---) AS sq
---WHERE
---  balance.address_id = sq.address_id;
---
----- staking
---UPDATE
---  balance
---SET
---  active_stake_submissions = COALESCE(balance.active_stake_submissions, 0) + COALESCE(sq.stake_submissions_vout, 0) - COALESCE(sq.stake_submissions_vin, 0)
---FROM (
---  SELECT
---    DISTINCT va.address_id,
---    COALESCE(SUM(vout.value), 0) AS stake_submissions_vout,
---    COALESCE(SUM(vin.amountin), 0) AS stake_submissions_vin
---  FROM
---    database_blockchain_state dbs
---  JOIN
---    vout ON vout.type = 'stakesubmission' AND vout.vout_id > dbs.last_vout_id
---  JOIN
---    vin ON vin.vin_id > dbs.last_vin_id
---  JOIN
---    vout prior_vout ON prior_vout.vout_id = vin.vout_id AND prior_vout.type = 'stakesubmission'
---  JOIN
---    vout_address va ON vout.vout_id = va.vout_id OR vin.vout_id = va.vout_id
---  WHERE
---    dbs.database_blockchain_state_id = 1
---  GROUP BY
---    va.address_id
---) AS sq
---WHERE
---  balance.address_id = sq.address_id;
+-- Clearing out before setting the liquid / stake values
+UPDATE balance SET liquid = 0, active_stake_submissions = 0;
 
 -- liquid
+-- NEED TO TEST, NOT MATCHING ON DCUR2 ADDR
 UPDATE
   balance
 SET
@@ -323,6 +280,7 @@ WHERE
   balance.address_id = sq.address_id;
 
 -- staking
+-- NEED TO TEST
 UPDATE
   balance
 SET
@@ -357,6 +315,7 @@ VACUUM FULL ANALYZE balance;
 -- Now update balance
 BEGIN;
 
+-- NEED TO TEST
 UPDATE
   balance
 SET
@@ -381,6 +340,7 @@ COMMIT;
 BEGIN;
 -- This has to be recomputed in its entireity
 -- PROBABLY should only be done a few times a day. It's slow and it locks up the table.
+-- WORKING AS INTENDED
 UPDATE
   balance
 SET

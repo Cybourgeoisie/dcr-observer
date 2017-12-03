@@ -25,56 +25,16 @@ class Address extends \Scrollio\Service\AbstractService
 				COALESCE(ba.stx, 0)   AS "stx",
 				COALESCE(ba.vout, 0)  AS "vout",
 				COALESCE(ba.vin, 0)   AS "vin",
-				COALESCE(ba.svout, 0) AS "svout",
-				COALESCE(ba.svin, 0)  AS "svin",
 				EXTRACT(EPOCH FROM bs.time) AS "start",
 				EXTRACT(EPOCH FROM be.time) AS "end",
 				bs.height AS first,
 				be.height AS last,
-				COALESCE(ba.liquid, 0) AS liquid,
-				COALESCE(ba.active_stake_submissions, 0) AS active_stake_submissions
-				--(
-				--	SELECT COALESCE(SUM(vout_stxsub.value), 0) FROM address a 
-				--	JOIN vout_address va ON va.address_id = a.address_id 
-				--	JOIN vout vout_stxcmt ON 
-				--		vout_stxcmt.vout_id = va.vout_id AND 
-				--		vout_stxcmt.type = \'sstxcommitment\' 
-				--	JOIN tx ON tx.tx_id = vout_stxcmt.tx_id AND tx.tree = 1 
-				--	JOIN vin ON vin.tx_id = tx.tx_id
-				--	JOIN vout_address vin_va ON
-				--		vin_va.vout_id = vin.vout_id AND 
-				--		vin_va.address_id = a.address_id
-				--	JOIN vout vout_stxsub ON 
-				--		vout_stxsub.tx_id = tx.tx_id AND 
-				--		vout_stxsub.type = \'stakesubmission\' 
-				--	JOIN vout_address va_stxsub ON 
-				--		va_stxsub.vout_id = vout_stxsub.vout_id AND 
-				--		va_stxsub.address_id != a.address_id
-				--	LEFT JOIN vin vin_spent ON 
-				--		vin_spent.vout_id = vout_stxsub.vout_id
-				--	WHERE a.address = $1 AND vin_spent.vin_id IS NULL 
-				--) AS actively_staking, -- vin & sstxcommitment have same address, stakesubmission is diff
-				--(
-				--	SELECT COALESCE(SUM(vout_stxsub.value), 0) FROM address a 
-				--	JOIN vout_address va ON va.address_id = a.address_id 
-				--	JOIN vout vout_stxcmt ON 
-				--		vout_stxcmt.vout_id = va.vout_id AND 
-				--		vout_stxcmt.type = \'sstxcommitment\' 
-				--	JOIN tx ON tx.tx_id = vout_stxcmt.tx_id AND tx.tree = 1 
-				--	JOIN vout vout_stxsub ON 
-				--		vout_stxsub.tx_id = tx.tx_id AND 
-				--		vout_stxsub.type = \'stakesubmission\' 
-				--	JOIN vout_address va_stxsub ON 
-				--		va_stxsub.vout_id = vout_stxsub.vout_id AND 
-				--		va_stxsub.address_id != a.address_id
-				--	LEFT JOIN vin vin_spent ON 
-				--		vin_spent.vout_id = vout_stxsub.vout_id
-				--	WHERE a.address = $1 AND vin_spent.vin_id IS NULL 
-				--) AS actively_staking, -- sstxcommitment is current address, stakesubmission is diff
+				COALESCE(ba.liquid_balance, 0) AS liquid,
+				COALESCE(ba.stakesubmission_balance, 0) AS active_stake_submissions
 			FROM
 				address a
 			JOIN
-				balance ba ON ba.address_id = a.address_id
+				address_summary_view ba ON ba.address_id = a.address_id
 			JOIN
 				block bs ON bs.block_id = ba.first_block_id
 			JOIN
@@ -145,9 +105,13 @@ class Address extends \Scrollio\Service\AbstractService
 				tv.votes,
 				COUNT(tv.tx_vote_id) AS count
 			FROM
-				address a_network
+				address a
 			JOIN
-				address a ON a.network = a_network.network
+				address_network_view anv ON anv.address_id = a.address_id
+			JOIN
+				address_network_view anv_network ON anv_network.network = anv.network
+			JOIN
+				address a_network ON a_network.address_id = anv_network.address_id
 			JOIN
 				tx_vote_address tva ON tva.address_id = a_network.address_id
 			JOIN
@@ -252,9 +216,9 @@ class Address extends \Scrollio\Service\AbstractService
 		$sql = '
 			SELECT
 			-- All TX inputs
-			(SELECT b.vout
-			FROM balance b 
-			JOIN address a ON a.address_id = b.address_id
+			(SELECT asv.vout
+			FROM address_summary_view asv
+			JOIN address a ON a.address_id = asv.address_id
 			WHERE a.address = $1) AS vout,
 			-- All coinbase inputs (mining), except the genesis block
 			(SELECT COALESCE(SUM(vout.value), 0) 
@@ -340,43 +304,68 @@ class Address extends \Scrollio\Service\AbstractService
 			SELECT 
 				a.address,
 				a.identifier,
-				CASE WHEN COALESCE(ba.balance, 0) < 0 THEN 0 ELSE COALESCE(ba.balance, 0) END AS balance,
+				CASE WHEN COALESCE(asv.balance, 0) < 0 THEN 0 ELSE COALESCE(asv.balance, 0) END AS balance,
 				--tx.hash AS tx_hash,
-				COALESCE(ba.tx, 0)    AS "tx",
-				COALESCE(ba.stx, 0)   AS "stx",
-				COALESCE(ba.vout, 0)  AS "vout",
-				COALESCE(ba.vin, 0)   AS "vin",
-				COALESCE(ba.svout, 0) AS "svout",
-				COALESCE(ba.svin, 0)  AS "svin",
+				COALESCE(asv.tx, 0)    AS "tx",
+				COALESCE(asv.stx, 0)   AS "stx",
+				COALESCE(asv.vout, 0)  AS "vout",
+				COALESCE(asv.vin, 0)   AS "vin",
 				EXTRACT(EPOCH FROM bs.time) AS "start",
 				EXTRACT(EPOCH FROM be.time) AS "end",
 				bs.height AS first,
 				be.height AS last
-			FROM (
-				SELECT
-					DISTINCT a.address_id
-				FROM
-					address a
-				JOIN
-					address a_this ON a_this.address = $1
-				WHERE
-					a_this.network = a.network
-			) AS sq
+			FROM
+				address a_this
 			JOIN
-				address a ON a.address_id = sq.address_id
+				address_network_view anv_this ON anv_this.address_id = a_this.address_id
+			JOIN
+				address_network_view anv ON anv.network = anv_this.network
+			JOIN
+				address_summary_view asv ON asv.address_id = anv.address_id
+			JOIN
+				address a ON a.address_id = asv.address_id
 			LEFT OUTER JOIN
-				balance ba ON ba.address_id = a.address_id
+				block bs ON bs.block_id = asv.first_block_id
 			LEFT OUTER JOIN
-				block bs ON bs.block_id = ba.first_block_id
-			LEFT OUTER JOIN
-				block be ON be.block_id = ba.last_block_id
-			--JOIN
-			--	tx ON tx.tx_id = sq.tx_id
-			--WHERE
-			--	balance > 0
+				block be ON be.block_id = asv.last_block_id
 			ORDER BY
 				balance DESC NULLS LAST;
 		';
+
+		$sql = '
+			SELECT 
+				a.address,
+				a.identifier,
+				CASE WHEN COALESCE(asv.balance, 0) < 0 THEN 0 ELSE COALESCE(asv.balance, 0) END AS balance,
+				--tx.hash AS tx_hash,
+				COALESCE(asv.tx, 0)    AS "tx",
+				COALESCE(asv.stx, 0)   AS "stx",
+				COALESCE(asv.vout, 0)  AS "vout",
+				COALESCE(asv.vin, 0)   AS "vin",
+				EXTRACT(EPOCH FROM bs.time) AS "start",
+				EXTRACT(EPOCH FROM be.time) AS "end",
+				bs.height AS first,
+				be.height AS last
+			FROM
+				address a_this
+			JOIN
+				address_network_view anv_this ON anv_this.address_id = a_this.address_id
+			JOIN
+				address_network_view anv ON anv.network = anv_this.network
+			JOIN
+				address_summary_view asv ON asv.address_id = anv.address_id
+			JOIN
+				address a ON a.address_id = asv.address_id
+			LEFT OUTER JOIN
+				block bs ON bs.block_id = asv.first_block_id
+			LEFT OUTER JOIN
+				block be ON be.block_id = asv.last_block_id
+			WHERE
+				a_this.address = $1
+			ORDER BY
+				asv.balance DESC NULLS LAST;
+		';
+
 		$db_handler = \Geppetto\DatabaseHandler::init();
 		$res = $db_handler->query($sql, array($address));
 
@@ -411,49 +400,59 @@ class Address extends \Scrollio\Service\AbstractService
 		$sql = '
 			SELECT
 			-- All TX inputs
-			(SELECT SUM(b.vout)
-			FROM balance b 
-			JOIN address a ON a.address_id = b.address_id
-			JOIN address this ON this.address = $1
-			WHERE this.network = a.network) AS vout,
+			(SELECT nsv.vout
+			FROM address a
+			JOIN address_network_view anv ON anv.address_id = a.address_id
+			JOIN network_summary_view nsv ON nsv.network = anv.network
+			WHERE a.address = $1) AS vout,
 			-- All coinbase inputs (mining), except the genesis block
 			(SELECT COALESCE(SUM(vout.value), 0) 
 			FROM address a 
 			JOIN address this ON this.address = $1
+			JOIN address_network_view anv_this ON anv_this.address_id = this.address_id
+			JOIN address_network_view anv ON anv.network = anv_this.network
 			--JOIN vout_address va ON va.address_id = a.address_id 
 			--JOIN vout ON vout.vout_id = va.vout_id 
 			JOIN vout ON vout.address_id = a.address_id 
 			JOIN tx ON tx.tx_id = vout.tx_id AND tx.tree = 0 AND tx.tx_id != 1 
 			JOIN vin ON vin.tx_id = tx.tx_id AND vin.coinbase != \'\'
-			WHERE a.network = this.network) AS coinbase,
+			WHERE anv.address_id = a.address_id) AS coinbase,
 			-- All stakegen inputs
 			(SELECT COALESCE(SUM(vout.value), 0)
 			FROM address a 
 			JOIN address this ON this.address = $1
+			JOIN address_network_view anv_this ON anv_this.address_id = this.address_id
+			JOIN address_network_view anv ON anv.network = anv_this.network
 			--JOIN vout_address va ON va.address_id = a.address_id 
 			--JOIN vout ON vout.vout_id = va.vout_id AND vout.type = \'stakegen\'
 			JOIN vout ON vout.address_id = a.address_id AND vout.type = \'stakegen\'
-			WHERE a.network = this.network) AS stakebase,
+			WHERE anv.address_id = a.address_id) AS stakebase,
 			-- All stakesubmission inputs
 			(SELECT COALESCE(SUM(vout.value), 0)
 			FROM address a 
 			JOIN address this ON this.address = $1
+			JOIN address_network_view anv_this ON anv_this.address_id = this.address_id
+			JOIN address_network_view anv ON anv.network = anv_this.network
 			--JOIN vout_address va ON va.address_id = a.address_id 
 			--JOIN vout ON vout.vout_id = va.vout_id AND vout.type = \'stakesubmission\'
 			JOIN vout ON vout.address_id = a.address_id AND vout.type = \'stakesubmission\'
-			WHERE a.network = this.network) AS stakesubmission,
+			WHERE anv.address_id = a.address_id) AS stakesubmission,
 			-- All genesis inputs
 			(SELECT COALESCE(SUM(vout.value), 0)
 			FROM address a 
 			JOIN address this ON this.address = $1
+			JOIN address_network_view anv_this ON anv_this.address_id = this.address_id
+			JOIN address_network_view anv ON anv.network = anv_this.network
 			--JOIN vout_address va ON va.address_id = a.address_id 
 			--JOIN vout ON vout.vout_id = va.vout_id AND vout.tx_id = 1
 			JOIN vout ON vout.address_id = a.address_id AND vout.tx_id = 1
-			WHERE a.network = this.network) AS genesis,
+			WHERE anv.address_id = a.address_id) AS genesis,
 			-- All inputs from an exchange
 			(SELECT COALESCE(SUM(vout.value), 0)
 			FROM address a 
 			JOIN address this ON this.address = $1
+			JOIN address_network_view anv_this ON anv_this.address_id = this.address_id
+			JOIN address_network_view anv ON anv.network = anv_this.network
 			--JOIN vout_address va ON va.address_id = a.address_id 
 			--JOIN vout ON vout.vout_id = va.vout_id 
 			JOIN vout ON vout.address_id = a.address_id 
@@ -464,7 +463,7 @@ class Address extends \Scrollio\Service\AbstractService
 				--origin_address.address_id = origin_vout_address.address_id AND 
 				origin_address.address_id = origin_vout.address_id AND 
 				origin_address.identifier IN (\'Poloniex\', \'Bittrex\')
-			WHERE a.network = this.network AND a.identifier NOT IN (\'Poloniex\', \'Bittrex\')) AS direct_from_exchange
+			WHERE anv.address_id = a.address_id AND a.identifier NOT IN (\'Poloniex\', \'Bittrex\')) AS direct_from_exchange
 		';
 		$db_handler = \Geppetto\DatabaseHandler::init();
 		$res = $db_handler->query($sql, array($address));
@@ -504,25 +503,21 @@ class Address extends \Scrollio\Service\AbstractService
 		$sql = '
 			SELECT 
 				a.address AS label,
-				ba.balance AS value
-			FROM (
-				SELECT
-					DISTINCT a.address_id
-				FROM
-					address a
-				JOIN
-					address a_this ON a_this.address = $1
-				WHERE
-					a_this.network = a.network
-			) AS sq
+				asv.balance AS value
+			FROM
+				address a_this
 			JOIN
-				address a ON a.address_id = sq.address_id
+				address_network_view anv_this ON anv_this.address_id = a_this.address_id
 			JOIN
-				balance ba ON ba.address_id = a.address_id
+				address_network_view anv ON anv.network = anv_this.network
+			JOIN
+				address_summary_view asv ON asv.address_id = anv.address_id
+			JOIN
+				address a ON a.address_id = asv.address_id
 			WHERE
-				balance > 0
+				asv.balance > 0 AND a_this.address = $1
 			ORDER BY
-				balance DESC;
+				asv.balance DESC;
 		';
 		$db_handler = \Geppetto\DatabaseHandler::init();
 		$res = $db_handler->query($sql, array($address));
@@ -546,29 +541,27 @@ class Address extends \Scrollio\Service\AbstractService
 
 		$sql = '
 			SELECT
-				count
-			FROM (
-				SELECT
-					COUNT(DISTINCT a.address_id) AS count
-				FROM
-					address a
-				JOIN
-					address a_this ON a_this.address = $1
-				WHERE
-					a_this.network = a.network
-			) AS sq;
+				nsv.num_addresses
+			FROM 
+				address a
+			JOIN
+				address_network_view anv ON anv.address_id = a.address_id
+			JOIN
+				network_summary_view nsv ON nsv.network = anv.network
+			WHERE
+				a.address = $1;
 		';
 		$db_handler = \Geppetto\DatabaseHandler::init();
 		$res = $db_handler->query($sql, array($address));
 
-		if (empty($res) || !array_key_exists(0, $res) || !array_key_exists('count', $res[0])) {
+		if (empty($res) || !array_key_exists(0, $res) || !array_key_exists('num_addresses', $res[0])) {
 			return array(
 				'network_size' => 1
 			);
 		}
 
 		return array(
-			'network_size' => $res[0]['count']
+			'network_size' => $res[0]['num_addresses']
 		);
 	}
 
@@ -576,18 +569,18 @@ class Address extends \Scrollio\Service\AbstractService
 	{
 		$sql = '
 			SELECT
+				asv.rank,
 				a.address,
 				a.identifier,
-				b.balance,
-				b.rank,
-				COALESCE(b.tx, 0) AS tx,
-				COALESCE(b.stx, 0) AS stx
+				asv.balance,
+				COALESCE(asv.tx, 0) AS tx,
+				COALESCE(asv.stx, 0) AS stx
 			FROM
-				balance b
+				address_summary_view asv
 			JOIN
-				address a ON a.address_id = b.address_id
+				address a ON a.address_id = asv.address_id
 			ORDER BY
-				b.rank ASC
+				asv.rank ASC
 			LIMIT
 				500;
 		';
@@ -605,6 +598,7 @@ class Address extends \Scrollio\Service\AbstractService
 
 	public function getTopNetworks()
 	{
+		
 		$sql = '
 			SELECT
 				hd.network,
@@ -614,14 +608,17 @@ class Address extends \Scrollio\Service\AbstractService
 				a.address,
 				a.identifier
 			FROM
-				hd_network hd
+				--hd_network hd
+				network_summary_view hd
 			JOIN
-				address a ON a.address_id = hd.address_id
+				--address a ON a.address_id = hd.address_id
+				address a ON a.address_id = hd.primary_address_id
 			ORDER BY
 				rank ASC
 			LIMIT
 				500;
 		';
+
 		$db_handler = \Geppetto\DatabaseHandler::init();
 		$res = $db_handler->query($sql, array());
 
@@ -652,7 +649,7 @@ class Address extends \Scrollio\Service\AbstractService
 				COUNT(*) AS num_addresses,
 				SUM(balance) AS total_balance
 			FROM
-				balance
+				address_balance_view b
 			WHERE
 				balance > 0
 			GROUP BY 1 ORDER BY 1 ASC;
@@ -683,7 +680,7 @@ class Address extends \Scrollio\Service\AbstractService
 				CASE WHEN a.identifier != \'\' THEN a.identifier ELSE a.address END AS label,
 				b.balance AS value
 			FROM
-				balance b
+				address_balance_view b
 			JOIN
 				address a ON a.address_id = b.address_id
 			WHERE
@@ -702,7 +699,7 @@ class Address extends \Scrollio\Service\AbstractService
 			SELECT
 				SUM(balance) AS value
 			FROM
-				balance
+				address_balance_view
 			WHERE
 				balance >= $1 AND balance <= $2
 		';
@@ -743,9 +740,11 @@ class Address extends \Scrollio\Service\AbstractService
 				CASE WHEN a.identifier != \'\' THEN a.identifier ELSE a.address END AS label,
 				hd.balance AS value
 			FROM
-				hd_network hd
+				--hd_network hd
+				network_summary_view hd
 			JOIN
-				address a ON a.address_id = hd.address_id
+				--address a ON a.address_id = hd.address_id
+				address a ON a.address_id = hd.network
 			WHERE
 				hd.balance >= $1 AND hd.balance < $2
 			ORDER BY hd.balance DESC
@@ -762,7 +761,8 @@ class Address extends \Scrollio\Service\AbstractService
 			SELECT
 				SUM(balance) AS value
 			FROM
-				hd_network
+				--hd_network
+				network_summary_view hd
 			WHERE
 				balance >= $1 AND balance <= $2
 		';
@@ -807,7 +807,8 @@ class Address extends \Scrollio\Service\AbstractService
 				COUNT(*) AS num_wallets,
 				SUM(balance) AS total_balance
 			FROM
-				hd_network
+				--hd_network
+				network_balance_view
 			WHERE
 				balance > 0
 			GROUP BY 1 ORDER BY 1 ASC;

@@ -13,6 +13,9 @@ switch (PROGRAM_ENVIRONMENT)
 		error_reporting(E_ALL);
 		ini_set('display_errors', '1');
 
+		// Caching
+		define('USE_CACHING', false);
+
 		// Site address
 		define('SITE_ADDRESS', 'http://192.168.99.100/');
 
@@ -22,6 +25,9 @@ switch (PROGRAM_ENVIRONMENT)
 		// Tell no secrets
 		error_reporting(0);
 		ini_set('display_errors', '0');
+
+		// Caching
+		define('USE_CACHING', true);
 
 		// Site address
 		define('SITE_ADDRESS', 'https://www.dcr.observer');

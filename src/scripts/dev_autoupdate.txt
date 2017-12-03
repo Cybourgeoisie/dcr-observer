@@ -1,0 +1,6 @@
+docker cp ./sql_data/latest_blocks.sql dcraudit-db:/latest_blocks.sql
+time docker exec -it dcraudit-db psql -U dcraudit_admin -d dcraudit -f latest_blocks.sql -q
+
+cd ../sql/scripts/;
+docker cp ./update_with_latest_blocks_materialized_views.sql dcraudit-db:/update_with_latest_blocks_materialized_views.sql
+time docker exec -it dcraudit-db psql -U dcraudit_admin -d dcraudit -f update_with_latest_blocks_materialized_views.sql

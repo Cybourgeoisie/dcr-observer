@@ -14,16 +14,20 @@ class RestApi extends \Scrollio\Api\AbstractApi
 	public function processRequest()
 	{
 		// Check for cache file
-		$cached_data = $this->getCacheFile();
-		if ($cached_data) {
-			return $cached_data;
+		if (defined('USE_CACHING') && USE_CACHING) {
+			$cached_data = $this->getCacheFile();
+			if ($cached_data) {
+				return $cached_data;
+			}
 		}
 
 		// Get live results
 		$result = parent::processRequest();
 
 		// Cache the result
-		$this->createCacheFile($result);
+		if (defined('USE_CACHING') && USE_CACHING) {
+			$this->createCacheFile($result);
+		}
 
 		// Return the result
 		return $result;

@@ -16,7 +16,7 @@ X Fix bug with balance calculations
 	X Miners
 	X Exchanges
 	- Stakepools
-X Top 500 HD wallets from DB (NOTE: Not from DB, but from accurate source)
+X Top 500 HD wallets from DB
 X Wealth distribution by HD wallet from DB (NOTE: Not from DB, but from accurate source)
 X Additional address details: List all addresses linked together, and from which transactions (HD)
 X Historical snapshots of rich list & wealth distribution (slider)
@@ -25,18 +25,28 @@ X Additional address details: Map portion of inputs from mining, genesis block, 
 X Voting Distribution Page: show distribution of voters' tickets & relative influence that their tickets have on vote outcome (onchain)
 X Mobile-friendly UI
 X Optimize database updates
+- Top voters (addresses and wallets) of all time
+- Maybe I could add a new section, "Stake Pool Details", which only shows up if a wallet / address was ever used to hold stake submissions, and have a few fields under it: "Submitted Tickets", "Completed Tickets", "Revoked Tickets"
 
 Important:
 X ORIGINAL: Update produce_db_inserts to include address_id with vouts
 	X Satisfy the above requirement by updating update_with_latest_blocks.sql to add address_id to vout, and set origin_tx_id, tx_vote_address records
 
 
+Remaining Todo before launch:
+- Flag addresses that are actively staking
+- Maybe I could add a new section, "Stake Pool Details", which only shows up if a wallet / address was ever used to hold stake submissions, and have a few fields under it: "Submitted Tickets", "Completed Tickets", "Revoked Tickets"
+- Add "stakegen" to getVoutDetails & HD version
+- Research HD once more for linking sstxcommitment 
+- Fix commitamt across the board - massive set of updates
+
+
 Additional Todo:
 X Add caching on PHP side to common DB queries
 - Re-run the historical data accumulation to include tags for all current identifiers
-- Add Google Analytics
+X Add Google Analytics
 - Backup entire database, download, before launch
-- SSL certificate
+X SSL certificate
 - Add toggle-able rows
 
 
