@@ -474,11 +474,11 @@ function getAddressInputPie($modal, $source) {
 	if ($source.data('origin') == 'hd-addr-input') {
 		addr_or_wallet = 'Wallet';
 		api_address = 'api/Address/getHdVoutDetails';
-		$modal.find('.modal-title').html('HD Wallet Input Breakdown (Experimental)');
+		$modal.find('.modal-title').html('HD Wallet Input Breakdown');
 	} else {
 		addr_or_wallet = 'Address';
 		api_address = 'api/Address/getVoutDetails';
-		$modal.find('.modal-title').html('Address Input Breakdown (Experimental)');
+		$modal.find('.modal-title').html('Address Input Breakdown');
 	}
 
 	$.post(api_address, {'address': address})
@@ -507,7 +507,8 @@ function loadHdAddressInfo(address, callback) {
 
 var remaining_hd_addresses_to_load = [];
 function setHdAddressInfo(data, req_address) {
-	hd_addresses = data.addresses;
+	var hd_addresses = data.addresses;
+	var network = data.network;
 
 	// Set the current requested address
 	$('.hd-top-address').html(req_address);
@@ -520,30 +521,23 @@ function setHdAddressInfo(data, req_address) {
 	// Clear the existing data
 	$hd_address_tbody.html('');
 
+	// Set the cumulative information
+	var total_balance  = network.balance;
+	var total_received = network.vout;
+	var total_sent     = network.vin;
+	var identifier     = network.identifier;
+
 	// Collect the cumulative information
-	var total_balance = 0, total_received = 0, total_sent = 0;
-	var identifier = '';
-	for (var i = 0; i < hd_addresses.length; i++) {
-		total_balance  += parseFloat(hd_addresses[i].balance);
-		total_received += parseFloat(hd_addresses[i].vout);
-		total_sent     += parseFloat(hd_addresses[i].vin);
-
-		// Pull the identifier from the requested address
-		if (hd_addresses[i].address == req_address) {
-			identifier = hd_addresses[i].identifier;
-		}
-
-		if (i < 10) {
-			addHdAddressRow($hd_address_tbody, $hd_address_row, hd_addresses[i], i+1);
-		}
+	for (var i = 0; i < 10; i++) {
+		addHdAddressRow($hd_address_tbody, $hd_address_row, hd_addresses[i], i+1);
 	}
 
 	if (hd_addresses.length > 10) {
 		// Store the remaining addresses for loading via "show all"
 		remaining_hd_addresses_to_load = hd_addresses.slice(10);
-		$('button.show-all-hd').removeAttr('disabled').html('Show All Addresses*');
+		$('button.show-all-hd').removeAttr('disabled').html('Show Top Addresses*');
 	} else {
-		$('button.show-all-hd').attr("disabled", "disabled").html('Showing All Addresses');
+		$('button.show-all-hd').attr("disabled", "disabled").html('Showing Top Addresses*');
 	}
 
 	// Set the "show all" button to do something
@@ -568,7 +562,7 @@ function setHdAddressInfo(data, req_address) {
 	$('.hd-fiat-value').html('$' + parseInt(parseFloat(total_balance)*dcr_price).toLocaleString());
 	$('.hd-total-in').html(total_received.toLocaleString());
 	$('.hd-total-out').html(total_sent.toLocaleString());
-	$('.hd-num-addresses').html(hd_addresses.length);
+	$('.hd-num-addresses').html(network.num_addresses);
 
 	// If the top address has an identifier, display it
 	$('.dcr-badge-hd-address-identifier').hide();

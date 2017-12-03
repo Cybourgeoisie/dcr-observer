@@ -54,6 +54,9 @@ rm /home/ec2-user/dcr-rich-list/src/translator/sql_data/latest_blocks.sql;
 /bin/echo "Update the views";
 /usr/bin/psql -d dcr-audit -U r9e43vzs5efe32gm -f /home/ec2-user/dcr-rich-list/src/sql/scripts/update_with_latest_blocks_materialized_views.sql;
 
+# Clear out the cache
+/bin/rm -rf /var/www/cache && /bin/mkdir /var/www/cache;
+
 /bin/echo "Done";
 
 # Remove the lockfile

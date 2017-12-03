@@ -10,6 +10,7 @@ DROP MATERIALIZED VIEW IF EXISTS address_rtx_view CASCADE;
 DROP MATERIALIZED VIEW IF EXISTS address_stx_view CASCADE;
 DROP MATERIALIZED VIEW IF EXISTS address_block_activity_view CASCADE;
 DROP MATERIALIZED VIEW IF EXISTS tx_network_initial_view CASCADE;
+DROP MATERIALIZED VIEW IF EXISTS address_vout_breakdown_view CASCADE;
 
 
 -------------------
@@ -322,6 +323,8 @@ SELECT
   SUM(asv.stakesubmission_vout) AS stakesubmission_vout,
   SUM(asv.liquid_vin) AS liquid_vin,
   SUM(asv.stakesubmission_vin) AS stakesubmission_vin,
+  SUM(asv.tx) AS tx,
+  SUM(asv.stx) AS stx,
   COUNT(anv.address_id) AS num_addresses,
   MIN(asv.first_block_id) AS first_block_id,
   MIN(asv.last_block_id) AS last_block_id
@@ -393,16 +396,21 @@ LEFT JOIN (
   GROUP BY address_id
 ) AS stakesubmission ON stakesubmission.address_id = vout.address_id
 LEFT JOIN (
-  SELECT this.address_id, COALESCE(SUM(vout.value), 0) AS vout
-  FROM vout
-  JOIN vin ON vin.tx_id = vout.tx_id 
-  JOIN vout origin_vout ON origin_vout.vout_id = vin.vout_id
-  JOIN address origin_address ON 
-    origin_address.address_id = origin_vout.address_id AND 
-    origin_address.identifier IN ('Poloniex', 'Bittrex')
-  JOIN address this ON this.address_id = vout.address_id
-  WHERE this.identifier NOT IN ('Poloniex', 'Bittrex')
-  GROUP BY this.address_id
+  SELECT
+    sq.address_id,
+    SUM(COALESCE(sq.value, 0)) AS vout
+  FROM (
+    SELECT DISTINCT ON (this.address_id, vout.vout_id) this.address_id, vout.value
+    FROM address this
+    JOIN vout ON vout.address_id = this.address_id
+    JOIN vin ON vin.tx_id = vout.tx_id 
+    JOIN vout origin_vout ON origin_vout.vout_id = vin.vout_id
+    JOIN address origin_address ON 
+      origin_address.address_id = origin_vout.address_id AND 
+      origin_address.identifier IN ('Poloniex', 'Bittrex')
+    WHERE this.identifier NOT IN ('Poloniex', 'Bittrex')
+  ) AS sq
+  GROUP BY sq.address_id
 ) AS direct_from_exchange ON direct_from_exchange.address_id = vout.address_id;
 
 CREATE INDEX address_vout_breakdown_view_network_idx ON address_vout_breakdown_view (address_id);

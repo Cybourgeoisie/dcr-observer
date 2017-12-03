@@ -21,5 +21,4 @@ X Fix the network creation SQL to capture EVERYTHING
 	- tx_network
 	- hd_network
 	X drop network column from address (alter table address drop column network;)
-- Implement vout_details in a materialized view
-- 
+X Implement vout_details in a materialized view 

@@ -265,38 +265,44 @@ class Address extends \Scrollio\Service\AbstractService
 			throw new \Exception('Invalid address provided.');
 		}
 
+		// Get the network details first
 		$sql = '
 			SELECT 
 				a.address,
 				a.identifier,
-				CASE WHEN COALESCE(asv.balance, 0) < 0 THEN 0 ELSE COALESCE(asv.balance, 0) END AS balance,
+				CASE WHEN COALESCE(nsv.balance, 0) < 0 THEN 0 ELSE COALESCE(nsv.balance, 0) END AS balance,
 				--tx.hash AS tx_hash,
-				COALESCE(asv.tx, 0)    AS "tx",
-				COALESCE(asv.stx, 0)   AS "stx",
-				COALESCE(asv.vout, 0)  AS "vout",
-				COALESCE(asv.vin, 0)   AS "vin",
+				COALESCE(nsv.tx, 0)    AS "tx",
+				COALESCE(nsv.stx, 0)   AS "stx",
+				COALESCE(nsv.vout, 0)  AS "vout",
+				COALESCE(nsv.vin, 0)   AS "vin",
 				EXTRACT(EPOCH FROM bs.time) AS "start",
 				EXTRACT(EPOCH FROM be.time) AS "end",
 				bs.height AS first,
-				be.height AS last
+				be.height AS last,
+				nsv.num_addresses
 			FROM
-				address a_this
+				address a
 			JOIN
-				address_network_view anv_this ON anv_this.address_id = a_this.address_id
+				address_network_view anv ON anv.address_id = a.address_id
 			JOIN
-				address_network_view anv ON anv.network = anv_this.network
-			JOIN
-				address_summary_view asv ON asv.address_id = anv.address_id
-			JOIN
-				address a ON a.address_id = asv.address_id
+				network_summary_view nsv ON nsv.network = anv.network
 			LEFT OUTER JOIN
-				block bs ON bs.block_id = asv.first_block_id
+				block bs ON bs.block_id = nsv.first_block_id
 			LEFT OUTER JOIN
-				block be ON be.block_id = asv.last_block_id
-			ORDER BY
-				balance DESC NULLS LAST;
+				block be ON be.block_id = nsv.last_block_id
+			WHERE
+				a.address = $1;
 		';
 
+		$db_handler = \Geppetto\DatabaseHandler::init();
+		$res_network = $db_handler->query($sql, array($address));
+
+		if (empty($res_network) || !array_key_exists(0, $res_network) || !array_key_exists('address', $res_network[0])) {
+			throw new \Exception('Could not find HD wallet by address.');
+		}
+
+		// Get all the address details after
 		$sql = '
 			SELECT 
 				a.address,
@@ -328,7 +334,9 @@ class Address extends \Scrollio\Service\AbstractService
 			WHERE
 				a_this.address = $1
 			ORDER BY
-				asv.balance DESC NULLS LAST;
+				asv.balance DESC NULLS LAST
+			LIMIT
+				250;
 		';
 
 		$db_handler = \Geppetto\DatabaseHandler::init();
@@ -337,7 +345,8 @@ class Address extends \Scrollio\Service\AbstractService
 		if (empty($res) || !array_key_exists(0, $res) || !array_key_exists('address', $res[0])) {
 			$lone_address_info = self::getDetails($address);
 			return array(
-				'count' => 1,
+				'count'     => 1,
+				'network'   => $res_network[0],
 				'addresses' => array($lone_address_info['addr_info'])
 			);
 		}
@@ -345,7 +354,8 @@ class Address extends \Scrollio\Service\AbstractService
 		$voting_info = $this->getWalletVotingRecord($address);
 
 		return array(
-			'count'          => count($res),
+			'count'          => $res_network[0]['num_addresses'],
+			'network'        => $res_network[0],
 			'addresses'      => $res,
 			'voting_record'  => $voting_info['voting_record'],
 			'voting_tally'   => $voting_info['voting_tally'],
