@@ -6,9 +6,11 @@ DROP MATERIALIZED VIEW IF EXISTS address_vout_vin_view CASCADE;
 DROP VIEW IF EXISTS address_rtx_view CASCADE;
 DROP VIEW IF EXISTS address_stx_view CASCADE;
 DROP VIEW IF EXISTS address_block_activity_view CASCADE;
+DROP VIEW IF EXISTS address_actively_staking_view CASCADE;
 DROP MATERIALIZED VIEW IF EXISTS address_rtx_view CASCADE;
 DROP MATERIALIZED VIEW IF EXISTS address_stx_view CASCADE;
 DROP MATERIALIZED VIEW IF EXISTS address_block_activity_view CASCADE;
+DROP MATERIALIZED VIEW IF EXISTS address_actively_staking_view CASCADE;
 DROP MATERIALIZED VIEW IF EXISTS tx_network_initial_view CASCADE;
 DROP MATERIALIZED VIEW IF EXISTS address_vout_breakdown_view CASCADE;
 
@@ -142,6 +144,23 @@ GROUP BY
 
 --CREATE INDEX address_block_activity_view_address_id_idx ON address_block_activity_view (address_id);
 
+-- Determine if an address is actively staking
+CREATE VIEW address_actively_staking_view AS
+SELECT
+  DISTINCT va.address_id
+FROM
+  vout
+LEFT JOIN
+  vin next_vin ON next_vin.vout_id = vout.vout_id
+JOIN
+  vin sender_vin ON sender_vin.tx_id = vout.tx_id
+JOIN
+  vout_address va ON va.vout_id = sender_vin.vout_id
+WHERE
+  vout.type = 'stakesubmission' AND next_vin.vin_id IS NULL;
+
+--CREATE INDEX address_actively_staking_view_address_id_idx ON address_actively_staking_view (address_id);
+
 -- Now combine them all
 CREATE MATERIALIZED VIEW address_summary_view AS
 SELECT
@@ -162,7 +181,8 @@ SELECT
   artxv.rtx,
   astxv.stx,
   abav.first_block_id,
-  abav.last_block_id
+  abav.last_block_id,
+  CASE WHEN (aasv.address_id IS NOT NULL) THEN true ELSE false END AS actively_staking
 FROM
   address_vout_vin_view avvv
 JOIN
@@ -172,7 +192,9 @@ JOIN
 JOIN
   address_stx_view astxv ON astxv.address_id = avvv.address_id
 JOIN
-  address_block_activity_view abav ON abav.address_id = avvv.address_id;
+  address_block_activity_view abav ON abav.address_id = avvv.address_id
+LEFT JOIN
+  address_actively_staking_view aasv ON aasv.address_id = avvv.address_id;
 
 CREATE INDEX address_summary_view_address_id_idx ON address_summary_view (address_id);
 CREATE INDEX address_summary_view_rank_idx ON address_summary_view (rank);

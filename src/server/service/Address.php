@@ -500,6 +500,7 @@ class Address extends \Scrollio\Service\AbstractService
 		$sql = '
 			SELECT
 				asv.rank,
+				asv.actively_staking,
 				a.address,
 				a.identifier,
 				asv.balance,

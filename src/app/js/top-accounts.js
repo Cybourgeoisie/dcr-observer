@@ -142,6 +142,12 @@ function pullTopAddressesFromApi(callback) {
 					$new_row.find('.top-td-addr-identifier').html(address_info.identifier);
 				}
 
+				// If the address is actively staking, make note of it
+				$new_row.find('.top-td-badge-address-actively-staking').hide();
+				if (address_info.hasOwnProperty('actively_staking') && address_info.actively_staking == 't') {
+					$new_row.find('.top-td-badge-address-actively-staking').show();
+				}
+
 				// Only display first 10 addresses by default
 				if (i >= 10) {
 					$new_row.hide();

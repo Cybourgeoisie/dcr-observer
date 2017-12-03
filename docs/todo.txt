@@ -21,7 +21,7 @@ X Wealth distribution by HD wallet from DB (NOTE: Not from DB, but from accurate
 X Additional address details: List all addresses linked together, and from which transactions (HD)
 X Historical snapshots of rich list & wealth distribution (slider)
 X Additional address details: Map portion of inputs from mining, genesis block, exchange, or staking
-- Flag addresses that are actively staking
+X Flag addresses that are actively staking
 X Voting Distribution Page: show distribution of voters' tickets & relative influence that their tickets have on vote outcome (onchain)
 X Mobile-friendly UI
 X Optimize database updates
@@ -34,7 +34,7 @@ X ORIGINAL: Update produce_db_inserts to include address_id with vouts
 
 
 Remaining Todo before launch:
-- Flag addresses that are actively staking
+X Flag addresses that are actively staking
 - Mobile cleaned up completely
 - Maybe I could add a new section, "Stake Pool Details", which only shows up if a wallet / address was ever used to hold stake submissions, and have a few fields under it: "Submitted Tickets", "Completed Tickets", "Revoked Tickets"
 - Research HD once more for linking sstxcommitment 
