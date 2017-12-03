@@ -92,11 +92,12 @@ FROM (SELECT vout_address_id FROM vout_address ORDER BY vout_address_id DESC LIM
 COMMIT;
 
 -- Now rebuild the material views
-REFRESH MATERIALIZED VIEW address_vout_vin_view;
-REFRESH MATERIALIZED VIEW address_balance_view;
-REFRESH MATERIALIZED VIEW address_summary_view;
-REFRESH MATERIALIZED VIEW tx_network_initial_view;
-REFRESH MATERIALIZED VIEW address_tx_network_second_view;
-REFRESH MATERIALIZED VIEW address_network_view;
-REFRESH MATERIALIZED VIEW network_top_address_view;
-REFRESH MATERIALIZED VIEW network_summary_view;
+REFRESH MATERIALIZED VIEW CONCURRENTLY address_vout_vin_view;
+REFRESH MATERIALIZED VIEW CONCURRENTLY address_balance_view;
+REFRESH MATERIALIZED VIEW CONCURRENTLY address_summary_view;
+REFRESH MATERIALIZED VIEW CONCURRENTLY tx_network_initial_view;
+REFRESH MATERIALIZED VIEW CONCURRENTLY address_tx_network_second_view;
+REFRESH MATERIALIZED VIEW CONCURRENTLY address_network_view;
+REFRESH MATERIALIZED VIEW CONCURRENTLY network_top_address_view;
+REFRESH MATERIALIZED VIEW CONCURRENTLY network_summary_view;
+REFRESH MATERIALIZED VIEW CONCURRENTLY address_vout_breakdown_view;

@@ -77,7 +77,7 @@ LEFT JOIN (
     vout.address_id
 ) AS sq3 ON sq3.address_id = va.address_id;
 
-CREATE INDEX address_vout_vin_view_address_id_idx ON address_vout_vin_view (address_id);
+CREATE UNIQUE INDEX address_vout_vin_view_address_id_idx ON address_vout_vin_view (address_id);
 
 CREATE MATERIALIZED VIEW address_balance_view AS
 SELECT 
@@ -90,7 +90,7 @@ FROM
 ORDER BY
   2 DESC;
 
-CREATE INDEX address_balance_view_address_id_idx ON address_balance_view (address_id);
+CREATE UNIQUE INDEX address_balance_view_address_id_idx ON address_balance_view (address_id);
 
 CREATE VIEW address_rtx_view AS
 SELECT
@@ -107,7 +107,7 @@ WHERE
 GROUP BY
   vout.address_id;
 
---CREATE INDEX address_rtx_view_address_id_idx ON address_rtx_view (address_id);
+--CREATE UNIQUE INDEX address_rtx_view_address_id_idx ON address_rtx_view (address_id);
 
 CREATE VIEW address_stx_view AS
 SELECT
@@ -124,7 +124,7 @@ WHERE
 GROUP BY
   vout.address_id;
 
---CREATE INDEX address_stx_view_address_id_idx ON address_stx_view (address_id);
+--CREATE UNIQUE INDEX address_stx_view_address_id_idx ON address_stx_view (address_id);
 
 CREATE VIEW address_block_activity_view AS
 SELECT
@@ -142,7 +142,7 @@ WHERE
 GROUP BY
   vout.address_id;
 
---CREATE INDEX address_block_activity_view_address_id_idx ON address_block_activity_view (address_id);
+--CREATE UNIQUE INDEX address_block_activity_view_address_id_idx ON address_block_activity_view (address_id);
 
 -- Determine if an address is actively staking
 CREATE VIEW address_actively_staking_view AS
@@ -196,7 +196,7 @@ JOIN
 LEFT JOIN
   address_actively_staking_view aasv ON aasv.address_id = avvv.address_id;
 
-CREATE INDEX address_summary_view_address_id_idx ON address_summary_view (address_id);
+CREATE UNIQUE INDEX address_summary_view_address_id_idx ON address_summary_view (address_id);
 CREATE INDEX address_summary_view_rank_idx ON address_summary_view (rank);
 CREATE INDEX address_summary_view_liquid_rank_idx ON address_summary_view (liquid_rank);
 CREATE INDEX address_summary_view_stakesubmission_rank_idx ON address_summary_view (stakesubmission_rank);
@@ -220,7 +220,7 @@ JOIN
 GROUP BY
   tx.tx_id;
 
-CREATE INDEX tx_network_initial_view_tx_id_idx ON tx_network_initial_view (tx_id);
+CREATE UNIQUE INDEX tx_network_initial_view_tx_id_idx ON tx_network_initial_view (tx_id);
 CREATE INDEX tx_network_initial_view_network_idx ON tx_network_initial_view (network);
 
 -- Now find the lowest networks from all of the transactions it belongs to
@@ -273,7 +273,7 @@ LEFT JOIN
 GROUP BY
   va.address_id;
 
-CREATE INDEX address_tx_network_second_view_address_id_idx ON address_tx_network_second_view (address_id);
+CREATE UNIQUE INDEX address_tx_network_second_view_address_id_idx ON address_tx_network_second_view (address_id);
 CREATE INDEX address_tx_network_second_view_network_idx ON address_tx_network_second_view (network);
 
 -- Now find the lowest addresses of all connected networks
@@ -306,7 +306,7 @@ WITH RECURSIVE network_chain AS (
 FROM
  network_chain;
 
-CREATE INDEX address_network_view_address_id_idx ON address_network_view (address_id);
+CREATE UNIQUE INDEX address_network_view_address_id_idx ON address_network_view (address_id);
 CREATE INDEX address_network_view_network_idx ON address_network_view (network);
 
 -- Determine the top address in the network
@@ -332,7 +332,7 @@ FROM (
   ) tmp
 WHERE rownum = 1;
 
-CREATE INDEX network_top_address_view_network_idx ON network_top_address_view (network);
+CREATE UNIQUE INDEX network_top_address_view_network_idx ON network_top_address_view (network);
 
 -- Now combine all of the address data
 CREATE VIEW network_balance_view AS
@@ -377,11 +377,12 @@ FROM
 WHERE
   ntav.network = nbv.network;
 
-CREATE INDEX network_summary_view_network_idx ON network_summary_view (network);
+CREATE UNIQUE INDEX network_summary_view_network_idx ON network_summary_view (network);
 CREATE INDEX network_summary_view_rank_idx ON network_summary_view (rank);
 CREATE INDEX network_summary_view_liquid_rank_idx ON network_summary_view (liquid_rank);
 CREATE INDEX network_summary_view_stakesubmission_rank_idx ON network_summary_view (stakesubmission_rank);
 
+-- And create the cached breakdown view of all vouts
 CREATE MATERIALIZED VIEW address_vout_breakdown_view AS
 SELECT 
   DISTINCT vout.address_id,
@@ -435,4 +436,4 @@ LEFT JOIN (
   GROUP BY sq.address_id
 ) AS direct_from_exchange ON direct_from_exchange.address_id = vout.address_id;
 
-CREATE INDEX address_vout_breakdown_view_network_idx ON address_vout_breakdown_view (address_id);
+CREATE UNIQUE INDEX address_vout_breakdown_view_network_idx ON address_vout_breakdown_view (address_id);
