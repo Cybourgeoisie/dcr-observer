@@ -35,10 +35,13 @@ X ORIGINAL: Update produce_db_inserts to include address_id with vouts
 
 Remaining Todo before launch:
 - Flag addresses that are actively staking
+- Mobile cleaned up completely
 - Maybe I could add a new section, "Stake Pool Details", which only shows up if a wallet / address was ever used to hold stake submissions, and have a few fields under it: "Submitted Tickets", "Completed Tickets", "Revoked Tickets"
-- Add "stakegen" to getVoutDetails & HD version
 - Research HD once more for linking sstxcommitment 
 - Fix commitamt across the board - massive set of updates
+- Tag stakepools
+- (3) I also want to revisit the HD wallet logic and see if I can definitely combine staking wallets, because this might help to show where the majority of votes are coming from. Right now, we only know with 100% certainty that combined inputs denote an HD wallet, but I plan to review the staking logic one more time and try to capture all HD wallets linked by staking as well (though I might not be able to get all of them due to stake pools sharing addresses, I should be able to combine addresses where a single-signature wallet is used to conduct the staking transaction.)
+- I know that we'd like to add more graphs and visuals to the site, and I possibly overlooked some features that we talked about. I skimmed over the chat once more to make sure that I hit on every important request.
 
 
 Additional Todo:

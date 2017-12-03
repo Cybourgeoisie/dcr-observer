@@ -215,55 +215,20 @@ class Address extends \Scrollio\Service\AbstractService
 
 		$sql = '
 			SELECT
-			-- All TX inputs
-			(SELECT asv.vout
-			FROM address_summary_view asv
-			JOIN address a ON a.address_id = asv.address_id
-			WHERE a.address = $1) AS vout,
-			-- All coinbase inputs (mining), except the genesis block
-			(SELECT COALESCE(SUM(vout.value), 0) 
-			FROM address a 
-			--JOIN vout_address va ON va.address_id = a.address_id 
-			--JOIN vout ON vout.vout_id = va.vout_id 
-			JOIN vout ON vout.address_id = a.address_id 
-			JOIN tx ON tx.tx_id = vout.tx_id AND tx.tree = 0 AND tx.tx_id != 1 
-			JOIN vin ON vin.tx_id = tx.tx_id AND vin.coinbase != \'\'
-			WHERE a.address = $1) AS coinbase,
-			-- All stakegen inputs
-			(SELECT COALESCE(SUM(vout.value), 0)
-			FROM address a 
-			--JOIN vout_address va ON va.address_id = a.address_id 
-			--JOIN vout ON vout.vout_id = va.vout_id AND vout.type = \'stakegen\'
-			JOIN vout ON vout.address_id = a.address_id AND vout.type = \'stakegen\'
-			WHERE a.address = $1) AS stakebase,
-			-- All stakesubmission inputs
-			(SELECT COALESCE(SUM(vout.value), 0)
-			FROM address a 
-			--JOIN vout_address va ON va.address_id = a.address_id 
-			--JOIN vout ON vout.vout_id = va.vout_id AND vout.type = \'stakesubmission\'
-			JOIN vout ON vout.address_id = a.address_id AND vout.type = \'stakesubmission\'
-			WHERE a.address = $1) AS stakesubmission,
-			-- All genesis inputs
-			(SELECT COALESCE(SUM(vout.value), 0)
-			FROM address a 
-			--JOIN vout_address va ON va.address_id = a.address_id 
-			--JOIN vout ON vout.vout_id = va.vout_id AND vout.tx_id = 1
-			JOIN vout ON vout.address_id = a.address_id AND vout.tx_id = 1
-			WHERE a.address = $1) AS genesis,
-			-- All inputs from an exchange
-			(SELECT COALESCE(SUM(vout.value), 0)
-			FROM address a 
-			--JOIN vout_address va ON va.address_id = a.address_id 
-			--JOIN vout ON vout.vout_id = va.vout_id 
-			JOIN vout ON vout.address_id = a.address_id
-			JOIN vin ON vin.tx_id = vout.tx_id 
-			--JOIN vout_address origin_vout_address ON origin_vout_address.vout_id = vin.vout_id
-			JOIN vout origin_vout ON origin_vout.vout_id = vin.vout_id
-			JOIN address origin_address ON 
-				--origin_address.address_id = origin_vout_address.address_id AND 
-				origin_address.address_id = origin_vout.address_id AND 
-				origin_address.identifier IN (\'Poloniex\', \'Bittrex\')
-			WHERE a.address = $1 AND a.identifier NOT IN (\'Poloniex\', \'Bittrex\')) AS direct_from_exchange
+				asv.vout,
+				avbv.genesis,
+				avbv.coinbase,
+				avbv.stakebase,
+				avbv.stakesubmission,
+				avbv.direct_from_exchange
+			FROM
+				address_summary_view asv
+			JOIN
+				address_vout_breakdown_view avbv ON avbv.address_id = asv.address_id
+			JOIN
+				address a ON a.address_id = asv.address_id
+			WHERE
+				a.address = $1
 		';
 		$db_handler = \Geppetto\DatabaseHandler::init();
 		$res = $db_handler->query($sql, array($address));
@@ -399,71 +364,26 @@ class Address extends \Scrollio\Service\AbstractService
 
 		$sql = '
 			SELECT
-			-- All TX inputs
-			(SELECT nsv.vout
-			FROM address a
-			JOIN address_network_view anv ON anv.address_id = a.address_id
-			JOIN network_summary_view nsv ON nsv.network = anv.network
-			WHERE a.address = $1) AS vout,
-			-- All coinbase inputs (mining), except the genesis block
-			(SELECT COALESCE(SUM(vout.value), 0) 
-			FROM address a 
-			JOIN address this ON this.address = $1
-			JOIN address_network_view anv_this ON anv_this.address_id = this.address_id
-			JOIN address_network_view anv ON anv.network = anv_this.network
-			--JOIN vout_address va ON va.address_id = a.address_id 
-			--JOIN vout ON vout.vout_id = va.vout_id 
-			JOIN vout ON vout.address_id = a.address_id 
-			JOIN tx ON tx.tx_id = vout.tx_id AND tx.tree = 0 AND tx.tx_id != 1 
-			JOIN vin ON vin.tx_id = tx.tx_id AND vin.coinbase != \'\'
-			WHERE anv.address_id = a.address_id) AS coinbase,
-			-- All stakegen inputs
-			(SELECT COALESCE(SUM(vout.value), 0)
-			FROM address a 
-			JOIN address this ON this.address = $1
-			JOIN address_network_view anv_this ON anv_this.address_id = this.address_id
-			JOIN address_network_view anv ON anv.network = anv_this.network
-			--JOIN vout_address va ON va.address_id = a.address_id 
-			--JOIN vout ON vout.vout_id = va.vout_id AND vout.type = \'stakegen\'
-			JOIN vout ON vout.address_id = a.address_id AND vout.type = \'stakegen\'
-			WHERE anv.address_id = a.address_id) AS stakebase,
-			-- All stakesubmission inputs
-			(SELECT COALESCE(SUM(vout.value), 0)
-			FROM address a 
-			JOIN address this ON this.address = $1
-			JOIN address_network_view anv_this ON anv_this.address_id = this.address_id
-			JOIN address_network_view anv ON anv.network = anv_this.network
-			--JOIN vout_address va ON va.address_id = a.address_id 
-			--JOIN vout ON vout.vout_id = va.vout_id AND vout.type = \'stakesubmission\'
-			JOIN vout ON vout.address_id = a.address_id AND vout.type = \'stakesubmission\'
-			WHERE anv.address_id = a.address_id) AS stakesubmission,
-			-- All genesis inputs
-			(SELECT COALESCE(SUM(vout.value), 0)
-			FROM address a 
-			JOIN address this ON this.address = $1
-			JOIN address_network_view anv_this ON anv_this.address_id = this.address_id
-			JOIN address_network_view anv ON anv.network = anv_this.network
-			--JOIN vout_address va ON va.address_id = a.address_id 
-			--JOIN vout ON vout.vout_id = va.vout_id AND vout.tx_id = 1
-			JOIN vout ON vout.address_id = a.address_id AND vout.tx_id = 1
-			WHERE anv.address_id = a.address_id) AS genesis,
-			-- All inputs from an exchange
-			(SELECT COALESCE(SUM(vout.value), 0)
-			FROM address a 
-			JOIN address this ON this.address = $1
-			JOIN address_network_view anv_this ON anv_this.address_id = this.address_id
-			JOIN address_network_view anv ON anv.network = anv_this.network
-			--JOIN vout_address va ON va.address_id = a.address_id 
-			--JOIN vout ON vout.vout_id = va.vout_id 
-			JOIN vout ON vout.address_id = a.address_id 
-			JOIN vin ON vin.tx_id = vout.tx_id 
-			--JOIN vout_address origin_vout_address ON origin_vout_address.vout_id = vin.vout_id
-			JOIN vout origin_vout ON origin_vout.vout_id = vin.vout_id
-			JOIN address origin_address ON 
-				--origin_address.address_id = origin_vout_address.address_id AND 
-				origin_address.address_id = origin_vout.address_id AND 
-				origin_address.identifier IN (\'Poloniex\', \'Bittrex\')
-			WHERE anv.address_id = a.address_id AND a.identifier NOT IN (\'Poloniex\', \'Bittrex\')) AS direct_from_exchange
+				SUM(COALESCE(asv_other.vout, 0)) AS vout,
+				SUM(COALESCE(avbv.genesis, 0)) AS genesis,
+				SUM(COALESCE(avbv.coinbase, 0)) AS coinbase,
+				SUM(COALESCE(avbv.stakebase, 0)) AS stakebase,
+				SUM(COALESCE(avbv.stakesubmission, 0)) AS stakesubmission,
+				SUM(COALESCE(avbv.direct_from_exchange, 0)) AS direct_from_exchange
+			FROM
+				address a
+			JOIN
+				address_network_view anv ON anv.address_id = a.address_id
+			JOIN
+				network_summary_view nsv ON nsv.network = anv.network
+			JOIN
+				address_network_view anv_other ON anv_other.network = anv.network
+			JOIN
+				address_summary_view asv_other ON asv_other.address_id = anv_other.address_id
+			JOIN
+				address_vout_breakdown_view avbv ON avbv.address_id = anv_other.address_id
+			WHERE
+				a.address = $1
 		';
 		$db_handler = \Geppetto\DatabaseHandler::init();
 		$res = $db_handler->query($sql, array($address));

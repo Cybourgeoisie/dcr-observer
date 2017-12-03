@@ -356,3 +356,53 @@ CREATE INDEX network_summary_view_network_idx ON network_summary_view (network);
 CREATE INDEX network_summary_view_rank_idx ON network_summary_view (rank);
 CREATE INDEX network_summary_view_liquid_rank_idx ON network_summary_view (liquid_rank);
 CREATE INDEX network_summary_view_stakesubmission_rank_idx ON network_summary_view (stakesubmission_rank);
+
+CREATE MATERIALIZED VIEW address_vout_breakdown_view AS
+SELECT 
+  DISTINCT vout.address_id,
+  COALESCE(genesis.vout, 0) AS genesis,
+  COALESCE(coinbase.vout, 0) AS coinbase,
+  COALESCE(stakebase.vout, 0) AS stakebase,
+  COALESCE(stakesubmission.vout, 0) AS stakesubmission,
+  COALESCE(direct_from_exchange.vout, 0) AS direct_from_exchange
+FROM
+  vout
+LEFT JOIN (
+  SELECT address_id, COALESCE(SUM(value), 0) AS vout
+  FROM vout
+  WHERE tx_id = 1
+  GROUP BY address_id
+) AS genesis ON genesis.address_id = vout.address_id
+LEFT JOIN (
+  SELECT address_id, COALESCE(SUM(vout.value), 0) AS vout
+  FROM vout
+  JOIN tx ON tx.tx_id = vout.tx_id AND tx.tree = 0 AND tx.tx_id != 1 
+  JOIN vin ON vin.tx_id = tx.tx_id AND vin.coinbase != ''
+  GROUP BY address_id
+) AS coinbase ON coinbase.address_id = vout.address_id
+LEFT JOIN (
+  SELECT address_id, COALESCE(SUM(value), 0) AS vout
+  FROM vout
+  WHERE vout.type = 'stakegen'
+  GROUP BY address_id
+) AS stakebase ON stakebase.address_id = vout.address_id
+LEFT JOIN (
+  SELECT address_id, COALESCE(SUM(value), 0) AS vout
+  FROM vout
+  WHERE vout.type = 'stakesubmission'
+  GROUP BY address_id
+) AS stakesubmission ON stakesubmission.address_id = vout.address_id
+LEFT JOIN (
+  SELECT this.address_id, COALESCE(SUM(vout.value), 0) AS vout
+  FROM vout
+  JOIN vin ON vin.tx_id = vout.tx_id 
+  JOIN vout origin_vout ON origin_vout.vout_id = vin.vout_id
+  JOIN address origin_address ON 
+    origin_address.address_id = origin_vout.address_id AND 
+    origin_address.identifier IN ('Poloniex', 'Bittrex')
+  JOIN address this ON this.address_id = vout.address_id
+  WHERE this.identifier NOT IN ('Poloniex', 'Bittrex')
+  GROUP BY this.address_id
+) AS direct_from_exchange ON direct_from_exchange.address_id = vout.address_id;
+
+CREATE INDEX address_vout_breakdown_view_network_idx ON address_vout_breakdown_view (address_id);
