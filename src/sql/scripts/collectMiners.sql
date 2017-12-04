@@ -25,6 +25,32 @@ FROM (
 WHERE
   address.address_id = sq.address_id;
 
+UPDATE
+  address
+SET
+  identifier = sq.identifier
+FROM (
+  SELECT
+    DISTINCT a.address_id,
+    a_primary.identifier
+  FROM
+    address a_ident
+  JOIN
+    address_network_view anv_ident ON anv_ident.address_id = a_ident.address_id
+  JOIN
+    network_summary_view nsv ON nsv.network = anv_ident.network
+  JOIN
+    address a_primary ON a_primary.address_id = nsv.primary_address_id
+  JOIN
+    address_network_view anv ON anv.network = nsv.network
+  JOIN
+    address a ON a.address_id = anv.address_id
+  WHERE
+    a_ident.address_id IN (1073020, 10210860) -- Poloniex, Bittrex
+) AS sq
+WHERE
+  address.address_id = sq.address_id;
+
 
 --SELECT
 --	DISTINCT a.address,

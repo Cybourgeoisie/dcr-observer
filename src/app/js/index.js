@@ -364,6 +364,12 @@ function setAddressInfo(data) {
 		$('span.addr-identifier').html(addr_info.identifier);
 	}
 
+	// If the address is actively staking, notify
+	$('.dcr-badge-address-actively-staking').hide();
+	if (addr_info.hasOwnProperty('actively_staking') && addr_info.actively_staking == 't') {
+		$('.dcr-badge-address-actively-staking').show();
+	}
+
 	// Show the address's voting record
 	showVotingRecord('addr', data.voting_tally, data.voting_record, data.tickets_staked);
 }
@@ -522,9 +528,9 @@ function setHdAddressInfo(data, req_address) {
 	$hd_address_tbody.html('');
 
 	// Set the cumulative information
-	var total_balance  = network.balance;
-	var total_received = network.vout;
-	var total_sent     = network.vin;
+	var total_balance  = parseFloat(network.balance);
+	var total_received = parseFloat(network.vout);
+	var total_sent     = parseFloat(network.vin);
 	var identifier     = network.identifier;
 
 	// Collect the cumulative information
@@ -565,11 +571,18 @@ function setHdAddressInfo(data, req_address) {
 	$('.hd-num-addresses').html(network.num_addresses);
 
 	// If the top address has an identifier, display it
-	$('.dcr-badge-hd-address-identifier').hide();
-	$('span.hd-addr-identifier').html('');
+	var $identifier = $('.dcr-badge-hd-address-identifier');
+	$identifier.hide();
+	$identifier.find('span.hd-addr-identifier').html('');
 	if (identifier && identifier.length > 0) {
-		$('.dcr-badge-hd-address-identifier').show();
-		$('span.hd-addr-identifier').html(identifier);
+		$identifier.show();
+		$identifier.find('span.hd-addr-identifier').html(identifier);
+	}
+
+	// If the top address has an identifier, display it
+	$('.dcr-badge-hd-address-actively-staking').hide();
+	if (network.actively_staking == 't') {
+		$('.dcr-badge-hd-address-actively-staking').show();
 	}
 
 	// Show the wallet's voting record
@@ -582,6 +595,7 @@ function addHdAddressRow($hd_address_tbody, $hd_address_row, hd_address, row_num
 	var balance    = hd_address.balance;
 	var identifier = hd_address.identifier;
 	var tx_hash    = hd_address.tx_hash;
+	var actively_staking = hd_address.actively_staking;
 
 	// Add a row
 	var $new_row = $hd_address_row.clone(true);
@@ -595,6 +609,12 @@ function addHdAddressRow($hd_address_tbody, $hd_address_row, hd_address, row_num
 	if (hd_address.hasOwnProperty('identifier') && identifier) {
 		$new_row.find('.hd-badge-address-identifier').show();
 		$new_row.find('.hd-addr-identifier').html(identifier);
+	}
+
+	// If the address is actively staking, make note of it
+	$new_row.find('.hd-badge-address-actively-staking').hide();
+	if (hd_address.hasOwnProperty('actively_staking') && actively_staking == 't') {
+		$new_row.find('.hd-badge-address-actively-staking').show();
 	}
 
 	$hd_address_tbody.append($new_row);

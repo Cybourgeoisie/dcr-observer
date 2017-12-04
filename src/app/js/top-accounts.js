@@ -312,6 +312,12 @@ function pullTopNetworksFromApi(callback) {
 					$new_row.find('.top-hd-td-addr-identifier').html(network_info.identifier);
 				}
 
+				// If the address is actively staking, make note of it
+				$new_row.find('.top-hd-td-badge-address-actively-staking').hide();
+				if (network_info.hasOwnProperty('actively_staking') && network_info.actively_staking == 't') {
+					$new_row.find('.top-hd-td-badge-address-actively-staking').show();
+				}
+
 				// Only display first 10 addresses by default
 				if (i >= 10) {
 					$new_row.hide();

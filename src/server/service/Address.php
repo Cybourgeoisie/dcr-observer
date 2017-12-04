@@ -19,26 +19,27 @@ class Address extends \Scrollio\Service\AbstractService
 			SELECT
 				a.address,
 				a.identifier,
-				ba.rank,
-				ba.balance,
-				COALESCE(ba.tx, 0)    AS "tx",
-				COALESCE(ba.stx, 0)   AS "stx",
-				COALESCE(ba.vout, 0)  AS "vout",
-				COALESCE(ba.vin, 0)   AS "vin",
+				asv.actively_staking,
+				asv.rank,
+				asv.balance,
+				COALESCE(asv.tx, 0)    AS "tx",
+				COALESCE(asv.stx, 0)   AS "stx",
+				COALESCE(asv.vout, 0)  AS "vout",
+				COALESCE(asv.vin, 0)   AS "vin",
 				EXTRACT(EPOCH FROM bs.time) AS "start",
 				EXTRACT(EPOCH FROM be.time) AS "end",
 				bs.height AS first,
 				be.height AS last,
-				COALESCE(ba.liquid_balance, 0) AS liquid,
-				COALESCE(ba.stakesubmission_balance, 0) AS active_stake_submissions
+				COALESCE(asv.liquid_balance, 0) AS liquid,
+				COALESCE(asv.stakesubmission_balance, 0) AS active_stake_submissions
 			FROM
 				address a
 			JOIN
-				address_summary_view ba ON ba.address_id = a.address_id
+				address_summary_view asv ON asv.address_id = a.address_id
 			JOIN
-				block bs ON bs.block_id = ba.first_block_id
+				block bs ON bs.block_id = asv.first_block_id
 			JOIN
-				block be ON be.block_id = ba.last_block_id
+				block be ON be.block_id = asv.last_block_id
 			WHERE
 				a.address = $1;
 		';
@@ -270,6 +271,7 @@ class Address extends \Scrollio\Service\AbstractService
 			SELECT 
 				a.address,
 				a.identifier,
+				nsv.actively_staking,
 				CASE WHEN COALESCE(nsv.balance, 0) < 0 THEN 0 ELSE COALESCE(nsv.balance, 0) END AS balance,
 				--tx.hash AS tx_hash,
 				COALESCE(nsv.tx, 0)    AS "tx",
@@ -307,6 +309,7 @@ class Address extends \Scrollio\Service\AbstractService
 			SELECT 
 				a.address,
 				a.identifier,
+				asv.actively_staking,
 				CASE WHEN COALESCE(asv.balance, 0) < 0 THEN 0 ELSE COALESCE(asv.balance, 0) END AS balance,
 				--tx.hash AS tx_hash,
 				COALESCE(asv.tx, 0)    AS "tx",
@@ -529,21 +532,19 @@ class Address extends \Scrollio\Service\AbstractService
 
 	public function getTopNetworks()
 	{
-		
 		$sql = '
 			SELECT
-				hd.network,
-				hd.balance,
-				hd.rank,
-				hd.num_addresses,
+				nsv.network,
+				nsv.balance,
+				nsv.actively_staking,
+				nsv.rank,
+				nsv.num_addresses,
 				a.address,
 				a.identifier
 			FROM
-				--hd_network hd
-				network_summary_view hd
+				network_summary_view nsv
 			JOIN
-				--address a ON a.address_id = hd.address_id
-				address a ON a.address_id = hd.primary_address_id
+				address a ON a.address_id = nsv.primary_address_id
 			ORDER BY
 				rank ASC
 			LIMIT
@@ -738,8 +739,7 @@ class Address extends \Scrollio\Service\AbstractService
 				COUNT(*) AS num_wallets,
 				SUM(balance) AS total_balance
 			FROM
-				--hd_network
-				network_balance_view
+				network_summary_view
 			WHERE
 				balance > 0
 			GROUP BY 1 ORDER BY 1 ASC;

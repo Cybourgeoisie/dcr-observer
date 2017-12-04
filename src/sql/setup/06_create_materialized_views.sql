@@ -200,7 +200,7 @@ CREATE UNIQUE INDEX address_summary_view_address_id_idx ON address_summary_view 
 CREATE INDEX address_summary_view_rank_idx ON address_summary_view (rank);
 CREATE INDEX address_summary_view_liquid_rank_idx ON address_summary_view (liquid_rank);
 CREATE INDEX address_summary_view_stakesubmission_rank_idx ON address_summary_view (stakesubmission_rank);
-
+CREATE INDEX address_summary_view_balance_idx ON address_summary_view (balance);
 
 -----------------
 -- HD Networks --
@@ -349,7 +349,8 @@ SELECT
   SUM(asv.stx) AS stx,
   COUNT(anv.address_id) AS num_addresses,
   MIN(asv.first_block_id) AS first_block_id,
-  MIN(asv.last_block_id) AS last_block_id
+  MIN(asv.last_block_id) AS last_block_id,
+  BOOL_OR(asv.actively_staking) AS actively_staking
 FROM (
   SELECT 
     network,
