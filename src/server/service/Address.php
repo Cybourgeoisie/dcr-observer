@@ -20,6 +20,7 @@ class Address extends \Scrollio\Service\AbstractService
 				a.address,
 				a.identifier,
 				asv.actively_staking,
+				--astxv.actively_staking,
 				asv.rank,
 				asv.balance,
 				COALESCE(asv.tx, 0)    AS "tx",
@@ -37,10 +38,17 @@ class Address extends \Scrollio\Service\AbstractService
 				COALESCE(asv.revoked_tickets, 0) AS revoked_tickets,
 				COALESCE(asv.active_stakesubmissions, 0) AS active_stakesubmissions,
 				COALESCE(asv.completed_stakesubmissions, 0) AS completed_stakesubmissions
+				--COALESCE(astxv.active_tickets, 0) AS active_tickets,
+				--COALESCE(astxv.completed_tickets, 0) AS completed_tickets,
+				--COALESCE(astxv.revoked_tickets, 0) AS revoked_tickets,
+				--COALESCE(astxv.active_stakesubmissions, 0) AS active_stakesubmissions,
+				--COALESCE(astxv.completed_stakesubmissions, 0) AS completed_stakesubmissions
 			FROM
 				address a
 			JOIN
 				address_summary_view asv ON asv.address_id = a.address_id
+			--LEFT JOIN
+			--	address_staking_view astxv ON astxv.address_id = asv.address_id
 			JOIN
 				block bs ON bs.block_id = asv.first_block_id
 			JOIN
@@ -320,6 +328,7 @@ class Address extends \Scrollio\Service\AbstractService
 				a.address,
 				a.identifier,
 				asv.actively_staking,
+				--astxv.actively_staking,
 				CASE WHEN COALESCE(asv.balance, 0) < 0 THEN 0 ELSE COALESCE(asv.balance, 0) END AS balance
 			FROM
 				address a_this
@@ -329,6 +338,8 @@ class Address extends \Scrollio\Service\AbstractService
 				address_network_view anv ON anv.network = anv_this.network
 			JOIN
 				address_summary_view asv ON asv.address_id = anv.address_id
+			--LEFT JOIN
+			--	address_staking_view astxv ON astxv.address_id = asv.address_id
 			JOIN
 				address a ON a.address_id = asv.address_id
 			WHERE
@@ -501,6 +512,7 @@ class Address extends \Scrollio\Service\AbstractService
 			SELECT
 				asv.rank,
 				asv.actively_staking,
+				--astxv.actively_staking,
 				a.address,
 				a.identifier,
 				asv.balance,
@@ -508,6 +520,8 @@ class Address extends \Scrollio\Service\AbstractService
 				COALESCE(asv.stx, 0) AS stx
 			FROM
 				address_summary_view asv
+			--LEFT JOIN
+			--	address_staking_view astxv ON astxv.address_id = asv.address_id
 			JOIN
 				address a ON a.address_id = asv.address_id
 			ORDER BY
