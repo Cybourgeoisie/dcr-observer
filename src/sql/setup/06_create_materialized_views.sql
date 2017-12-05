@@ -260,160 +260,95 @@ CREATE INDEX address_summary_view_balance_idx ON address_summary_view (balance);
 -- HD Networks --
 -----------------
 
--- Now get all tx / address pairs, set to lowest network, store to tx network
---CREATE MATERIALIZED VIEW tx_network_initial_view AS
---SELECT
---  tx.tx_id,
---  min(va.address_id) AS network
---FROM
---  tx
---JOIN
---  vin ON vin.tx_id = tx.tx_id
---JOIN
---  vout_address va ON va.vout_id = vin.vout_id
---GROUP BY
---  tx.tx_id;
-
-CREATE MATERIALIZED VIEW tx_network_initial_view AS
-SELECT
+-- Get all addresses attached to transactions that interest us
+CREATE MATERIALIZED VIEW hd_address_tx_logic_view AS
+SELECT -- Get all tx<->[vin address] relationships
+  tx.tx_id,
+  va.address_id
+FROM
+  tx
+JOIN
+  vin ON vin.tx_id = tx.tx_id
+JOIN
+  vout_address va ON va.vout_id = vin.vout_id
+UNION
+SELECT -- Get al
   sq.tx_id,
-  min(network) AS network
-FROM (
+  va.address_id
+FROM ( -- get all tx<->[vout address] relationships ONLY for txes with a vout with stakesubmission to a Ds% address
   SELECT
-    tx.tx_id,
-    min(va.address_id) AS network
+    tx.tx_id
   FROM
     tx
   JOIN
-    vin ON vin.tx_id = tx.tx_id
-  JOIN
-    vout_address va ON va.vout_id = vin.vout_id
-  GROUP BY
-    tx.tx_id
-  UNION ALL
-  SELECT
-    sq.tx_id,
-    min(va.address_id) AS network
-  FROM (
-    SELECT
-      tx.tx_id
-    FROM
-      tx
-    JOIN
-      vout ON vout.tx_id = tx.tx_id
-    JOIN
-      vout_address va ON va.vout_id = vout.vout_id
-    JOIN
-      address a ON a.address_id = va.address_id
-    WHERE
-      vout.type = 'stakesubmission' AND a.address LIKE 'Ds%'
-  ) AS sq
-  JOIN
-    vout ON vout.tx_id = sq.tx_id
+    vout ON vout.tx_id = tx.tx_id
   JOIN
     vout_address va ON va.vout_id = vout.vout_id
-  GROUP BY
-    sq.tx_id
+  JOIN
+    address a ON a.address_id = va.address_id
+  WHERE
+    vout.type = 'stakesubmission' AND a.address LIKE 'Ds%'
 ) AS sq
+JOIN
+  vout ON vout.tx_id = sq.tx_id
+JOIN
+  vout_address va ON va.vout_id = vout.vout_id;
+
+
+-- Now get all tx / address pairs, set to lowest network, store to tx network
+CREATE MATERIALIZED VIEW tx_network_initial_view AS
+SELECT
+  tx_id,
+  min(address_id) AS network
+FROM
+  hd_address_tx_logic_view
 GROUP BY
-  sq.tx_id;
+  tx_id;
 
 CREATE UNIQUE INDEX tx_network_initial_view_tx_id_idx ON tx_network_initial_view (tx_id);
 CREATE INDEX tx_network_initial_view_network_idx ON tx_network_initial_view (network);
 
 -- Now find the lowest networks from all of the transactions it belongs to
-CREATE VIEW address_tx_network_initial_view AS
+CREATE MATERIALIZED VIEW address_tx_network_initial_view AS
 SELECT
-  va.address_id,
-  COALESCE(MIN(tniv.network), va.address_id) AS network
+  hatlv.address_id,
+  MIN(tniv.network) AS network
 FROM
-  vout_address va
+  hd_address_tx_logic_view hatlv
 LEFT JOIN
-  vin ON vin.vout_id = va.vout_id
-LEFT JOIN
-  tx_network_initial_view tniv ON tniv.tx_id = vin.tx_id
+  tx_network_initial_view tniv ON tniv.tx_id = hatlv.tx_id
 GROUP BY
-  va.address_id;
+  hatlv.address_id;
 
---CREATE INDEX address_tx_network_initial_view_address_id_idx ON address_tx_network_initial_view (address_id);
---CREATE INDEX address_tx_network_initial_view_network_idx ON address_tx_network_initial_view (network);
+CREATE UNIQUE INDEX address_tx_network_initial_view_address_id_idx ON address_tx_network_initial_view (address_id);
+CREATE INDEX address_tx_network_initial_view_network_idx ON address_tx_network_initial_view (network);
 
 -- Then go BACK and fill in the minimum addresses to the initial txes
---CREATE VIEW tx_network_second_view AS
---SELECT
---  tx.tx_id,
---  min(atnv.network) AS network
---FROM
---  tx
---JOIN
---  vin ON vin.tx_id = tx.tx_id
---JOIN
---  vout_address va ON va.vout_id = vin.vout_id
---JOIN
---  address_tx_network_initial_view atnv ON atnv.address_id = va.address_id
---GROUP BY
---  tx.tx_id;
-
-CREATE VIEW tx_network_second_view AS
+CREATE MATERIALIZED VIEW tx_network_second_view AS
 SELECT
-  sq.tx_id,
-  min(network) AS network
-FROM (
-  SELECT
-    tx.tx_id,
-    min(va.address_id) AS network
-  FROM
-    tx
-  JOIN
-    vin ON vin.tx_id = tx.tx_id
-  JOIN
-    vout_address va ON va.vout_id = vin.vout_id
-  GROUP BY
-    tx.tx_id
-  UNION ALL
-  SELECT
-    sq.tx_id,
-    min(va.address_id) AS network
-  FROM (
-    SELECT
-      tx.tx_id
-    FROM
-      tx
-    JOIN
-      vout ON vout.tx_id = tx.tx_id
-    JOIN
-      vout_address va ON va.vout_id = vout.vout_id
-    JOIN
-      address a ON a.address_id = va.address_id
-    WHERE
-      vout.type = 'stakesubmission' AND a.address LIKE 'Ds%'
-  ) AS sq
-  JOIN
-    vout ON vout.tx_id = sq.tx_id
-  JOIN
-    vout_address va ON va.vout_id = vout.vout_id
-  GROUP BY
-    sq.tx_id
-) AS sq
+  hatlv.tx_id,
+  min(atnv.network) AS network
+FROM
+  hd_address_tx_logic_view hatlv
+JOIN
+  address_tx_network_initial_view atnv ON atnv.address_id = hatlv.address_id
 GROUP BY
-  sq.tx_id;
+  hatlv.tx_id;
 
---CREATE INDEX tx_network_second_view_tx_id_idx ON tx_network_second_view (tx_id);
---CREATE INDEX tx_network_second_view_network_idx ON tx_network_second_view (network);
+CREATE UNIQUE INDEX tx_network_second_view_tx_id_idx ON tx_network_second_view (tx_id);
+CREATE INDEX tx_network_second_view_network_idx ON tx_network_second_view (network);
 
 -- Now find the lowest networks from all of the transactions it belongs to
 CREATE MATERIALIZED VIEW address_tx_network_second_view AS
 SELECT
-  va.address_id,
-  COALESCE(MIN(tnsv.network), va.address_id) AS network
+  hatlv.address_id,
+  MIN(tnsv.network) AS network
 FROM
-  vout_address va
+  hd_address_tx_logic_view hatlv
 LEFT JOIN
-  vin ON vin.vout_id = va.vout_id
-LEFT JOIN
-  tx_network_second_view tnsv ON tnsv.tx_id = vin.tx_id
+  tx_network_second_view tnsv ON tnsv.tx_id = hatlv.tx_id
 GROUP BY
-  va.address_id;
+  hatlv.address_id;
 
 CREATE UNIQUE INDEX address_tx_network_second_view_address_id_idx ON address_tx_network_second_view (address_id);
 CREATE INDEX address_tx_network_second_view_network_idx ON address_tx_network_second_view (network);
@@ -443,10 +378,18 @@ WITH RECURSIVE network_chain AS (
     address_tx_network_second_view atnv
   INNER JOIN
     network_chain nc ON nc.address_id = atnv.network
-) SELECT
- *
+)
+SELECT
+  a.address_id,
+  CASE WHEN nc.network IS NOT NULL THEN nc.network ELSE a.address_id END AS network
 FROM
- network_chain;
+  address a
+LEFT JOIN (
+  SELECT
+    nc.*
+  FROM
+    network_chain nc
+) AS nc ON nc.address_id = a.address_id;
 
 CREATE UNIQUE INDEX address_network_view_address_id_idx ON address_network_view (address_id);
 CREATE INDEX address_network_view_network_idx ON address_network_view (network);

@@ -151,7 +151,7 @@ function pullIssueResultsFromApi(issue, rci, callback) {
 
 			// Set the "show all" button to do something
 			$('button.show-all-issue-voting').click(function(event) {
-				for (var i = 10; i < records.length; i++) {
+				for (var i = 25; i < records.length; i++) {
 					addAddressRowToIssueResults(i, records[i], total_votes, infl_total_votes, $row, $tbody);
 				}
 
@@ -174,7 +174,7 @@ function addAddressRowToIssueResults(i, record, total_votes, infl_total_votes, $
 
 	var $new_row = $row.clone(false);
 	$new_row.find('th').html(i + 1);
-	$new_row.find('td.issue-results-address > a').html(record.address).attr('href', '#addr=' + record.address);
+	$new_row.find('td.issue-results-address > a').html(record.address).attr('href', '#hd-addr=' + record.address);
 	$new_row.find('td.issue-results-weight').html(pct.toLocaleString() + '%');
 	$new_row.find('td.issue-results-influence').html(infl_pct.toLocaleString() + '%');
 	$new_row.find('td.issue-results-yes').html(record.yes.toLocaleString());

@@ -159,112 +159,63 @@ class Voting extends \Scrollio\Service\AbstractService
 		// Validation - hmm
 		if ($rci <= 0) { $rci = 1; }
 
-		// If we're showing all, omit the tx clause to speed things up
-		if ($rci <= 0) {
-			// Get the vote results for the given block period
-			$sql = '
-				SELECT
-					tv.votes,
-					a.address,
-					COUNT(tv.tx_vote_id) AS count
-				FROM
-					tx_vote tv
-				JOIN
-					tx_vote_address tva ON tva.tx_vote_id = tv.tx_vote_id
-				JOIN
-					address a ON a.address_id = tva.address_id
-				WHERE
-					tv.version = $1
-				GROUP BY
-					tv.votes, a.address
-				ORDER BY
-					3 DESC
-				LIMIT
-					250;
-			';
-			/* wallets
-			$sql = '
-				SELECT
-					tv.votes,
-					primary_a.address,
-					COUNT(tv.tx_vote_id) AS count
-				FROM
-					tx_vote tv
-				JOIN
-					tx_vote_address tva ON tva.tx_vote_id = tv.tx_vote_id
-				JOIN
-					address a ON a.address_id = tva.address_id
-				JOIN
-					hd_network hn ON hn.network = a.network
-				JOIN
-					address primary_a ON primary_a.address_id = hn.address_id
-				WHERE
-					tv.version = $1
-				GROUP BY
-					tv.votes, primary_a.address
-				ORDER BY
-					3 DESC
-				LIMIT
-					250;
-			';
-			//*/
-			$db_handler = \Geppetto\DatabaseHandler::init();
-			$res = $db_handler->query($sql, array($version));
-		} else {
-			// Get the vote results for the given block period
-			$sql = '
-				SELECT
-					tv.votes,
-					a.address,
-					COUNT(tv.tx_vote_id) AS count
-				FROM
-					tx_vote tv
-				JOIN
-					tx_vote_address tva ON tva.tx_vote_id = tv.tx_vote_id
-				JOIN
-					address a ON a.address_id = tva.address_id
-				JOIN
-					tx ON tx.tx_id = tv.tx_id
-				JOIN
-					block ON block.block_id = tx.block_id AND block.height >= $2 AND block.height < $3
-				WHERE
-					tv.version = $1
-				GROUP BY
-					tv.votes, a.address
-				ORDER BY
-					3 DESC;
-			';
-			/* wallets
-			$sql = '
-				SELECT
-					tv.votes,
-					primary_a.address,
-					COUNT(tv.tx_vote_id) AS count
-				FROM
-					tx_vote tv
-				JOIN
-					tx_vote_address tva ON tva.tx_vote_id = tv.tx_vote_id
-				JOIN
-					address a ON a.address_id = tva.address_id
-				JOIN
-					hd_network hn ON hn.network = a.network
-				JOIN
-					address primary_a ON primary_a.address_id = hn.address_id
-				JOIN
-					tx ON tx.tx_id = tv.tx_id
-				JOIN
-					block ON block.block_id = tx.block_id AND block.height >= $2 AND block.height < $3
-				WHERE
-					tv.version = $1
-				GROUP BY
-					tv.votes, primary_a.address
-				ORDER BY
-					3 DESC;
-			';
-			//*/
-			$db_handler = \Geppetto\DatabaseHandler::init();
-			$res = $db_handler->query($sql, array($version, ($rci-1)*8064+4096, ($rci)*8064+4096));
-		}
+		// Get the vote results for the given block period
+		/*// Addresses
+		$sql = '
+			SELECT
+				tv.votes,
+				a.address,
+				COUNT(tv.tx_vote_id) AS count
+			FROM
+				tx_vote tv
+			JOIN
+				tx_vote_address tva ON tva.tx_vote_id = tv.tx_vote_id
+			JOIN
+				address a ON a.address_id = tva.address_id
+			JOIN
+				tx ON tx.tx_id = tv.tx_id
+			JOIN
+				block ON block.block_id = tx.block_id AND block.height >= $2 AND block.height < $3
+			WHERE
+				tv.version = $1
+			GROUP BY
+				tv.votes, a.address
+			ORDER BY
+				3 DESC;
+		';
+		*/
+		// wallets
+		$sql = '
+			SELECT
+				tv.votes,
+				primary_a.address,
+				COUNT(tv.tx_vote_id) AS count
+			FROM
+				tx_vote tv
+			JOIN
+				tx_vote_address tva ON tva.tx_vote_id = tv.tx_vote_id
+			JOIN
+				address a ON a.address_id = tva.address_id
+			JOIN
+				address_network_view anv ON anv.address_id = a.address_id
+			JOIN
+				network_summary_view nsv ON nsv.network = anv.network
+			JOIN
+				address primary_a ON primary_a.address_id = nsv.primary_address_id
+			JOIN
+				tx ON tx.tx_id = tv.tx_id
+			JOIN
+				block ON block.block_id = tx.block_id AND block.height >= $2 AND block.height < $3
+			WHERE
+				tv.version = $1
+			GROUP BY
+				tv.votes, primary_a.address
+			ORDER BY
+				3 DESC;
+		';
+
+		$db_handler = \Geppetto\DatabaseHandler::init();
+		$res = $db_handler->query($sql, array($version, ($rci-1)*8064+4096, ($rci)*8064+4096));
 
 		if (empty($res) || !array_key_exists(0, $res)) {
 			return array(
