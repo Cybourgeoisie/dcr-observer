@@ -23,6 +23,8 @@ ALTER TABLE tx_vote_address ADD CONSTRAINT tx_vote_address_tx_vote_id_address_id
 -- CREATE INDEX tx_vote_issue_idx ON tx_vote (version);
 -- ALTER TABLE tx_vote ADD COLUMN "origin_tx_id" BIGINT UNIQUE REFERENCES "tx" (tx_id);
 -- CREATE INDEX tx_vote_origin_tx_id_idx ON tx_vote (tx_id);
+-- CREATE INDEX tx_vote_address_tx_vote_id_idx ON tx_vote_address (tx_vote_id);
+-- CREATE INDEX tx_vote_address_address_id_idx ON tx_vote_address (address_id);
 
 -- Examples of vote bits that show that the version determines what they mean:
 -- https://explorer.dcrdata.org/explorer/tx/10b7511a05fa84b20ebb3cbb8da5dd901f00e42a2b9bf6b3ff13c829682162b2

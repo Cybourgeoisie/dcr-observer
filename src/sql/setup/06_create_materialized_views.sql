@@ -7,6 +7,7 @@ DROP VIEW IF EXISTS address_rtx_view CASCADE;
 DROP VIEW IF EXISTS address_stx_view CASCADE;
 DROP VIEW IF EXISTS address_block_activity_view CASCADE;
 DROP VIEW IF EXISTS address_actively_staking_view CASCADE;
+DROP VIEW IF EXISTS address_stake_submissions_view CASCADE;
 DROP MATERIALIZED VIEW IF EXISTS address_rtx_view CASCADE;
 DROP MATERIALIZED VIEW IF EXISTS address_stx_view CASCADE;
 DROP MATERIALIZED VIEW IF EXISTS address_block_activity_view CASCADE;
@@ -91,6 +92,9 @@ ORDER BY
   2 DESC;
 
 CREATE UNIQUE INDEX address_balance_view_address_id_idx ON address_balance_view (address_id);
+CREATE INDEX address_balance_view_balance_idx ON address_balance_view (balance);
+CREATE INDEX address_balance_view_liquid_balance_idx ON address_balance_view (liquid_balance);
+CREATE INDEX address_balance_view_stakesubmission_balance_idx ON address_balance_view (stakesubmission_balance);
 
 CREATE VIEW address_rtx_view AS
 SELECT
@@ -147,17 +151,50 @@ GROUP BY
 -- Determine if an address is actively staking
 CREATE VIEW address_actively_staking_view AS
 SELECT
-  DISTINCT va.address_id
+  sq.address_id,
+  BOOL_OR(actively_staking) AS actively_staking,
+  SUM(active_tickets) AS active_tickets,
+  SUM(completed_tickets) AS completed_tickets,
+  SUM(revoked_tickets) AS revoked_tickets
+FROM (
+  SELECT
+    DISTINCT ON (va.address_id, sender_vin.tx_id)
+    va.address_id,
+    sender_vin.tx_id,
+    next_vin.vin_id IS NULL AS actively_staking,
+    CASE WHEN (next_vin.vin_id IS NULL) THEN 1 ELSE 0 END AS active_tickets,
+    CASE WHEN (next_vin.vin_id IS NOT NULL AND stakerevoke_vout.vout_id IS NULL) THEN 1 ELSE 0 END AS completed_tickets,
+    CASE WHEN (next_vin.vin_id IS NOT NULL AND stakerevoke_vout.vout_id IS NOT NULL) THEN 1 ELSE 0 END AS revoked_tickets
+  FROM
+    vout
+  LEFT JOIN
+    vin next_vin ON next_vin.vout_id = vout.vout_id
+  LEFT JOIN
+    vout stakerevoke_vout ON stakerevoke_vout.tx_id = next_vin.tx_id AND stakerevoke_vout.type = 'stakerevoke'
+  JOIN
+    vin sender_vin ON sender_vin.tx_id = vout.tx_id
+  JOIN
+    vout_address va ON va.vout_id = sender_vin.vout_id
+  WHERE
+    vout.type = 'stakesubmission'
+) AS sq
+GROUP BY 
+  sq.address_id;
+
+-- For those addresses used for stake submissions, keep track of tickets active and completed
+CREATE VIEW address_stake_submissions_view AS
+SELECT
+  DISTINCT vout.address_id,
+  SUM(CASE WHEN vin.vin_id IS NULL THEN 1 ELSE 0 END) AS active_stakesubmissions,
+  SUM(CASE WHEN vin.vin_id IS NOT NULL THEN 1 ELSE 0 END) AS completed_stakesubmissions
 FROM
   vout
 LEFT JOIN
-  vin next_vin ON next_vin.vout_id = vout.vout_id
-JOIN
-  vin sender_vin ON sender_vin.tx_id = vout.tx_id
-JOIN
-  vout_address va ON va.vout_id = sender_vin.vout_id
+  vin ON vin.vout_id = vout.vout_id
 WHERE
-  vout.type = 'stakesubmission' AND next_vin.vin_id IS NULL;
+  vout.type = 'stakesubmission'
+GROUP BY
+  vout.address_id;
 
 --CREATE INDEX address_actively_staking_view_address_id_idx ON address_actively_staking_view (address_id);
 
@@ -182,7 +219,12 @@ SELECT
   astxv.stx,
   abav.first_block_id,
   abav.last_block_id,
-  CASE WHEN (aasv.address_id IS NOT NULL) THEN true ELSE false END AS actively_staking
+  COALESCE(aasv.actively_staking, 'f') AS actively_staking,
+  COALESCE(aasv.active_tickets, 0) AS active_tickets,
+  COALESCE(aasv.completed_tickets, 0) AS completed_tickets,
+  COALESCE(aasv.revoked_tickets, 0) AS revoked_tickets,
+  COALESCE(assv.active_stakesubmissions, 0) AS active_stakesubmissions,
+  COALESCE(assv.completed_stakesubmissions, 0) AS completed_stakesubmissions
 FROM
   address_vout_vin_view avvv
 JOIN
@@ -194,7 +236,9 @@ JOIN
 JOIN
   address_block_activity_view abav ON abav.address_id = avvv.address_id
 LEFT JOIN
-  address_actively_staking_view aasv ON aasv.address_id = avvv.address_id;
+  address_actively_staking_view aasv ON aasv.address_id = avvv.address_id
+LEFT JOIN
+  address_stake_submissions_view assv ON assv.address_id = avvv.address_id;
 
 CREATE UNIQUE INDEX address_summary_view_address_id_idx ON address_summary_view (address_id);
 CREATE INDEX address_summary_view_rank_idx ON address_summary_view (rank);
@@ -350,7 +394,12 @@ SELECT
   COUNT(anv.address_id) AS num_addresses,
   MIN(asv.first_block_id) AS first_block_id,
   MIN(asv.last_block_id) AS last_block_id,
-  BOOL_OR(asv.actively_staking) AS actively_staking
+  BOOL_OR(asv.actively_staking) AS actively_staking,
+  SUM(asv.active_tickets) AS active_tickets,
+  SUM(asv.completed_tickets) AS completed_tickets,
+  SUM(asv.revoked_tickets) AS revoked_tickets,
+  SUM(asv.active_stakesubmissions) AS active_stakesubmissions,
+  SUM(asv.completed_stakesubmissions) AS completed_stakesubmissions
 FROM (
   SELECT 
     network,
@@ -382,6 +431,7 @@ CREATE UNIQUE INDEX network_summary_view_network_idx ON network_summary_view (ne
 CREATE INDEX network_summary_view_rank_idx ON network_summary_view (rank);
 CREATE INDEX network_summary_view_liquid_rank_idx ON network_summary_view (liquid_rank);
 CREATE INDEX network_summary_view_stakesubmission_rank_idx ON network_summary_view (stakesubmission_rank);
+CREATE INDEX network_summary_view_balance_idx ON network_summary_view (balance);
 
 -- And create the cached breakdown view of all vouts
 CREATE MATERIALIZED VIEW address_vout_breakdown_view AS

@@ -586,49 +586,7 @@
 						</span>
 					</div>
 				</div>
-			</div>
-			<br />
-
-			
-			<h5>
-				Balance Details
-			</h5>
-
-			<div class="container">
-				<div class="row">
-					<div class="col-6 text-right" style="font-weight:bold;">
-						Liquid Balance
-					</div>
-					<div class="col-6 text-left" style="color:rgba(0,0,0,.5);">
-						<span class="addr-liquid-balance">X</span> DCR
-					</div>
-				</div>
-				<!--<div class="row">
-					<div class="col-6 text-right" style="font-weight:bold;">
-						Actively Staking
-					</div>
-					<div class="col-6 text-left" style="color:rgba(0,0,0,.5);">
-						<span class="addr-actively-staking">X</span> DCR
-					</div>
-				</div>-->
-				<div class="row">
-					<div class="col-6 text-right" style="font-weight:bold;">
-						Stake Submissions
-					</div>
-					<div class="col-6 text-left" style="color:rgba(0,0,0,.5);">
-						<span class="addr-stake-submissions">X</span> DCR
-					</div>
-				</div>
-				<div class="row">
-					<div class="col-6 text-right" style="font-weight:bold;">
-						Total Balance
-					</div>
-					<div class="col-6 text-left" style="color:rgba(0,0,0,.5);">
-						<span class="addr-total-balance">X</span> DCR
-					</div>
-				</div>
 			</div><br />
-			
 
 			<h5>Activity</h5>
 
@@ -669,16 +627,86 @@
 					</div>
 				</div>
 			</div><br />
+			
+			<h5>
+				Balance Details
+			</h5>
+
+			<div class="container">
+				<div class="row">
+					<div class="col-6 text-right" style="font-weight:bold;">
+						Liquid Balance <i class="fa fa-info-circle" data-toggle="tooltip" data-placement="top" title="Amount of DCR that this address can freely spend"></i>
+					</div>
+					<div class="col-6 text-left" style="color:rgba(0,0,0,.5);">
+						<span class="addr-liquid-balance">X</span> DCR
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-6 text-right" style="font-weight:bold;">
+						Stake Submissions <i class="fa fa-info-circle" data-toggle="tooltip" data-placement="top" title="Amount of DCR sent to this address for ticket staking"></i>
+					</div>
+					<div class="col-6 text-left" style="color:rgba(0,0,0,.5);">
+						<span class="addr-stake-submissions">X</span> DCR
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-6 text-right" style="font-weight:bold;">
+						Total Balance
+					</div>
+					<div class="col-6 text-left" style="color:rgba(0,0,0,.5);">
+						<span class="addr-total-balance">X</span> DCR
+					</div>
+				</div>
+			</div><br />
+
+			<h5>
+				Staking Details
+			</h5>
+
+			<div class="container">
+				<div class="row">
+					<div class="col-6 text-right" style="font-weight:bold;">
+						Active Submissions <i class="fa fa-info-circle" data-toggle="tooltip" data-placement="top" title="Current ticket submissions that this address is staking"></i>
+					</div>
+					<div class="col-6 text-left" style="color:rgba(0,0,0,.5);">
+						<span class="addr-active-stakesubmissions">X</span>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-6 text-right" style="font-weight:bold;">
+						Completed Submissions <i class="fa fa-info-circle" data-toggle="tooltip" data-placement="top" title="All stake submissions that this address paid out"></i>
+					</div>
+					<div class="col-6 text-left" style="color:rgba(0,0,0,.5);">
+						<span class="addr-completed-stakesubmissions">X</span>
+					</div>
+				</div>
+			</div><br />
 
 			<h5>Voting Record</h5>
 
 			<div class="container">
 				<div class="row">
 					<div class="col-6 text-right" style="font-weight:bold;">
+						Tickets In Flight
+					</div>
+					<div class="col-6 text-left" style="color:rgba(0,0,0,.5);">
+						<span class="addr-active-tickets">X</span>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-6 text-right" style="font-weight:bold;">
 						Tickets Staked
 					</div>
 					<div class="col-6 text-left addr-tickets-staked" style="color:rgba(0,0,0,.5);">
 						300
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-6 text-right" style="font-weight:bold;">
+						Tickets Revoked
+					</div>
+					<div class="col-6 text-left" style="color:rgba(0,0,0,.5);">
+						<span class="addr-revoked-tickets">X</span>
 					</div>
 				</div>
 				<div class="row">
@@ -848,15 +876,54 @@
 			</div>
 			<br />
 
+			<h5>
+				Staking Details
+			</h5>
+
+			<div class="container">
+				<div class="row">
+					<div class="col-6 text-right" style="font-weight:bold;">
+						Active Submissions <i class="fa fa-info-circle" data-toggle="tooltip" data-placement="top" title="Current ticket submissions that this wallet is staking"></i>
+					</div>
+					<div class="col-6 text-left" style="color:rgba(0,0,0,.5);">
+						<span class="hd-addr-active-stakesubmissions">X</span>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-6 text-right" style="font-weight:bold;">
+						Completed Submissions <i class="fa fa-info-circle" data-toggle="tooltip" data-placement="top" title="All stake submissions that this wallet paid out"></i>
+					</div>
+					<div class="col-6 text-left" style="color:rgba(0,0,0,.5);">
+						<span class="hd-addr-completed-stakesubmissions">X</span>
+					</div>
+				</div>
+			</div><br />
+
 			<h5>Voting Record</h5>
 
 			<div class="container">
+				<div class="row">
+					<div class="col-6 text-right" style="font-weight:bold;">
+						Tickets In Flight
+					</div>
+					<div class="col-6 text-left" style="color:rgba(0,0,0,.5);">
+						<span class="hd-addr-active-tickets">X</span>
+					</div>
+				</div>
 				<div class="row">
 					<div class="col-6 text-right" style="font-weight:bold;">
 						Tickets Staked
 					</div>
 					<div class="col-6 text-left hd-addr-tickets-staked" style="color:rgba(0,0,0,.5);">
 						300
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-6 text-right" style="font-weight:bold;">
+						Tickets Revoked
+					</div>
+					<div class="col-6 text-left" style="color:rgba(0,0,0,.5);">
+						<span class="hd-addr-revoked-tickets">X</span>
 					</div>
 				</div>
 				<div class="row">
@@ -1099,7 +1166,10 @@
 						<tr>
 							<th>Rank</th>
 							<th>Address</th>
-							<th>Influence</th>
+							<th>% Total Votes</th>
+							<th>
+								Influence <i class="fa fa-info-circle" data-toggle="tooltip" data-placement="top" title="How much this address affected the vote results"></i>
+							</th>
 							<th>Yes</th>
 							<th>No</th>
 							<th>Abstain</th>
@@ -1111,6 +1181,7 @@
 							<td class="issue-results-address" scope="row">
 								<a href="#addr">address</a>
 							</td>
+							<td class="issue-results-weight">0.00%</td>
 							<td class="issue-results-influence">0.00%</td>
 							<td class="issue-results-yes">0 (0.00%)</td>
 							<td class="issue-results-no">20 (50.00%)</td>

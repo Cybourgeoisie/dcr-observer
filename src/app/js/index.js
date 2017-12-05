@@ -238,6 +238,9 @@ function setHistoricalSliderEvents() {
 }
 
 function setEvents() {
+	// Activate all tooltips
+	$('[data-toggle="tooltip"]').tooltip();
+
 	// Find all internal links, bind to handle navigation
 	$('a.page-toggle').click(function(event) {
 		$('.navbar-collapse').collapse('hide');
@@ -369,6 +372,13 @@ function setAddressInfo(data) {
 	if (addr_info.hasOwnProperty('actively_staking') && addr_info.actively_staking == 't') {
 		$('.dcr-badge-address-actively-staking').show();
 	}
+
+	// Display current staking details
+	$('.addr-active-tickets').html(addr_info.active_tickets);
+	$('.addr-completed-tickets').html(addr_info.completed_tickets);
+	$('.addr-revoked-tickets').html(addr_info.revoked_tickets);
+	$('.addr-active-stakesubmissions').html(addr_info.active_stakesubmissions);
+	$('.addr-completed-stakesubmissions').html(addr_info.completed_stakesubmissions);
 
 	// Show the address's voting record
 	showVotingRecord('addr', data.voting_tally, data.voting_record, data.tickets_staked);
@@ -534,7 +544,7 @@ function setHdAddressInfo(data, req_address) {
 	var identifier     = network.identifier;
 
 	// Collect the cumulative information
-	for (var i = 0; i < 10; i++) {
+	for (var i = 0; i < Math.min(hd_addresses.length, 10); i++) {
 		addHdAddressRow($hd_address_tbody, $hd_address_row, hd_addresses[i], i+1);
 	}
 
@@ -585,6 +595,13 @@ function setHdAddressInfo(data, req_address) {
 		$('.dcr-badge-hd-address-actively-staking').show();
 	}
 
+	// Display current staking details
+	$('.hd-addr-active-tickets').html(network.active_tickets);
+	$('.hd-addr-completed-tickets').html(network.completed_tickets);
+	$('.hd-addr-revoked-tickets').html(network.revoked_tickets);
+	$('.hd-addr-active-stakesubmissions').html(network.active_stakesubmissions);
+	$('.hd-addr-completed-stakesubmissions').html(network.completed_stakesubmissions);
+
 	// Show the wallet's voting record
 	showVotingRecord('hd', data.voting_tally, data.voting_record, data.tickets_staked);
 }
@@ -594,7 +611,6 @@ function addHdAddressRow($hd_address_tbody, $hd_address_row, hd_address, row_num
 	var address    = hd_address.address;
 	var balance    = hd_address.balance;
 	var identifier = hd_address.identifier;
-	var tx_hash    = hd_address.tx_hash;
 	var actively_staking = hd_address.actively_staking;
 
 	// Add a row

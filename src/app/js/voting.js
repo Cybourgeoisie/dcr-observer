@@ -123,6 +123,7 @@ function pullIssueResultsFromApi(issue, rci, callback) {
 	 		// Get the vote results
 	 		var results = data.results;
 	 		var total_votes = results.issue_summary.yes + results.issue_summary.no + results.issue_summary.abstain;
+	 		var infl_total_votes = results.issue_summary.yes + results.issue_summary.no;
 	 		var num_voters = results.issue_summary.num_voters;
 
 	 		$('.issue-results-overview-yes').html(results.issue_summary.yes.toLocaleString());
@@ -142,7 +143,7 @@ function pullIssueResultsFromApi(issue, rci, callback) {
 			// Now display them all
 			var records = results.vote_summary;
 			for (var i = 0; i < Math.min(records.length, 25); i++) {
-				addAddressRowToIssueResults(i, records[i], total_votes, $row, $tbody);
+				addAddressRowToIssueResults(i, records[i], total_votes, infl_total_votes, $row, $tbody);
 			}
 
 			// Reset the "show all" button
@@ -151,7 +152,7 @@ function pullIssueResultsFromApi(issue, rci, callback) {
 			// Set the "show all" button to do something
 			$('button.show-all-issue-voting').click(function(event) {
 				for (var i = 10; i < records.length; i++) {
-					addAddressRowToIssueResults(i, records[i], total_votes, $row, $tbody);
+					addAddressRowToIssueResults(i, records[i], total_votes, infl_total_votes, $row, $tbody);
 				}
 
 				$('button.show-all-issue-voting').attr("disabled", "disabled").html('Showing All');
@@ -160,19 +161,22 @@ function pullIssueResultsFromApi(issue, rci, callback) {
 	});
 }
 
-function addAddressRowToIssueResults(i, record, total_votes, $row, $tbody) {
+function addAddressRowToIssueResults(i, record, total_votes, infl_total_votes, $row, $tbody) {
 	// If there's something worth showing, let's show it
 	var sum = (record.abstain + record.yes + record.no);
+	var infl_sum = (record.yes + record.no);
 	if (sum <= 0) {
 		return;
 	}
 
 	var pct = (parseFloat(sum)/total_votes)*100;
+	var infl_pct = (infl_total_votes > 0) ? (parseFloat(infl_sum)/infl_total_votes)*100 : 0.0;
 
 	var $new_row = $row.clone(false);
 	$new_row.find('th').html(i + 1);
 	$new_row.find('td.issue-results-address > a').html(record.address).attr('href', '#addr=' + record.address);
-	$new_row.find('td.issue-results-influence').html(pct.toLocaleString() + '%');
+	$new_row.find('td.issue-results-weight').html(pct.toLocaleString() + '%');
+	$new_row.find('td.issue-results-influence').html(infl_pct.toLocaleString() + '%');
 	$new_row.find('td.issue-results-yes').html(record.yes.toLocaleString());
 	$new_row.find('td.issue-results-no').html(record.no.toLocaleString());
 	$new_row.find('td.issue-results-abstain').html(record.abstain.toLocaleString());

@@ -31,7 +31,12 @@ class Address extends \Scrollio\Service\AbstractService
 				bs.height AS first,
 				be.height AS last,
 				COALESCE(asv.liquid_balance, 0) AS liquid,
-				COALESCE(asv.stakesubmission_balance, 0) AS active_stake_submissions
+				COALESCE(asv.stakesubmission_balance, 0) AS active_stake_submissions,
+				COALESCE(asv.active_tickets, 0) AS active_tickets,
+				COALESCE(asv.completed_tickets, 0) AS completed_tickets,
+				COALESCE(asv.revoked_tickets, 0) AS revoked_tickets,
+				COALESCE(asv.active_stakesubmissions, 0) AS active_stakesubmissions,
+				COALESCE(asv.completed_stakesubmissions, 0) AS completed_stakesubmissions
 			FROM
 				address a
 			JOIN
@@ -282,7 +287,12 @@ class Address extends \Scrollio\Service\AbstractService
 				EXTRACT(EPOCH FROM be.time) AS "end",
 				bs.height AS first,
 				be.height AS last,
-				nsv.num_addresses
+				nsv.num_addresses,
+				COALESCE(nsv.active_tickets, 0) AS active_tickets,
+				COALESCE(nsv.completed_tickets, 0) AS completed_tickets,
+				COALESCE(nsv.revoked_tickets, 0) AS revoked_tickets,
+				COALESCE(nsv.active_stakesubmissions, 0) AS active_stakesubmissions,
+				COALESCE(nsv.completed_stakesubmissions, 0) AS completed_stakesubmissions
 			FROM
 				address a
 			JOIN
@@ -310,16 +320,7 @@ class Address extends \Scrollio\Service\AbstractService
 				a.address,
 				a.identifier,
 				asv.actively_staking,
-				CASE WHEN COALESCE(asv.balance, 0) < 0 THEN 0 ELSE COALESCE(asv.balance, 0) END AS balance,
-				--tx.hash AS tx_hash,
-				COALESCE(asv.tx, 0)    AS "tx",
-				COALESCE(asv.stx, 0)   AS "stx",
-				COALESCE(asv.vout, 0)  AS "vout",
-				COALESCE(asv.vin, 0)   AS "vin",
-				EXTRACT(EPOCH FROM bs.time) AS "start",
-				EXTRACT(EPOCH FROM be.time) AS "end",
-				bs.height AS first,
-				be.height AS last
+				CASE WHEN COALESCE(asv.balance, 0) < 0 THEN 0 ELSE COALESCE(asv.balance, 0) END AS balance
 			FROM
 				address a_this
 			JOIN
@@ -330,10 +331,6 @@ class Address extends \Scrollio\Service\AbstractService
 				address_summary_view asv ON asv.address_id = anv.address_id
 			JOIN
 				address a ON a.address_id = asv.address_id
-			LEFT OUTER JOIN
-				block bs ON bs.block_id = asv.first_block_id
-			LEFT OUTER JOIN
-				block be ON be.block_id = asv.last_block_id
 			WHERE
 				a_this.address = $1
 			ORDER BY

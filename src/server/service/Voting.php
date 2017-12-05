@@ -456,10 +456,7 @@ class Voting extends \Scrollio\Service\AbstractService
 				address a ON a.address_id = tva.address_id
 			JOIN
 				address_network_view anv ON anv.address_id = tva.address_id
-			--JOIN
-			--	hd_network hn ON hn.network = a.network
 			JOIN
-				--address primary_address ON primary_address.address_id = hn.address_id
 				address primary_address ON primary_address.address_id = anv.network
 			GROUP BY
 				anv.network,

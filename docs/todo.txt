@@ -32,11 +32,19 @@ Important:
 X ORIGINAL: Update produce_db_inserts to include address_id with vouts
 	X Satisfy the above requirement by updating update_with_latest_blocks.sql to add address_id to vout, and set origin_tx_id, tx_vote_address records
 
+Todo 2:
+- Tag stakepools - public and private
+- Include staking txes in HD wallet calculation
+- Show "actively staking" on voting pages
+X Add "Current Tickets", "Staked Tickets" and "Revoked Tickets" to details pages for own addr and stake submission
+X Clean up existing slow queries
+	- A few remaining - the cumulative voting addresses / stake pool pages are slow as fuck
 
-Remaining Todo before launch:
+
+Suggested Todo before launch:
 X Flag addresses that are actively staking
 - Mobile cleaned up completely
-- Maybe I could add a new section, "Stake Pool Details", which only shows up if a wallet / address was ever used to hold stake submissions, and have a few fields under it: "Submitted Tickets", "Completed Tickets", "Revoked Tickets"
+X Maybe I could add a new section, "Stake Pool Details", which only shows up if a wallet / address was ever used to hold stake submissions, and have a few fields under it: "Submitted Tickets", "Completed Tickets", "Revoked Tickets"
 - Research HD once more for linking sstxcommitment 
 - Fix commitamt across the board - massive set of updates
 - Tag stakepools
