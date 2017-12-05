@@ -252,7 +252,17 @@ class Voting extends \Scrollio\Service\AbstractService
 				$votes = $votes >> 1;
 			}
 
+			// Check if this address previously voted a different way
+			$addr_previous_key = false;
 			$addr_votes = array('address' => $row['address'], 'abstain' => 0, 'yes' => 0, 'no' => 0);
+			foreach ($vote_summary as $key => $vote_address_summary) {
+				if ($vote_address_summary['address'] == $row['address']) {
+					$addr_previous_key = $key;
+					$addr_votes = $vote_address_summary;
+					break;
+				}
+			}
+
 			if ($votes & 0b10) {
 				$addr_votes['yes']        += $row['count'];
 				$issue_summary['yes']     += $row['count']; 
@@ -264,8 +274,12 @@ class Voting extends \Scrollio\Service\AbstractService
 				$issue_summary['abstain'] += $row['count']; 
 			}
 
-			$vote_summary[] = $addr_votes;
-			$issue_summary['num_voters']++;
+			if ($addr_previous_key !== false) {
+				$vote_summary[$addr_previous_key] = $addr_votes;
+			} else {
+				$vote_summary[] = $addr_votes;
+				$issue_summary['num_voters']++;
+			}
 		}
 
 		return array(

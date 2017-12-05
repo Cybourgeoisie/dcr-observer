@@ -669,6 +669,63 @@ class Address extends \Scrollio\Service\AbstractService
 		);
 	}
 
+	public function getWealthAddressesListing(int $range_idx, bool $is_hd)
+	{
+		if ($range_idx < 0 || $range_idx > 7) {
+			$range_idx = 7;
+		}
+
+		// Form the range
+		if ($range_idx == 0) {
+			$range_start = 0.01;
+			$range_end = 1.0;
+		} else {
+			$range_start = floatval(pow(10, $range_idx-1));
+			$range_end = floatval(pow(10, $range_idx));
+		}
+
+		$bin = number_format($range_start) . ' to ' . number_format($range_end) . ' DCR';
+
+		if ($is_hd) {
+			$sql = '
+				SELECT
+					a.address,
+					hd.balance
+				FROM
+					network_summary_view hd
+				JOIN
+					address a ON a.address_id = hd.primary_address_id
+				WHERE
+					hd.balance >= $1 AND hd.balance < $2
+				ORDER BY hd.balance DESC;
+			';
+		} else {
+			$sql = '
+				SELECT
+					a.address,
+					b.balance
+				FROM
+					address_balance_view b
+				JOIN
+					address a ON a.address_id = b.address_id
+				WHERE
+					b.balance >= $1 AND b.balance < $2
+				ORDER BY balance DESC;
+			';
+		}
+		$db_handler = \Geppetto\DatabaseHandler::init();
+		$res = $db_handler->query($sql, array($range_start, $range_end));
+
+		if (empty($res) || !array_key_exists(0, $res)) {
+			throw new \Exception('Could not collect Decred wealth by address.');
+		}
+
+		return array(
+			'data' => $res,
+			'bin' => $bin
+		);
+	}
+
 	public function getWealthNetworksBetweenRanges(float $range_start, float $range_end)
 	{
 		// We do not let the site slow down
@@ -683,11 +740,9 @@ class Address extends \Scrollio\Service\AbstractService
 				CASE WHEN a.identifier != \'\' THEN a.identifier ELSE a.address END AS label,
 				hd.balance AS value
 			FROM
-				--hd_network hd
 				network_summary_view hd
 			JOIN
-				--address a ON a.address_id = hd.address_id
-				address a ON a.address_id = hd.network
+				address a ON a.address_id = hd.primary_address_id
 			WHERE
 				hd.balance >= $1 AND hd.balance < $2
 			ORDER BY hd.balance DESC

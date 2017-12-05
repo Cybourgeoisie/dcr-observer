@@ -50,7 +50,9 @@ body {
 .table-vote-results-summary td,
 .table-vote-results-summary th,
 .table-issue-results td,
-.table-issue-results th {
+.table-issue-results th,
+.table-dist-list td,
+.table-dist-list th {
 	font-size:80%;
 }
 

@@ -80,6 +80,73 @@ function pullWealthDistribution(callback) {
 	});
 }
 
+function loadDistributionListing(range, is_hd, callback) {
+	$.post('api/Address/getWealthAddressesListing', {'range_idx' : range, 'is_hd' : is_hd})
+	 .done(function(data) {
+	 	if (data.hasOwnProperty('success') && data.success) {
+	 		// Handle callbacks
+	 		if (callback && typeof callback === 'function') {
+	 			callback.call(this);
+	 		}
+
+	 		var $table = $('.table-dist-list').show();
+			var $tbody = $table.find('tbody');
+			var $row = $table.find('tr:last').clone(false);
+			$tbody.html('');
+
+			// Get the bin
+			var bin = data.bin;
+			$('.dist-list-lead').html('The current Decred address wealth list for addresses between ' + bin);
+
+			// Determine which url to use
+			var uri_hash = '#addr=';
+			if (is_hd) {
+				uri_hash = '#hd-addr=';
+				$('.dcr-page-dist-listing > h1').html('HD Wallet Wealth List');
+				$('.dist-list-lead').html('The current Decred wealth list for HD wallets between ' + bin);
+			} else {
+				$('.dcr-page-dist-listing > h1').html('Address Wealth List');
+				$('.dist-list-lead').html('The current Decred wealth list for addresses between ' + bin);
+			}
+
+			for (var i = 0; i < Math.min(data.data.length, 25); i++) {
+				var $new_row = $row.clone(false);
+				$new_row.find('th').html(i+1);
+				$new_row.find('td.td-dist-list-addr > a').attr("href", uri_hash + data.data[i].address).html(data.data[i].address);
+				$new_row.find('td.td-dist-list-balance').html(parseFloat(data.data[i].balance).toLocaleString() + " DCR");
+				$tbody.append($new_row);
+			}
+
+			// Reset the "show all" button
+			$('button.show-all-dist-list').removeAttr('disabled').html('Show All Addresses *');
+
+			// Set the "show all" button to do something
+			$('button.show-all-dist-list').off();
+			$('button.show-all-dist-list').click(function(event) {
+				for (var i = 25; i < data.data.length; i++) {
+					var $new_row = $row.clone(false);
+					$new_row.find('th').html(i+1);
+					$new_row.find('td.td-dist-list-addr > a').attr("href", uri_hash + data.data[i].address).html(data.data[i].address);
+					$new_row.find('td.td-dist-list-balance').html(parseFloat(data.data[i].balance).toLocaleString() + " DCR");
+					$tbody.append($new_row);
+				}
+
+				$('button.show-all-dist-list').attr("disabled", "disabled").html('Showing All Addresses');
+			});
+	 	} else {
+	 		// Handle callbacks
+	 		if (callback && typeof callback === 'function') {
+	 			callback.call(this);
+	 		}
+
+	 		$('.table-dist-list').hide();
+
+			// Get the bin
+			$('.dist-list-lead').html('Could not find addresses in that range.');
+	 	}
+	 });
+}
+
 function pullWealthDistributionFromApi(callback) {
 	$.post('api/Address/getWealth')
 	 .done(function(data) {
@@ -124,7 +191,7 @@ function pullWealthDistributionFromApi(callback) {
 				var $new_row = $distrib_row.clone(false);
 				$new_row.data('source', i);
 				$new_row.find('th').html(bin);
-				$new_row.find('td.td-num-addrs').html(parseInt(count).toLocaleString());
+				$new_row.find('td.td-num-addrs > a').attr("href", "#dist-listing=" + i).html(parseInt(count).toLocaleString());
 				$new_row.find('td.td-pct-addrs .wealth-pct-addrs').html(pct_accts + "%");
 				$new_row.find('td.td-pct-addrs .progress-bar').css('width', pct_accts + '%');
 				$new_row.find('td.td-sum').html(parseInt(value).toLocaleString() + " DCR");
@@ -257,7 +324,7 @@ function pullWealthDistributionNetworksFromApi(callback) {
 
 				var $new_row = $distrib_row.clone(false);
 				$new_row.find('th').html(bin);
-				$new_row.find('td.td-hd-num-wallets').html(parseInt(count).toLocaleString());
+				$new_row.find('td.td-hd-num-wallets > a').attr("href", "#dist-hd-listing=" + i).html(parseInt(count).toLocaleString());
 				$new_row.find('td.td-hd-pct-wallets .wealth-hd-pct-wallets').html(pct_accts + "%");
 				$new_row.find('td.td-hd-pct-wallets .progress-bar').css('width', pct_accts + '%');
 				$new_row.find('td.td-hd-sum').html(parseInt(value).toLocaleString() + " DCR");
@@ -280,11 +347,12 @@ function getWealthDistributionPie($modal, $source) {
 	var range_end = parseFloat($source.data('range-end'));
 
 	// Determine if we're getting networks or addresses
-	var api_address;
+	var api_address, is_hd = false;
 	if ($source.data('origin') == 'dist-addr') {
 		api_address = 'api/Address/getWealthAddressesBetweenRanges';
 		$modal.find('.modal-title').html('Wealth Breakdown By Address');
 	} else {
+		is_hd = true;
 		api_address = 'api/Address/getWealthNetworksBetweenRanges';
 		$modal.find('.modal-title').html('Wealth Breakdown By Wallet');
 	}
@@ -296,12 +364,12 @@ function getWealthDistributionPie($modal, $source) {
 			$modal.find('.modal-data-loading').hide();
 
 	 		// Load the pie
-	 		showWealthDistributionPie(data);
+	 		showWealthDistributionPie(data, is_hd);
 	 	}
 	});
 }
 
-function showWealthDistributionPie(results) {
+function showWealthDistributionPie(results, is_hd) {
 	var data = results.data
 
 	// Determine the size of the pie
@@ -369,6 +437,24 @@ function showWealthDistributionPie(results) {
 			"effect": "default", // none / default
 			"speed": 750
 		}, "pullOutSegmentOnClick": { "effect": "linear", "speed": 400, "size": 8 } },
-		"misc": { "gradient": { "enabled": false, "percentage": 100 } }
+		"misc": { "gradient": { "enabled": false, "percentage": 100 } },
+		"callbacks" : {
+			"onload" : function() { 
+				$("[class$=_segmentMainLabel-outer]").each(function(idx, $el) {
+					var addr = $(this).attr('data-text');
+					if (addr.startsWith('Ds') || addr.startsWith('Dc')) {
+						if (is_hd) {
+							$(this).html("<a href=\"#hd-addr=" + addr + "\">" + $(this).text() + "</a>");							
+						} else {
+							$(this).html("<a href=\"#addr=" + addr + "\">" + $(this).text() + "</a>");
+						}
+					} else if (addr == 'Other') {
+						$(this).html($(this).html() + ' * ');
+						$(this).attr('data-toggle', 'tooltip').attr('title', 'All addresses that are too small to show.');
+						$(this).tooltip();
+					}
+				});
+			}
+		}
 	});
 }

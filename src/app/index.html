@@ -82,7 +82,7 @@
 						<a class="dropdown-item page-toggle" href="#vote-results">Vote Results</a>
 						<a class="dropdown-item page-toggle" href="#voting">Top Addresses by Votes</a>
 						<a class="dropdown-item page-toggle" href="#voting-hd">Top HD Wallets by Votes</a>
-						<a class="dropdown-item page-toggle" href="#voting-stakesubmission">Top Stake Pools</a>
+						<a class="dropdown-item page-toggle" href="#voting-stakesubmission">Top Stake Addresses</a>
 					</div>
 				</li>
 			</ul>
@@ -251,7 +251,9 @@
 				<tbody>
 					<tr>
 						<th scope="row">0 to 1.0 DCR</th>
-						<td class="td-num-addrs">X</td>
+						<td class="td-num-addrs">
+							<a href="#dist-listing">X</a>
+						</td>
 						<td class="td-pct-addrs">
 							<div class="progress" style="position:relative;top:1px;opacity:0.5;">
 								<div class="progress-bar bg-success" role="progressbar" style="width:25%"></div>
@@ -313,7 +315,9 @@
 				<tbody>
 					<tr>
 						<th scope="row">0 to 1.0 DCR</th>
-						<td class="td-hd-num-wallets">X</td>
+						<td class="td-hd-num-wallets">
+							<a href="#dist-hd-listing">X</a>
+						</td>
 						<td class="td-hd-pct-wallets">
 							<div class="progress" style="position:relative;top:1px;opacity:0.5;">
 								<div class="progress-bar bg-success" role="progressbar" style="width:25%"></div>
@@ -353,6 +357,37 @@
 					View Block #<span class="historical-slider-value"></span>
 				</button>
 			</p>
+		</div>
+
+		<!-- Distribution Full Listing Page -->
+		<div class="dcr-page dcr-page-dist-listing dist-body" style="display:none;">
+			<h1>Wealth List</h1>
+			<p class="lead">
+				<span class="dist-list-lead">The current Decred address wealth list for addresses between 0 and 1 DCR.</span>
+			</p>
+
+			<table class="table table-hover table-dist-list table-responsive-sm">
+				<thead>
+					<tr>
+						<th></th>
+						<th>Address</th>
+						<th>Balance</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr>
+						<th></th>
+						<td class="td-dist-list-addr">
+							<a href="#addr"></a>
+						</td>
+						<td class="td-dist-list-balance">X DCR</td>
+					</tr>
+				</tbody>
+			</table>
+			<p class="lead" style="text-align:center;">
+				<button class="btn btn-primary my-2 my-sm-0 show-all-dist-list">Show All Addresses *</button>
+			</p>
+			<p><small>(*) May be very slow to load on mobile.</small></p>
 		</div>
 
 		<!-- Voting Address Distribution Page -->
@@ -461,9 +496,9 @@
 
 		<!-- Voting Stakepool Distribution Page -->
 		<div class="dcr-page dcr-page-voting-stakesubmission dist-body" style="display:none;">
-			<h1>Top 200 Stake Pools</h1>
+			<h1>Top 200 Stake Addresses</h1>
 			<p class="lead">
-				<span>The top Decred stake pools over the past 8064 blocks.</span>
+				<span>The top Decred stake addresses <small><i class="fa fa-info-circle" data-toggle="tooltip" data-placement="bottom" title="Both public stake pools and solo staking addresses."></i></small> over the past 8064 blocks.</span>
 			</p>
 
 			<h4>Summary</h4>
@@ -471,8 +506,8 @@
 				<small>
 					<strong><span class="top-stakesubmission-votes">X</span> out of <span class="total-stakesubmission-votes">X</span> Votes</strong> | <span class="top-stakesubmission-votes-percent">X%</span> of Votes 
 					<br />
-					<strong><span class="top-stakesubmission-voters">200</span> out of <span class="total-stakesubmission-voters">X</span> Stake Pools</strong> | 
-					<span class="top-stakesubmission-voters-percent">X%</span> of Active Stake Pools
+					<strong><span class="top-stakesubmission-voters">200</span> out of <span class="total-stakesubmission-voters">X</span> Stake Addresses</strong> | 
+					<span class="top-stakesubmission-voters-percent">X%</span> of Active Stake Addresses
 				</small>
 			</p>
 

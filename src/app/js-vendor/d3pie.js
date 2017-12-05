@@ -816,6 +816,7 @@ var labels = {
 				.attr("class", pie.cssPrefix + "segmentMainLabel-" + section)
 				.text(function(d, i) {
 					var str = d.label;
+					$(this).attr("data-text", str)
 
 					// if a custom formatter has been defined, pass it the raw label string - it can do whatever it wants with it.
 					// we only apply truncation if it's not defined

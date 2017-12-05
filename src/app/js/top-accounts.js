@@ -79,6 +79,7 @@ function pullTopAddresses(callback) {
 		$('button.show-all-500').removeAttr('disabled').html('Show All 500');
 
 		// Set the "show all 500" button to do something
+		$('button.show-all-500').off();
 		$('button.show-all-500').click(function(event) {
 			$('.table-addresses tr').show();
 			$('button.show-all-500').attr("disabled", "disabled").html('Showing All 500');
@@ -160,6 +161,7 @@ function pullTopAddressesFromApi(callback) {
 			$('button.show-all-500').removeAttr('disabled').html('Show All 500');
 
 			// Set the "show all 500" button to do something
+			$('button.show-all-500').off();
 			$('button.show-all-500').click(function(event) {
 				$('.table-addresses tr').show();
 				$('button.show-all-500').attr("disabled", "disabled").html('Showing All 500');
@@ -252,6 +254,7 @@ function pullTopNetworks(callback) {
 		$('button.show-all-500-hd').removeAttr('disabled').html('Show All 500');
 
 		// Set the "show all 500" button to do something
+		$('button.show-all-500-hd').off();
 		$('button.show-all-500-hd').click(function(event) {
 			$('.table-networks tr').show();
 			$('button.show-all-500-hd').attr("disabled", "disabled").html('Showing All 500');
@@ -330,6 +333,7 @@ function pullTopNetworksFromApi(callback) {
 			$('button.show-all-500-hd').removeAttr('disabled').html('Show All 500');
 
 			// Set the "show all 500" button to do something
+			$('button.show-all-500-hd').off();
 			$('button.show-all-500-hd').click(function(event) {
 				$('.table-networks tr').show();
 				$('button.show-all-500-hd').attr("disabled", "disabled").html('Showing All 500');

@@ -150,6 +150,7 @@ function pullIssueResultsFromApi(issue, rci, callback) {
 			$('button.show-all-issue-voting').removeAttr('disabled').html('Show All ' + num_voters.toLocaleString());
 
 			// Set the "show all" button to do something
+			$('button.show-all-issue-voting').off();
 			$('button.show-all-issue-voting').click(function(event) {
 				for (var i = 25; i < records.length; i++) {
 					addAddressRowToIssueResults(i, records[i], total_votes, infl_total_votes, $row, $tbody);
@@ -229,6 +230,7 @@ function pullTicketDistributionFromApi(callback) {
 			$('button.show-all-voting-200').removeAttr('disabled').html('Show All 200');
 
 			// Set the "show all 500" button to do something
+			$('button.show-all-voting-200').off();
 			$('button.show-all-voting-200').click(function(event) {
 				$('.table-distribution-voting tr').show();
 				$('button.show-all-voting-200').attr("disabled", "disabled").html('Showing All 200');
@@ -297,6 +299,7 @@ function pullTicketNetworkDistributionFromApi(callback) {
 			$('button.show-all-voting-hd-200').removeAttr('disabled').html('Show All 200');
 
 			// Set the "show all 500" button to do something
+			$('button.show-all-voting-hd-200').off();
 			$('button.show-all-voting-hd-200').click(function(event) {
 				$('.table-distribution-voting-hd tr').show();
 				$('button.show-all-voting-hd-200').attr("disabled", "disabled").html('Showing All 200');
@@ -365,6 +368,7 @@ function pullTicketStakePoolDistributionFromApi(callback) {
 			$('button.show-all-voting-stakesubmission-200').removeAttr('disabled').html('Show All 200');
 
 			// Set the "show all 500" button to do something
+			$('button.show-all-voting-stakesubmission-200').off();
 			$('button.show-all-voting-stakesubmission-200').click(function(event) {
 				$('.table-distribution-voting-stakesubmission tr').show();
 				$('button.show-all-voting-stakesubmission-200').attr("disabled", "disabled").html('Showing All 200');

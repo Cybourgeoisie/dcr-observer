@@ -1,5 +1,5 @@
 // Configuration
-var valid_uri_hashes = ['home', 'top-hd', 'dist', 'dist-hd', 'addr', 'hd-addr', 'vote-results', 'issue-results', 'voting', 'voting-hd', 'voting-stakesubmission', '404', 'maintenance'];
+var valid_uri_hashes = ['home', 'top-hd', 'dist', 'dist-hd', 'dist-listing', 'dist-hd-listing', 'addr', 'hd-addr', 'vote-results', 'issue-results', 'voting', 'voting-hd', 'voting-stakesubmission', '404', 'maintenance'];
 var dcr_price = 30.0;
 var total_dcr = 6651899.447322492;
 var current_block_height = 189416;
@@ -110,6 +110,18 @@ function handleNavigation(uri_hash) {
 		pullTopNetworks(function() { showPage('top-hd'); });
 	} else if (uri == 'dist-hd') {
 		pullWealthDistributionNetworks(function() { showPage('dist-hd'); });
+	} else if (uri == 'dist-listing' && uri_param && uri_param.length) {
+		if (MAINTENANCE_MODE) {
+			showPage('maintenance');
+		} else {
+			loadDistributionListing(uri_param, false, function() { showPage('dist-listing'); });
+		}
+	} else if (uri == 'dist-hd-listing' && uri_param && uri_param.length) {
+		if (MAINTENANCE_MODE) {
+			showPage('maintenance');
+		} else {
+			loadDistributionListing(uri_param, true, function() { showPage('dist-listing'); });
+		}
 	} else if (uri == 'vote-results') {
 		if (MAINTENANCE_MODE) {
 			showPage('maintenance');
@@ -557,6 +569,7 @@ function setHdAddressInfo(data, req_address) {
 	}
 
 	// Set the "show all" button to do something
+	$('button.show-all-hd').off();
 	$('button.show-all-hd').click(function(event) {
 		var $hd_address_table = $('.table-hd-addresses');
 		var $hd_address_tbody = $hd_address_table.find('tbody');
@@ -708,7 +721,17 @@ function showAddressDistributionPie(results) {
 			"effect": "default", // none / default
 			"speed": 750
 		}, "pullOutSegmentOnClick": { "effect": "linear", "speed": 400, "size": 8 } },
-		"misc": { "gradient": { "enabled": false, "percentage": 100 } }
+		"misc": { "gradient": { "enabled": false, "percentage": 100 } },
+		"callbacks" : {
+			"onload" : function() { 
+				$("[class$=_segmentMainLabel-outer]").each(function(idx, $el) {
+					var addr = $(this).attr('data-text');
+					if (addr.startsWith('Ds') || addr.startsWith('Dc')) {
+						$(this).html("<a href=\"#addr=" + addr + "\">" + $(this).text() + "</a>");
+					}
+				});
+			}
+		}
 	});
 }
 
