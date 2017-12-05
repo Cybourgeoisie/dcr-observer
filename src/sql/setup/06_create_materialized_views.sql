@@ -8,11 +8,19 @@ DROP VIEW IF EXISTS address_stx_view CASCADE;
 DROP VIEW IF EXISTS address_block_activity_view CASCADE;
 DROP VIEW IF EXISTS address_actively_staking_view CASCADE;
 DROP VIEW IF EXISTS address_stake_submissions_view CASCADE;
+DROP VIEW IF EXISTS tx_network_initial_view CASCADE;
+DROP VIEW IF EXISTS address_tx_network_initial_view CASCADE;
+DROP VIEW IF EXISTS tx_network_second_view CASCADE;
+DROP VIEW IF EXISTS address_tx_network_second_view CASCADE;
 DROP MATERIALIZED VIEW IF EXISTS address_rtx_view CASCADE;
 DROP MATERIALIZED VIEW IF EXISTS address_stx_view CASCADE;
 DROP MATERIALIZED VIEW IF EXISTS address_block_activity_view CASCADE;
 DROP MATERIALIZED VIEW IF EXISTS address_actively_staking_view CASCADE;
+DROP MATERIALIZED VIEW IF EXISTS address_stake_submissions_view CASCADE;
 DROP MATERIALIZED VIEW IF EXISTS tx_network_initial_view CASCADE;
+DROP MATERIALIZED VIEW IF EXISTS address_tx_network_initial_view CASCADE;
+DROP MATERIALIZED VIEW IF EXISTS tx_network_second_view CASCADE;
+DROP MATERIALIZED VIEW IF EXISTS address_tx_network_second_view CASCADE;
 DROP MATERIALIZED VIEW IF EXISTS address_vout_breakdown_view CASCADE;
 
 
@@ -149,7 +157,7 @@ GROUP BY
 --CREATE UNIQUE INDEX address_block_activity_view_address_id_idx ON address_block_activity_view (address_id);
 
 -- Determine if an address is actively staking
-CREATE VIEW address_actively_staking_view AS
+CREATE MATERIALIZED VIEW address_actively_staking_view AS
 SELECT
   sq.address_id,
   BOOL_OR(actively_staking) AS actively_staking,
@@ -181,8 +189,10 @@ FROM (
 GROUP BY 
   sq.address_id;
 
+CREATE UNIQUE INDEX address_actively_staking_view_address_id_idx ON address_actively_staking_view (address_id);
+
 -- For those addresses used for stake submissions, keep track of tickets active and completed
-CREATE VIEW address_stake_submissions_view AS
+CREATE MATERIALIZED VIEW address_stake_submissions_view AS
 SELECT
   DISTINCT vout.address_id,
   SUM(CASE WHEN vin.vin_id IS NULL THEN 1 ELSE 0 END) AS active_stakesubmissions,
@@ -196,7 +206,7 @@ WHERE
 GROUP BY
   vout.address_id;
 
---CREATE INDEX address_actively_staking_view_address_id_idx ON address_actively_staking_view (address_id);
+CREATE UNIQUE INDEX address_stake_submissions_view_address_id_idx ON address_stake_submissions_view (address_id);
 
 -- Now combine them all
 CREATE MATERIALIZED VIEW address_summary_view AS
@@ -251,18 +261,62 @@ CREATE INDEX address_summary_view_balance_idx ON address_summary_view (balance);
 -----------------
 
 -- Now get all tx / address pairs, set to lowest network, store to tx network
+--CREATE MATERIALIZED VIEW tx_network_initial_view AS
+--SELECT
+--  tx.tx_id,
+--  min(va.address_id) AS network
+--FROM
+--  tx
+--JOIN
+--  vin ON vin.tx_id = tx.tx_id
+--JOIN
+--  vout_address va ON va.vout_id = vin.vout_id
+--GROUP BY
+--  tx.tx_id;
+
 CREATE MATERIALIZED VIEW tx_network_initial_view AS
 SELECT
-  tx.tx_id,
-  min(va.address_id) AS network
-FROM
-  tx
-JOIN
-  vin ON vin.tx_id = tx.tx_id
-JOIN
-  vout_address va ON va.vout_id = vin.vout_id
+  sq.tx_id,
+  min(network) AS network
+FROM (
+  SELECT
+    tx.tx_id,
+    min(va.address_id) AS network
+  FROM
+    tx
+  JOIN
+    vin ON vin.tx_id = tx.tx_id
+  JOIN
+    vout_address va ON va.vout_id = vin.vout_id
+  GROUP BY
+    tx.tx_id
+  UNION ALL
+  SELECT
+    sq.tx_id,
+    min(va.address_id) AS network
+  FROM (
+    SELECT
+      tx.tx_id
+    FROM
+      tx
+    JOIN
+      vout ON vout.tx_id = tx.tx_id
+    JOIN
+      vout_address va ON va.vout_id = vout.vout_id
+    JOIN
+      address a ON a.address_id = va.address_id
+    WHERE
+      vout.type = 'stakesubmission' AND a.address LIKE 'Ds%'
+  ) AS sq
+  JOIN
+    vout ON vout.tx_id = sq.tx_id
+  JOIN
+    vout_address va ON va.vout_id = vout.vout_id
+  GROUP BY
+    sq.tx_id
+) AS sq
 GROUP BY
-  tx.tx_id;
+  sq.tx_id;
 
 CREATE UNIQUE INDEX tx_network_initial_view_tx_id_idx ON tx_network_initial_view (tx_id);
 CREATE INDEX tx_network_initial_view_network_idx ON tx_network_initial_view (network);
@@ -285,20 +339,64 @@ GROUP BY
 --CREATE INDEX address_tx_network_initial_view_network_idx ON address_tx_network_initial_view (network);
 
 -- Then go BACK and fill in the minimum addresses to the initial txes
+--CREATE VIEW tx_network_second_view AS
+--SELECT
+--  tx.tx_id,
+--  min(atnv.network) AS network
+--FROM
+--  tx
+--JOIN
+--  vin ON vin.tx_id = tx.tx_id
+--JOIN
+--  vout_address va ON va.vout_id = vin.vout_id
+--JOIN
+--  address_tx_network_initial_view atnv ON atnv.address_id = va.address_id
+--GROUP BY
+--  tx.tx_id;
+
 CREATE VIEW tx_network_second_view AS
 SELECT
-  tx.tx_id,
-  min(atnv.network) AS network
-FROM
-  tx
-JOIN
-  vin ON vin.tx_id = tx.tx_id
-JOIN
-  vout_address va ON va.vout_id = vin.vout_id
-JOIN
-  address_tx_network_initial_view atnv ON atnv.address_id = va.address_id
+  sq.tx_id,
+  min(network) AS network
+FROM (
+  SELECT
+    tx.tx_id,
+    min(va.address_id) AS network
+  FROM
+    tx
+  JOIN
+    vin ON vin.tx_id = tx.tx_id
+  JOIN
+    vout_address va ON va.vout_id = vin.vout_id
+  GROUP BY
+    tx.tx_id
+  UNION ALL
+  SELECT
+    sq.tx_id,
+    min(va.address_id) AS network
+  FROM (
+    SELECT
+      tx.tx_id
+    FROM
+      tx
+    JOIN
+      vout ON vout.tx_id = tx.tx_id
+    JOIN
+      vout_address va ON va.vout_id = vout.vout_id
+    JOIN
+      address a ON a.address_id = va.address_id
+    WHERE
+      vout.type = 'stakesubmission' AND a.address LIKE 'Ds%'
+  ) AS sq
+  JOIN
+    vout ON vout.tx_id = sq.tx_id
+  JOIN
+    vout_address va ON va.vout_id = vout.vout_id
+  GROUP BY
+    sq.tx_id
+) AS sq
 GROUP BY
-  tx.tx_id;
+  sq.tx_id;
 
 --CREATE INDEX tx_network_second_view_tx_id_idx ON tx_network_second_view (tx_id);
 --CREATE INDEX tx_network_second_view_network_idx ON tx_network_second_view (network);

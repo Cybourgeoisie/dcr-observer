@@ -94,6 +94,8 @@ COMMIT;
 -- Now rebuild the material views
 REFRESH MATERIALIZED VIEW CONCURRENTLY address_vout_vin_view;
 REFRESH MATERIALIZED VIEW CONCURRENTLY address_balance_view;
+REFRESH MATERIALIZED VIEW CONCURRENTLY address_actively_staking_view;
+REFRESH MATERIALIZED VIEW CONCURRENTLY address_stake_submissions_view;
 REFRESH MATERIALIZED VIEW CONCURRENTLY address_summary_view;
 REFRESH MATERIALIZED VIEW CONCURRENTLY tx_network_initial_view;
 REFRESH MATERIALIZED VIEW CONCURRENTLY address_tx_network_second_view;
