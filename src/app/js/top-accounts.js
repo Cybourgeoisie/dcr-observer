@@ -143,6 +143,22 @@ function pullTopAddressesFromApi(callback) {
 					$new_row.find('.top-td-addr-identifier').html(address_info.identifier);
 				}
 
+				// If the address is mining, display it
+				$new_row.find('.top-td-badge-address-miner').hide();
+				$new_row.find('.top-td-addr-miner').html('');
+				if (address_info.hasOwnProperty('miner') && address_info.miner) {
+					$new_row.find('.top-td-badge-address-miner').show();
+					$new_row.find('.top-td-addr-miner').html(address_info.miner);
+				}
+
+				// If the address is a ticket, display it
+				$new_row.find('.top-td-badge-address-ticket').hide();
+				$new_row.find('.top-td-addr-ticket').html('');
+				if (address_info.hasOwnProperty('ticket') && address_info.ticket) {
+					$new_row.find('.top-td-badge-address-ticket').show();
+					$new_row.find('.top-td-addr-ticket').html(address_info.ticket);
+				}
+
 				// If the address is actively staking, make note of it
 				$new_row.find('.top-td-badge-address-actively-staking').hide();
 				if (address_info.hasOwnProperty('actively_staking') && address_info.actively_staking == 't') {
@@ -313,6 +329,22 @@ function pullTopNetworksFromApi(callback) {
 				if (network_info.hasOwnProperty('identifier') && network_info.identifier) {
 					$new_row.find('.top-hd-td-badge-address-identifier').show();
 					$new_row.find('.top-hd-td-addr-identifier').html(network_info.identifier);
+				}
+
+				// If the address is mining, display it
+				$new_row.find('.top-hd-td-badge-address-miner').hide();
+				$new_row.find('.top-hd-td-addr-miner').html('');
+				if (network_info.hasOwnProperty('miner') && network_info.miner) {
+					$new_row.find('.top-hd-td-badge-address-miner').show();
+					$new_row.find('.top-hd-td-addr-miner').html(network_info.miner);
+				}
+
+				// If the address is a ticket, display it
+				$new_row.find('.top-hd-td-badge-address-ticket').hide();
+				$new_row.find('.top-hd-td-addr-ticket').html('');
+				if (network_info.hasOwnProperty('ticket') && network_info.ticket) {
+					$new_row.find('.top-hd-td-badge-address-ticket').show();
+					$new_row.find('.top-hd-td-addr-ticket').html(network_info.ticket);
 				}
 
 				// If the address is actively staking, make note of it

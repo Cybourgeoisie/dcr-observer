@@ -9,20 +9,15 @@ DROP VIEW IF EXISTS address_block_activity_view CASCADE;
 DROP VIEW IF EXISTS address_actively_staking_view CASCADE;
 DROP VIEW IF EXISTS address_stake_submissions_view CASCADE;
 DROP VIEW IF EXISTS hd_address_tx_logic_view CASCADE;
-DROP VIEW IF EXISTS tx_network_initial_view CASCADE;
-DROP VIEW IF EXISTS address_tx_network_initial_view CASCADE;
-DROP VIEW IF EXISTS tx_network_second_view CASCADE;
-DROP VIEW IF EXISTS address_tx_network_second_view CASCADE;
+DROP VIEW IF EXISTS address_owner_identifiers_view CASCADE;
+DROP VIEW IF EXISTS address_origin_identifiers_view CASCADE;
+DROP VIEW IF EXISTS address_ticket_identifiers_view CASCADE;
 DROP MATERIALIZED VIEW IF EXISTS address_rtx_view CASCADE;
 DROP MATERIALIZED VIEW IF EXISTS address_stx_view CASCADE;
 DROP MATERIALIZED VIEW IF EXISTS address_block_activity_view CASCADE;
 DROP MATERIALIZED VIEW IF EXISTS address_actively_staking_view CASCADE;
 DROP MATERIALIZED VIEW IF EXISTS address_stake_submissions_view CASCADE;
 DROP MATERIALIZED VIEW IF EXISTS hd_address_tx_logic_view CASCADE;
-DROP MATERIALIZED VIEW IF EXISTS tx_network_initial_view CASCADE;
-DROP MATERIALIZED VIEW IF EXISTS address_tx_network_initial_view CASCADE;
-DROP MATERIALIZED VIEW IF EXISTS tx_network_second_view CASCADE;
-DROP MATERIALIZED VIEW IF EXISTS address_tx_network_second_view CASCADE;
 DROP MATERIALIZED VIEW IF EXISTS address_vout_breakdown_view CASCADE;
 
 
@@ -292,7 +287,7 @@ FROM ( -- get all tx<->[vout address] relationships ONLY for txes with a vout wi
     vout.type = 'stakesubmission' AND a.address LIKE 'Ds%'
 ) AS sq
 JOIN
-  vout ON vout.tx_id = sq.tx_id
+  vout ON vout.tx_id = sq.tx_id AND (vout.type = 'stakesubmission' OR vout.type = 'sstxcommitment')
 JOIN
   vout_address va ON va.vout_id = vout.vout_id;
 
@@ -322,14 +317,11 @@ LEFT JOIN
 GROUP BY
   hatlv.address_id;
 
---CREATE UNIQUE INDEX address_tx_network_initial_view_address_id_idx ON address_tx_network_initial_view (address_id);
---CREATE INDEX address_tx_network_initial_view_network_idx ON address_tx_network_initial_view (network);
-
 -- Then go BACK and fill in the minimum addresses to the initial txes
 CREATE VIEW tx_network_second_view AS
 SELECT
   hatlv.tx_id,
-  min(atnv.network) AS network
+  MIN(atnv.network) AS network
 FROM
   hd_address_tx_logic_view hatlv
 JOIN
@@ -337,23 +329,97 @@ JOIN
 GROUP BY
   hatlv.tx_id;
 
---CREATE UNIQUE INDEX tx_network_second_view_tx_id_idx ON tx_network_second_view (tx_id);
---CREATE INDEX tx_network_second_view_network_idx ON tx_network_second_view (network);
+-- Now find the lowest networks from all of the transactions it belongs to
+CREATE VIEW address_tx_network_second_view AS
+SELECT
+  hatlv.address_id,
+  MIN(tniv.network) AS network
+FROM
+  hd_address_tx_logic_view hatlv
+LEFT JOIN
+  tx_network_second_view tniv ON tniv.tx_id = hatlv.tx_id
+GROUP BY
+  hatlv.address_id;
+
+-- HALFWAY POINT
+-- Then go BACK and fill in the minimum addresses to the initial txes
+CREATE MATERIALIZED VIEW tx_network_third_view AS
+SELECT
+  hatlv.tx_id,
+  MIN(atnv.network) AS network
+FROM
+  hd_address_tx_logic_view hatlv
+JOIN
+  address_tx_network_second_view atnv ON atnv.address_id = hatlv.address_id
+GROUP BY
+  hatlv.tx_id;
+
+CREATE UNIQUE INDEX tx_network_third_view_tx_id_idx ON tx_network_third_view (tx_id);
+CREATE INDEX tx_network_third_view_network_idx ON tx_network_third_view (network);
+
 
 -- Now find the lowest networks from all of the transactions it belongs to
-CREATE MATERIALIZED VIEW address_tx_network_second_view AS
+CREATE VIEW address_tx_network_third_view AS
+SELECT
+  hatlv.address_id,
+  MIN(tniv.network) AS network
+FROM
+  hd_address_tx_logic_view hatlv
+LEFT JOIN
+  tx_network_third_view tniv ON tniv.tx_id = hatlv.tx_id
+GROUP BY
+  hatlv.address_id;
+
+-- Then go BACK and fill in the minimum addresses to the initial txes
+CREATE VIEW tx_network_fourth_view AS
+SELECT
+  hatlv.tx_id,
+  MIN(atnv.network) AS network
+FROM
+  hd_address_tx_logic_view hatlv
+JOIN
+  address_tx_network_third_view atnv ON atnv.address_id = hatlv.address_id
+GROUP BY
+  hatlv.tx_id;
+
+-- Now find the lowest networks from all of the transactions it belongs to
+CREATE VIEW address_tx_network_fourth_view AS
+SELECT
+  hatlv.address_id,
+  MIN(tniv.network) AS network
+FROM
+  hd_address_tx_logic_view hatlv
+LEFT JOIN
+  tx_network_fourth_view tniv ON tniv.tx_id = hatlv.tx_id
+GROUP BY
+  hatlv.address_id;
+
+-- Then go BACK and fill in the minimum addresses to the initial txes
+CREATE VIEW tx_network_fifth_view AS
+SELECT
+  hatlv.tx_id,
+  MIN(atnv.network) AS network
+FROM
+  hd_address_tx_logic_view hatlv
+JOIN
+  address_tx_network_fourth_view atnv ON atnv.address_id = hatlv.address_id
+GROUP BY
+  hatlv.tx_id;
+
+-- Now find the lowest networks from all of the transactions it belongs to
+CREATE MATERIALIZED VIEW address_tx_network_fifth_view AS
 SELECT
   hatlv.address_id,
   MIN(tnsv.network) AS network
 FROM
   hd_address_tx_logic_view hatlv
 LEFT JOIN
-  tx_network_second_view tnsv ON tnsv.tx_id = hatlv.tx_id
+  tx_network_fifth_view tnsv ON tnsv.tx_id = hatlv.tx_id
 GROUP BY
   hatlv.address_id;
 
-CREATE UNIQUE INDEX address_tx_network_second_view_address_id_idx ON address_tx_network_second_view (address_id);
-CREATE INDEX address_tx_network_second_view_network_idx ON address_tx_network_second_view (network);
+CREATE UNIQUE INDEX address_tx_network_fifth_view_address_id_idx ON address_tx_network_fifth_view (address_id);
+CREATE INDEX address_tx_network_fifth_view_network_idx ON address_tx_network_fifth_view (network);
 
 -- Now find the lowest addresses of all connected networks
 CREATE MATERIALIZED VIEW address_network_view AS
@@ -366,7 +432,7 @@ WITH RECURSIVE network_chain AS (
       address_id,
       network
     FROM
-      address_tx_network_second_view
+      address_tx_network_fifth_view
     WHERE
       address_id = network
   ) AS init
@@ -377,7 +443,7 @@ WITH RECURSIVE network_chain AS (
     atnv.address_id,
     nc.network
   FROM
-    address_tx_network_second_view atnv
+    address_tx_network_fifth_view atnv
   INNER JOIN
     network_chain nc ON nc.address_id = atnv.network
 )
@@ -475,6 +541,129 @@ CREATE INDEX network_summary_view_rank_idx ON network_summary_view (rank);
 --CREATE INDEX network_summary_view_liquid_rank_idx ON network_summary_view (liquid_rank);
 --CREATE INDEX network_summary_view_stakesubmission_rank_idx ON network_summary_view (stakesubmission_rank);
 CREATE INDEX network_summary_view_balance_idx ON network_summary_view (balance);
+
+
+-- Assign identifiers: owners (trex, polo, dev fund, genesis); types (mining, pool ticket, solo ticket)
+CREATE VIEW address_owner_identifiers_view AS
+SELECT
+  sq.address_id,
+  sq.owner 
+FROM (
+  SELECT
+    anv.address_id,
+    'Dev Fund' AS owner
+  FROM
+    address_network_view anv
+  JOIN
+    address a_this ON a_this.address = 'Dcur2mcGjmENx4DhNqDctW5wJCVyT3Qeqkx'
+  JOIN
+    address_network_view anv_this ON anv_this.address_id = a_this.address_id
+  WHERE
+    anv.network = anv_this.network
+  UNION
+  SELECT
+    anv.address_id,
+    'Bittrex' AS owner
+  FROM
+    address_network_view anv
+  JOIN
+    address a_this ON a_this.address = 'DsYyjn3CibRn3Bs3GxtxdBNyrwmENSbwA5Y'
+  JOIN
+    address_network_view anv_this ON anv_this.address_id = a_this.address_id
+  WHERE
+    anv.network = anv_this.network
+  UNION
+  SELECT
+    anv.address_id,
+    'Poloniex' AS owner
+  FROM
+    address_network_view anv
+  JOIN
+    address a_this ON a_this.address = 'DsatEqTNTh5RZHWrSLzS8e3QVNmE1U7iYAL'
+  JOIN
+    address_network_view anv_this ON anv_this.address_id = a_this.address_id
+  WHERE
+    anv.network = anv_this.network
+  UNION
+  SELECT
+    va.address_id,
+    'Genesis' AS origin
+  FROM
+    vout
+  JOIN
+    vout_address va ON va.vout_id = vout.vout_id
+  WHERE
+    vout.tx_id = 1
+) AS sq;
+
+CREATE VIEW address_origin_identifiers_view AS
+SELECT
+  sq.address_id,
+  sq.origin
+FROM (
+  SELECT
+    DISTINCT a.address_id,
+    'Mining' AS origin
+  FROM
+    vin
+  JOIN
+    vout ON vout.tx_id = vin.tx_id
+  JOIN
+    vout_address va ON va.vout_id = vout.vout_id
+  JOIN
+    address a ON a.address_id = va.address_id
+  WHERE
+    -- We don't want to count the first block, which was an investor / developer distribution
+    -- Nor do we count the developer fund
+    vin.coinbase != '' AND vin.tx_id > 1 AND a.address != 'Dcur2mcGjmENx4DhNqDctW5wJCVyT3Qeqkx'
+) AS sq;
+
+CREATE VIEW address_ticket_identifiers_view AS
+SELECT
+  sq.address_id,
+  sq.ticket
+FROM (
+  SELECT
+    DISTINCT a.address_id,
+    'Pool Ticket' AS ticket
+  FROM
+    vout
+  JOIN
+    vout_address va ON va.vout_id = vout.vout_id
+  JOIN
+    address a ON a.address_id = va.address_id
+  WHERE
+    vout.type = 'stakesubmission' AND a.address LIKE 'Dc%'
+  UNION
+  SELECT
+    DISTINCT a.address_id,
+    'Solo Ticket' AS ticket
+  FROM
+    vout
+  JOIN
+    vout_address va ON va.vout_id = vout.vout_id
+  JOIN
+    address a ON a.address_id = va.address_id
+  WHERE
+    vout.type = 'stakesubmission' AND a.address LIKE 'Ds%'
+) AS sq;
+
+CREATE MATERIALIZED VIEW address_identifiers_view AS
+SELECT
+  a.address_id,
+  owner.owner,
+  origin.origin,
+  ticket.ticket
+FROM
+  address a
+LEFT JOIN
+  address_owner_identifiers_view owner ON owner.address_id = a.address_id
+LEFT JOIN
+  address_origin_identifiers_view origin ON origin.address_id = a.address_id
+LEFT JOIN
+  address_ticket_identifiers_view ticket ON ticket.address_id = a.address_id;
+
+CREATE UNIQUE INDEX address_identifiers_view_network_idx ON address_identifiers_view (address_id);
 
 -- And create the cached breakdown view of all vouts
 CREATE MATERIALIZED VIEW address_vout_breakdown_view AS

@@ -381,6 +381,22 @@ function setAddressInfo(data) {
 		$('span.addr-identifier').html(addr_info.identifier);
 	}
 
+	// If the address is a miner, display it
+	$('.dcr-badge-address-miner').hide();
+	$('span.addr-miner').html('');
+	if (addr_info.hasOwnProperty('miner') && addr_info.miner) {
+		$('.dcr-badge-address-miner').show();
+		$('span.addr-miner').html(addr_info.miner);
+	}
+
+	// If the address is a ticket, display it
+	$('.dcr-badge-address-ticket').hide();
+	$('span.addr-ticket').html('');
+	if (addr_info.hasOwnProperty('ticket') && addr_info.ticket) {
+		$('.dcr-badge-address-ticket').show();
+		$('span.addr-ticket').html(addr_info.ticket);
+	}
+
 	// If the address is actively staking, notify
 	$('.dcr-badge-address-actively-staking').hide();
 	if (addr_info.hasOwnProperty('actively_staking') && addr_info.actively_staking == 't') {
@@ -657,7 +673,25 @@ function setHdAddressInfo(data, req_address) {
 		$identifier.find('span.hd-addr-identifier').html(identifier);
 	}
 
-	// If the top address has an identifier, display it
+	// If the top address is a miner, display it
+	var $miner = $('.dcr-badge-hd-address-miner');
+	$miner.hide();
+	$miner.find('span.hd-addr-miner').html('');
+	if (network.miner && network.miner.length > 0) {
+		$miner.show();
+		$miner.find('span.hd-addr-miner').html(network.miner);
+	}
+
+	// If the top address is a ticket, display it
+	var $ticket = $('.dcr-badge-hd-address-ticket');
+	$ticket.hide();
+	$ticket.find('span.hd-addr-ticket').html('');
+	if (network.ticket && network.ticket.length > 0) {
+		$ticket.show();
+		$ticket.find('span.hd-addr-ticket').html(network.ticket);
+	}
+
+	// If the top address is staking, display it
 	$('.dcr-badge-hd-address-actively-staking').hide();
 	if (network.actively_staking == 't') {
 		$('.dcr-badge-hd-address-actively-staking').show();
@@ -694,6 +728,22 @@ function addHdAddressRow($hd_address_tbody, $hd_address_row, hd_address, row_num
 	if (hd_address.hasOwnProperty('identifier') && identifier) {
 		$new_row.find('.hd-badge-address-identifier').show();
 		$new_row.find('.hd-addr-identifier').html(identifier);
+	}
+
+	// If the address is a miner, display it
+	$new_row.find('.hd-badge-address-miner').hide();
+	$new_row.find('.hd-addr-miner').html('');
+	if (hd_address.hasOwnProperty('miner') && hd_address.miner) {
+		$new_row.find('.hd-badge-address-miner').show();
+		$new_row.find('.hd-addr-miner').html(hd_address.miner);
+	}
+
+	// If the address is a ticket, display it
+	$new_row.find('.hd-badge-address-ticket').hide();
+	$new_row.find('.hd-addr-ticket').html('');
+	if (hd_address.hasOwnProperty('ticket') && hd_address.ticket) {
+		$new_row.find('.hd-badge-address-ticket').show();
+		$new_row.find('.hd-addr-ticket').html(hd_address.ticket);
 	}
 
 	// If the address is actively staking, make note of it

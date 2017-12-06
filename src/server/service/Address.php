@@ -18,7 +18,9 @@ class Address extends \Scrollio\Service\AbstractService
 		$sql = '
 			SELECT
 				a.address,
-				a.identifier,
+				aiv.owner AS identifier,
+				aiv.origin AS miner,
+				aiv.ticket,
 				asv.actively_staking,
 				--astxv.actively_staking,
 				asv.rank,
@@ -47,8 +49,8 @@ class Address extends \Scrollio\Service\AbstractService
 				address a
 			JOIN
 				address_summary_view asv ON asv.address_id = a.address_id
-			--LEFT JOIN
-			--	address_staking_view astxv ON astxv.address_id = asv.address_id
+			LEFT JOIN
+				address_identifiers_view aiv ON aiv.address_id = a.address_id
 			JOIN
 				block bs ON bs.block_id = asv.first_block_id
 			JOIN
@@ -283,7 +285,9 @@ class Address extends \Scrollio\Service\AbstractService
 		$sql = '
 			SELECT 
 				a.address,
-				a.identifier,
+				aiv.owner AS identifier,
+				aiv.origin AS miner,
+				aiv.ticket,
 				nsv.actively_staking,
 				CASE WHEN COALESCE(nsv.balance, 0) < 0 THEN 0 ELSE COALESCE(nsv.balance, 0) END AS balance,
 				--tx.hash AS tx_hash,
@@ -305,6 +309,8 @@ class Address extends \Scrollio\Service\AbstractService
 				COALESCE(nsv.completed_stakesubmissions, 0) AS completed_stakesubmissions
 			FROM
 				address a
+			LEFT JOIN
+				address_identifiers_view aiv ON aiv.address_id = a.address_id
 			JOIN
 				address_network_view anv ON anv.address_id = a.address_id
 			JOIN
@@ -328,9 +334,10 @@ class Address extends \Scrollio\Service\AbstractService
 		$sql = '
 			SELECT 
 				a.address,
-				a.identifier,
+				aiv.owner AS identifier,
+				aiv.origin AS miner,
+				aiv.ticket,
 				asv.actively_staking,
-				--astxv.actively_staking,
 				CASE WHEN COALESCE(asv.balance, 0) < 0 THEN 0 ELSE COALESCE(asv.balance, 0) END AS balance
 			FROM
 				address a_this
@@ -340,8 +347,8 @@ class Address extends \Scrollio\Service\AbstractService
 				address_network_view anv ON anv.network = anv_this.network
 			JOIN
 				address_summary_view asv ON asv.address_id = anv.address_id
-			--LEFT JOIN
-			--	address_staking_view astxv ON astxv.address_id = asv.address_id
+			LEFT JOIN
+				address_identifiers_view aiv ON aiv.address_id = asv.address_id
 			JOIN
 				address a ON a.address_id = asv.address_id
 			WHERE
@@ -714,16 +721,17 @@ class Address extends \Scrollio\Service\AbstractService
 			SELECT
 				asv.rank,
 				asv.actively_staking,
-				--astxv.actively_staking,
 				a.address,
-				a.identifier,
+				aiv.owner AS identifier,
+				aiv.origin AS miner,
+				aiv.ticket AS ticket,
 				asv.balance,
 				COALESCE(asv.tx, 0) AS tx,
 				COALESCE(asv.stx, 0) AS stx
 			FROM
 				address_summary_view asv
-			--LEFT JOIN
-			--	address_staking_view astxv ON astxv.address_id = asv.address_id
+			LEFT JOIN
+				address_identifiers_view aiv ON aiv.address_id = asv.address_id
 			JOIN
 				address a ON a.address_id = asv.address_id
 			ORDER BY
@@ -753,11 +761,15 @@ class Address extends \Scrollio\Service\AbstractService
 				nsv.rank,
 				nsv.num_addresses,
 				a.address,
-				a.identifier
+				aiv.owner AS identifier,
+				aiv.origin AS miner,
+				aiv.ticket AS ticket
 			FROM
 				network_summary_view nsv
 			JOIN
 				address a ON a.address_id = nsv.primary_address_id
+			LEFT JOIN
+				address_identifiers_view aiv ON aiv.address_id = a.address_id
 			ORDER BY
 				rank ASC
 			LIMIT
@@ -822,12 +834,14 @@ class Address extends \Scrollio\Service\AbstractService
 
 		$sql = '
 			SELECT
-				CASE WHEN a.identifier != \'\' THEN a.identifier ELSE a.address END AS label,
+				CASE WHEN aiv.owner != \'\' THEN aiv.owner ELSE a.address END AS label,
 				b.balance AS value
 			FROM
 				address_balance_view b
 			JOIN
 				address a ON a.address_id = b.address_id
+			LEFT JOIN
+				address_identifiers_view aiv ON aiv.address_id = a.address_id
 			WHERE
 				b.balance >= $1 AND b.balance < $2
 			ORDER BY balance DESC
@@ -939,12 +953,14 @@ class Address extends \Scrollio\Service\AbstractService
 
 		$sql = '
 			SELECT
-				CASE WHEN a.identifier != \'\' THEN a.identifier ELSE a.address END AS label,
+				CASE WHEN aiv.owner != \'\' THEN aiv.owner ELSE a.address END AS label,
 				hd.balance AS value
 			FROM
 				network_summary_view hd
 			JOIN
 				address a ON a.address_id = hd.primary_address_id
+			LEFT JOIN
+				address_identifiers_view aiv ON aiv.address_id = a.address_id
 			WHERE
 				hd.balance >= $1 AND hd.balance < $2
 			ORDER BY hd.balance DESC
