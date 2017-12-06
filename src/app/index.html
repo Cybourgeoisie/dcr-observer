@@ -51,6 +51,28 @@
 		</div>
 	</div>
 
+	<!-- Display connections within modal -->
+	<div class="modal-connection-table" style="display:none;">
+		<table class="table table-hover table-addr-connection table-responsive-sm">
+			<thead>
+				<tr>
+					<th>Address</th>
+					<th>Transaction</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr>
+					<td class="addr-connection-table-address">
+						<a class="page-toggle" href="#addr">X</a>
+					</td>
+					<td class="addr-connection-table-tx">
+						<a href="#" target="blank">X</a> 
+					</td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+
 	<!-- Navigation Bar -->
 	<nav class="navbar navbar-expand-md navbar-dark bg-dark fixed-top dcr-navbar-top">
 		<a class="navbar-brand page-toggle" href="#home">
@@ -912,6 +934,38 @@
 			<br />
 
 			<h5>
+				Balance Details
+			</h5>
+
+			<div class="container">
+				<div class="row">
+					<div class="col-6 text-right" style="font-weight:bold;">
+						Liquid Balance <i class="fa fa-info-circle" data-toggle="tooltip" data-placement="top" title="Amount of DCR that this wallet can freely spend"></i>
+					</div>
+					<div class="col-6 text-left" style="color:rgba(0,0,0,.5);">
+						<span class="hd-addr-liquid-balance">X</span> DCR
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-6 text-right" style="font-weight:bold;">
+						Stake Submissions <i class="fa fa-info-circle" data-toggle="tooltip" data-placement="top" title="Amount of DCR sent to this wallet for ticket staking"></i>
+					</div>
+					<div class="col-6 text-left" style="color:rgba(0,0,0,.5);">
+						<span class="hd-addr-stake-submissions">X</span> DCR
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-6 text-right" style="font-weight:bold;">
+						Total Balance
+					</div>
+					<div class="col-6 text-left" style="color:rgba(0,0,0,.5);">
+						<span class="hd-addr-total-balance">X</span> DCR
+					</div>
+				</div>
+			</div><br />
+
+
+			<h5>
 				Staking Details
 			</h5>
 
@@ -1025,10 +1079,7 @@
 						<th>Row</th>
 						<th>Address</th>
 						<th>Balance</th>
-						<!--<th>
-							<span class="d-none d-md-inline d-l-inline d-xl-inline">Shared TX</span>
-							<span class="d-inline d-md-none d-l-none d-xl-none">TX</span>
-						</th>-->
+						<th>Connection</th>
 					</tr>
 				</thead>
 				<tbody>
@@ -1049,7 +1100,11 @@
 							<span class="hd-addr-balance-value">X</span>
 							<span class="d-none d-md-inline d-l-inline d-xl-inline"> DCR</span>
 						</td>
-						<!--<td class="hd-addr-tx-link"><a href="#" target="blank">View</a></td>-->
+						<td class="hd-addr-tx-link">
+							<button class="btn btn-default hd-addr-view-connection" style="padding:2px 6px;margin:0;font-size:80%;" data-toggle="modal" data-target=".data-modal" data-origin="hd-addr-view-connection" data-from="" data-to="">
+								<i class="fa fa-code-fork" aria-hidden="true"></i>
+							</button>
+						</td>
 					</tr>
 				</tbody>
 			</table>

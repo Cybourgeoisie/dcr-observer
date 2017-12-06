@@ -52,7 +52,9 @@ body {
 .table-issue-results td,
 .table-issue-results th,
 .table-dist-list td,
-.table-dist-list th {
+.table-dist-list th,
+.table-addr-connection td,
+.table-addr-connection th {
 	font-size:80%;
 }
 

@@ -296,6 +296,8 @@ class Address extends \Scrollio\Service\AbstractService
 				bs.height AS first,
 				be.height AS last,
 				nsv.num_addresses,
+				COALESCE(nsv.liquid_balance, 0) AS liquid,
+				COALESCE(nsv.stakesubmission_balance, 0) AS active_stake_submissions,
 				COALESCE(nsv.active_tickets, 0) AS active_tickets,
 				COALESCE(nsv.completed_tickets, 0) AS completed_tickets,
 				COALESCE(nsv.revoked_tickets, 0) AS revoked_tickets,
@@ -470,6 +472,203 @@ class Address extends \Scrollio\Service\AbstractService
 		return array(
 			'data' => $res
 		);
+	}
+
+	public function getAddressConnection(string $from, string $to) {
+		// Don't allow same address
+		if ($from == $to) {
+			throw new Exception("Same addresses provided.");
+		}
+
+		// Validate the addresses
+		$to = preg_replace("/[^A-Za-z0-9]/", '', $to);
+		if (strlen($to) < 34 || strlen($to) > 36 || $to[0] != 'D') {
+			throw new \Exception('Invalid address provided.');
+		}
+
+		$from = preg_replace("/[^A-Za-z0-9]/", '', $from);
+		if (strlen($from) < 34 || strlen($from) > 36 || $from[0] != 'D') {
+			throw new \Exception('Invalid address provided.');
+		}
+
+		// Get the two addresses
+		$sql = 'SELECT address_id, address FROM address WHERE address IN ($1, $2);';
+		$db_handler = \Geppetto\DatabaseHandler::init();
+		$res = $db_handler->query($sql, array($from, $to));
+
+		// Validate
+		if (!$res || count($res) != 2) {
+			throw new \Exception("Could not find addresses.");
+		}
+
+		// Collect both
+		if ($res[0]['address'] == $to) {
+			$to_id   = $res[0]['address_id'];
+			$from_id = $res[1]['address_id'];
+		} else if ($res[1]['address'] == $to) {
+			$to_id   = $res[1]['address_id'];
+			$from_id = $res[0]['address_id'];
+		}
+
+		// Preparation
+		$seen     = array(intval($from_id));
+		$not_seen = array(intval($from_id)); // Start by looking from the "from" address
+		$b_found  = false;
+		$attempts = 0;
+		$paths    = array();
+		$txes     = array();
+
+		// Continually look to find the address, with a terminal condition
+		while (!$b_found && $attempts++ < 22)
+		{
+			// Remove duplicates
+			$not_seen = array_unique($not_seen);
+
+			// Find all addresses connected to these addresses
+			$sql = '
+				SELECT
+					hatlv.address_id,
+					sq.address_id AS from_address_id,
+					sq.tx_id
+				FROM (
+					SELECT
+						tx_id,
+						address_id
+					FROM 
+						hd_address_tx_logic_view hatlv
+					WHERE
+						address_id IN (' . implode(',', $not_seen) . ')
+				) AS sq
+				JOIN
+					hd_address_tx_logic_view hatlv ON hatlv.tx_id = sq.tx_id
+			';
+			$db_handler = \Geppetto\DatabaseHandler::init();
+			$res = $db_handler->query($sql, array());
+
+			// Iterate over all addresses
+			foreach ($res as $row) {
+				if (in_array(intval($row['address_id']), $seen)) { continue; }
+
+				if (!array_key_exists(intval($row['from_address_id']), $paths)) {
+					$paths[$row['from_address_id']] = array();
+				}
+
+				if (!array_key_exists(intval($row['tx_id']), $txes)) {
+					$txes[$row['tx_id']] = array();
+				}
+
+				// Keep track of the connections
+				$paths[$row['from_address_id']][] = intval($row['address_id']);
+				$txes[$row['tx_id']][] = array(intval($row['from_address_id']), intval($row['address_id']));
+
+				// If we find what we want, return
+				if ($row['address_id'] == $to_id) {
+					// We know the last ID and the first ID
+					$last_id = $row['from_address_id'];
+					
+					// Find the path
+					$path = $this->connectNodes($paths, $from_id, $last_id);
+
+					// Reverse it, tack on the final node
+					$path   = array_reverse($path);
+					$path[] = intval($to_id);
+
+
+					// Find the txes between them
+					$path_txes = $this->findPathTxes($path, $txes);
+
+					// Now get all the addresses
+					$sql = 'SELECT address_id, address FROM address WHERE address_id IN (' . implode(',', $path) . ');';
+					$db_handler = \Geppetto\DatabaseHandler::init();
+					$res = $db_handler->query($sql, array());
+
+					// And all tx hashes
+					$sql = 'SELECT tx_id, hash FROM tx WHERE tx_id IN (' . implode(',', $path_txes) . ');';
+					$db_handler = \Geppetto\DatabaseHandler::init();
+					$tx_res = $db_handler->query($sql, array());
+
+					// Correlate the tx hashes
+					foreach ($tx_res as $key => $row) {
+						$path_key = array_search(intval($row['tx_id']), $path_txes);
+						$path_txes[$path_key] = $row['hash'];
+					}
+
+					// Construct the final path
+					foreach ($res as $key => $row) {
+						$path_key = array_search(intval($row['address_id']), $path);
+						$path[$path_key] = $row['address'];
+					}
+
+					// And combine both for the final picture
+					$path_to = array(array('address' => $path[0]));
+					for ($i = 1; $i < count($path); $i++) {
+						$path_to[] = array('address' => $path[$i], 'tx' => $path_txes[$i-1]);
+					}
+
+					return array(
+						'success' => true,
+						'path' => $path_to
+					);
+				}
+
+				// Include in next round
+				$not_seen[] = intval($row['address_id']);
+				$seen[] = intval($row['address_id']);
+			}
+		}
+
+		return array(
+			'success' => true,
+			'data' => 'could not find connection'
+		);
+	}
+
+	protected function connectNodes($paths, $first, $last) {
+		// Start the path
+		$path = array(intval($last));
+
+		// Remove the unneeded node
+		unset($paths[$last]);
+
+		// Iterate over remaining, limited
+		$attempts = 0;
+		while ($attempts++ < 22) {
+			foreach ($paths as $node_id => $neighbors) {
+				if (in_array($last, $neighbors)) {
+					$path[] = intval($node_id);
+					$last = $node_id;
+
+					if ($node_id == $first) {
+						return $path;
+					}
+
+					// Found the next node - we're done with this one
+					unset($paths[$node_id]);
+					break;
+				}
+			}
+		}
+
+		return $path;
+	}
+
+	protected function findPathTxes($path, $txes) {
+		// Need to find the tx between the two nodes in the path
+		$tx_path = array();
+		for ($i = 0; $i < count($path) - 1; $i++) {
+			$from = $path[$i]; $to = $path[$i+1];
+			foreach ($txes as $tx_id => $node_sets) {
+				foreach ($node_sets as $node_set) {
+					if (($from == $node_set[0] && $to == $node_set[1]) || 
+						($from == $node_set[1] && $to == $node_set[0])) {
+						$tx_path[] = $tx_id;
+						break;
+					}
+				}
+			}
+		}
+
+		return $tx_path;
 	}
 
 	public function getImmediateNetwork(string $address) {

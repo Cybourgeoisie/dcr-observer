@@ -300,6 +300,8 @@ function setEvents() {
 			getIssueVoteResultsPie($(this), $source);
 		} else if ($source.data('origin') == 'vote-results-versions') {
 			getVersionVoteResultsPie($(this), $source);
+		} else if ($source.data('origin') == 'hd-addr-view-connection') {
+			getAddressConnection($(this), $source);
 		}
 	});
 
@@ -468,6 +470,51 @@ function setAddressNetwork(network_info, address) {
 	}
 }
 
+function getAddressConnection($modal, $source) {
+	// Display the loader
+	$modal.find('.modal-data-loading').show();
+
+	// Pull the address from the data source
+	var address_from = $source.data('from');
+	var address_to   = $source.data('to');
+
+	// Set title
+	$modal.find('.modal-title').html('Connection Between Addresses');
+
+	$.post('api/Address/getAddressConnection', {'from': address_from, 'to':address_to})
+	 .done(function(data) {
+	 	if (data.hasOwnProperty('success') && data.success) {
+	 		// Hide the loader
+			$modal.find('.modal-data-loading').hide();
+
+			// Generate the table
+			$table = $('.modal-connection-table').clone(true).show();
+			$tbody = $table.find('tbody');
+			$row   = $tbody.find('tr').clone(true);
+			$tbody.html('');
+
+			// Collect the path
+			var path = data.path;
+			for (var i = 0; i < path.length; i++) {
+				$new_row = $row.clone(true);
+				$new_row.find('.addr-connection-table-address > a').attr('href', '#addr=' + path[i].address).html(path[i].address);
+				if (path[i].hasOwnProperty('tx')) {
+					$new_row.find('.addr-connection-table-tx > a').attr('href', 'https://explorer.dcrdata.org/explorer/tx/' + path[i].tx).html('View');
+				} else {
+					$new_row.find('.addr-connection-table-tx > a').attr('href', '').html('');
+				}
+				$new_row.appendTo($tbody);
+			}
+
+	 		// Load the data
+	 		$modal.find('.modal-body').append($table);
+	 	} else {
+	 		console.log("Error");
+	 		console.log(data);
+	 	}
+	});
+}
+
 function getAddressDistributionPie($modal, $source) {
 	// Display the loader
 	$modal.find('.modal-data-loading').show();
@@ -576,8 +623,9 @@ function setHdAddressInfo(data, req_address) {
 		var $hd_address_row = $hd_address_table.find('tr:last').clone(true).show();
 
 		for (var i = 0; i < remaining_hd_addresses_to_load.length; i++) {
-			addHdAddressRow($hd_address_tbody, $hd_address_row, remaining_hd_addresses_to_load[i], i + 11);			
+			addHdAddressRow($hd_address_tbody, $hd_address_row, remaining_hd_addresses_to_load[i], i + 11);
 		}
+		$('.hd-addr-view-connection').data('from', req_address);
 
 		$('button.show-all-hd').attr("disabled", "disabled").html('Showing All Addresses');
 	});
@@ -587,11 +635,18 @@ function setHdAddressInfo(data, req_address) {
 
 	// Set cumulative information
 	$('.hd-addr-view-all').data('address', req_address);
+	$('.hd-addr-view-connection').data('from', req_address).removeAttr("disabled");
+	$('.hd-addr-view-connection[data-to=\'' + req_address + '\']').attr("disabled", "disabled");
 	$('.hd-balance').html(total_balance.toLocaleString());
 	$('.hd-fiat-value').html('$' + parseInt(parseFloat(total_balance)*dcr_price).toLocaleString());
 	$('.hd-total-in').html(total_received.toLocaleString());
 	$('.hd-total-out').html(total_sent.toLocaleString());
 	$('.hd-num-addresses').html(network.num_addresses);
+
+	// Balance info
+	$('.hd-addr-liquid-balance').html(parseFloat(network.liquid).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2}));
+	$('.hd-addr-stake-submissions').html(parseFloat(network.active_stake_submissions).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2}));
+	$('.hd-addr-total-balance').html(parseFloat(network.balance).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2}));
 
 	// If the top address has an identifier, display it
 	var $identifier = $('.dcr-badge-hd-address-identifier');
@@ -631,6 +686,7 @@ function addHdAddressRow($hd_address_tbody, $hd_address_row, hd_address, row_num
 	$new_row.find('th').html(row_number);
 	$new_row.find('td.hd-addr-address > a').html(address).data('address', address).attr('href', '#addr=' + address);
 	$new_row.find('td.hd-addr-balance > .hd-addr-balance-value').html(parseFloat(balance).toLocaleString());
+	$new_row.find('.hd-addr-view-connection').data('to', address).attr('data-to', address);
 
 	// If the address has an identifier, display it
 	$new_row.find('.hd-badge-address-identifier').hide();
