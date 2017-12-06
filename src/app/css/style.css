@@ -128,3 +128,17 @@ td {
 		font-size:150%;
 	}
 }
+
+.badge-info {
+	background-color: #2971FF;
+}
+.badge-success {
+	background-color: #41BF53;
+}
+.badge-warning {
+	color: #fff;
+	background-color: #2ED6A1; /*#69D3F5;*/
+}
+.badge-danger {
+	background-color: #FD714A;
+}
