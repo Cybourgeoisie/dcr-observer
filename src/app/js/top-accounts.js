@@ -59,6 +59,11 @@ function pullTopAddresses(callback) {
 			$new_row.find('td.top-td-num-tx').html(num_tx);
 			$new_row.find('td.top-td-pct-stx').html(pct_stx + '%');
 
+			// Hide unhandled items
+			$new_row.find('.top-td-badge-address-miner').hide();
+			$new_row.find('.top-td-badge-address-ticket').hide();
+			$new_row.find('.top-td-badge-address-actively-staking').hide();
+
 			// If the address has an identifier, display it
 			$new_row.find('.top-td-badge-address-identifier').hide();
 			$new_row.find('.top-td-addr-identifier').html('');
@@ -255,6 +260,11 @@ function pullTopNetworks(callback) {
 			$new_row.find('td.top-hd-td-balance > .top-hd-balance').html(parseInt(balance).toLocaleString());
 			$new_row.find('td.top-hd-td-percent').html(pct + '%');
 			$new_row.find('td.top-hd-td-num-addrs').html(num_addrs);
+
+			// Hide unhandled items
+			$new_row.find('.top-hd-td-badge-address-miner').hide();
+			$new_row.find('.top-hd-td-badge-address-ticket').hide();
+			$new_row.find('.top-hd-td-badge-address-actively-staking').hide();
 
 			// If the address has an identifier, display it
 			$new_row.find('.top-hd-td-badge-address-identifier').hide();
