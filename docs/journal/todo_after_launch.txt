@@ -1,0 +1,4 @@
+Todo After Launch:
+- Update historical views to include tags
+- Additional cleanup on mobile
+- Review HD logic, see if we can correctly group more addresses into wallets

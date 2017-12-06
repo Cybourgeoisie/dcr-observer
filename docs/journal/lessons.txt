@@ -1,0 +1,58 @@
+Plan:
+=====
+X Put up maintenance page.
+X Trim vout / vin.
+X Vacuum tables.
+X Turn off autovacuum.
+X Run balance updaters without a transaction.
+
+While the long-running queries are going, do this:
+X Review the importAll balance logic for any optimizations.
+X Import more blocks into the local DB for more accurate testing. (up to 10,000 - edit: did 7,000. it's too slow.)
+
+
+What I learned today:
+=====================
+
+Kind of kicking off from the previous several lessons..
+
+- Even though the Postgres tables and indices aren't that big (a few gigs in total), performing balance operations over the entire table is a massive pain in the ass and will take forever.
+
+- Always perform snapshots and backups, especially when crossing over to a state that can't be recovered from, and after a state that takes a LONG TIME to produce.
+
+- While mongo and node.js may be effective, and it's very quick to produce the tables required, the learning curve to adapt to node and mongo is more than a few hours. Especially when trying to develop a database that is as intensive and extensive as decred blockchain storage.
+
+- Add a fuckton of indexes. Where JOINs are made, where you ORDER or GROUP or WHERE.
+
+- Turn off indexes when importing massive quantities of data. And triggers as well.
+
+- VACUUM FULL ANALYZE; often. Especially after the big-ass balance calculations.
+
+- Wrapping multiple massive database-wide queries into a transaction results in a lot of temporary tables and data stored. Transactions are fine, and best suited, for small scope interactions. But when trying to "rebalance" the balance table, it's a terrible fucking idea.
+
+- The most performant I've been able to "rebalance" the balance table, I've had to turn off autovacuum, and force VACUUM FULL ANALYZE after every single query, because the balance table gets really bloated, really fast. Like, 1/2 a gig or more per query. It's insane.
+
+- Postgres is a lot faster than I give it credit for, BUT it's not ideal for massive queries that affect the entire database. Perhaps that would be true for any other architecture, but the kinds of queries I'm trying to run are fucking deathly.
+
+- Oh, there's more.
+
+- Use WHERE statements to limit everything extensively. The more limitations, the faster the query. Postgres knows how to optimize for these, even if you think it won't.
+
+
+On Nov 25:
+==========
+
+- I suspect that updating a row by combining values within the same row (updating the balance from vout/vin in the same table) takes a while because the original data has to be preserved. On the face of it, the calculation seems dead simple, but it should probably be compiled from other tables, or stored to another table. If I had to guess, it creates a temporary copy of the table or data.
+
+- ALWAYS COALESCE if there's ANY possibility that a value could be null. It destroys the entire calculation.
+
+- UPDATEs will sometimes be incredibly slow if there are too many records being inserted. Instead of performing searches on an index lookup, it will turn over to sequential lookups, which for large tables will make things incredibly slow. One way around this is to break up the updates into ranges, which will force the index lookup and dramatically reduce time spent. (For example, inserting addresses into vout from vout_address uses two sequential lookups unless the range of vout_id is 200k or less - a reduction of at least 20x.)
+
+
+On Dec 6:
+=========
+
+Just about to launch.
+
+Autovacuum:
+ALTER SYSTEM SET autovacuum = on; SELECT pg_reload_conf();

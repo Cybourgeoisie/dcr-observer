@@ -1,0 +1,28 @@
+Features Needed:
+- Address search: all inputs, outputs, txes, activity block times & dates, current values
+- Transaction search: all inputs, outputs, votes
+- Block search: all txes, inputs, outputs
+
+A database sounds really necessary at this point. However, we can start simple...
+
+- For all vin's, we need the addresses. Currently, we need to do a search. Let's fix that.
+- Reduce O(n^2) time to O(n)
+- Iterate over all blocks from 0 to current, when come across a vin, get the vout address and store it
+	- As I saw, there MIGHT be duplicates, so store in an array
+
+vout -> "scriptPubKey" -> addresses array
+
+if (!vin[i].hasOwnProperty('vout')) {
+	vin[i].vout = [];
+}
+
+vin[i].vout.push({
+	addresses: vout[j].scriptPubKey.addresses,
+	blockheight: ,
+	tree: ,
+	blockindex: ,
+	vout: ,
+});
+
+// Now save the vin back to the file
+

@@ -1,5 +1,9 @@
 BEGIN;
 
+-- No longer in use
+-- Replaced by the views
+
+
 ALTER TABLE "address" ADD COLUMN "network" BIGINT;
 CREATE INDEX "address_network_idx" ON address (network);
 UPDATE address SET network = address_id;

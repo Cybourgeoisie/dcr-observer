@@ -1,0 +1,19 @@
+Todo, 11/22/2017:
+
+X Verify that the update process works
+X Update the data on the main site
+X Find a good way to display data
+- Flag staking addresses
+- Add toggle-able rows
+X Find way to visualize data on the address and wealth pages
+I Beginning of voting distribution page
+X Talk to John about how staking works in the tx side
+X "I find myself wanting to be able to click on the HD wallets categories and see a break of addresses."
+X "Also wanting to click top addresses and seeing taken to a breakdown on that address"
+
+Notes on voting:
+---------------
+
+Check out chaincfg/params.go
+
+RuleChangeActivationInterval

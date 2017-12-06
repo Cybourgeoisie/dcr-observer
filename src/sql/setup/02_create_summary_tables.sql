@@ -1,5 +1,8 @@
 BEGIN;
 
+-- No longer in use
+-- Replaced by the views
+
 CREATE TABLE "balance" (
 	"balance_id"               BIGSERIAL PRIMARY KEY,
 	"address_id"               BIGINT UNIQUE REFERENCES "address" (address_id),

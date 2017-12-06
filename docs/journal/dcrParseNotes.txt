@@ -1,0 +1,34 @@
+Where to find certain parameters (address prefixes, etc):
+https://github.com/decred/dcrd/blob/master/chaincfg/params.go#L622
+
+For reference, on Bitcoin:
+https://github.com/btcsuite/btcd/blob/master/chaincfg/params.go
+
+PoW: BLAKE256 hashing algorithm
+
+Block Magic: D9B400F9
+Really thought it was..
+Oh.
+https://docs.decred.org/advanced/block-header-specifications/
+
+Found "parent" block:
+#172590: https://mainnet.decred.org/block/000000000000001ec6927171a28992ccff4ae74932a763c3e6cbbbedd66be956
+#128355: https://mainnet.decred.org/block/000000000000021a03088b388115e5a5946cf8602015c6b5a9ef7f219d583cb6
+#74798:  https://mainnet.decred.org/block/0000000000000e10bc5826223531ffc4558337b174a48215462cf3ca87635f98
+
+
+--
+
+rpcserver.go:
+	handleGetRawTransaction
+		call FetchBlockHeader
+		call createTxRawResult
+
+Reading variable integers from the first byte: common.go::ReadVarInt
+	0xff -> 9 bytes (64b int)
+	0xfe -> 5 bytes (32b int)
+	0xfd -> 3 bytes (16b int)
+	else -> 1 byte  (8b  int)
+
+Will need opcode.go for the parser
+
