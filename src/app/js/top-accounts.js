@@ -135,12 +135,16 @@ function pullTopAddressesFromApi(callback) {
 				$new_row.find('td.top-td-num-tx').html(num_tx);
 				$new_row.find('td.top-td-pct-stx').html(pct_stx + '%');
 
+				// Remove all break tags from the info section
+				$new_row.find('.top-td-info').find('br').remove();
+
 				// If the address has an identifier, display it
 				$new_row.find('.top-td-badge-address-identifier').hide();
 				$new_row.find('.top-td-addr-identifier').html('');
 				if (address_info.hasOwnProperty('identifier') && address_info.identifier) {
 					$new_row.find('.top-td-badge-address-identifier').show();
 					$new_row.find('.top-td-addr-identifier').html(address_info.identifier);
+					$new_row.find('.top-td-badge-address-identifier').after('<br />');
 				}
 
 				// If the address is mining, display it
@@ -149,6 +153,7 @@ function pullTopAddressesFromApi(callback) {
 				if (address_info.hasOwnProperty('miner') && address_info.miner) {
 					$new_row.find('.top-td-badge-address-miner').show();
 					$new_row.find('.top-td-addr-miner').html(address_info.miner);
+					$new_row.find('.top-td-badge-address-miner').after('<br />');
 				}
 
 				// If the address is a ticket, display it
@@ -157,6 +162,7 @@ function pullTopAddressesFromApi(callback) {
 				if (address_info.hasOwnProperty('ticket') && address_info.ticket) {
 					$new_row.find('.top-td-badge-address-ticket').show();
 					$new_row.find('.top-td-addr-ticket').html(address_info.ticket);
+					$new_row.find('.top-td-badge-address-ticket').after('<br />');
 				}
 
 				// If the address is actively staking, make note of it
@@ -323,12 +329,16 @@ function pullTopNetworksFromApi(callback) {
 				$new_row.find('td.top-hd-td-percent').html(pct + '%');
 				$new_row.find('td.top-hd-td-num-addrs').html(num_addrs);
 
+				// Remove all break tags from the info section
+				$new_row.find('.top-hd-td-info').find('br').remove();
+
 				// If the address has an identifier, display it
 				$new_row.find('.top-hd-td-badge-address-identifier').hide();
 				$new_row.find('.top-hd-td-addr-identifier').html('');
 				if (network_info.hasOwnProperty('identifier') && network_info.identifier) {
 					$new_row.find('.top-hd-td-badge-address-identifier').show();
 					$new_row.find('.top-hd-td-addr-identifier').html(network_info.identifier);
+					$new_row.find('.top-hd-td-badge-address-identifier').after('<br />');
 				}
 
 				// If the address is mining, display it
@@ -337,6 +347,7 @@ function pullTopNetworksFromApi(callback) {
 				if (network_info.hasOwnProperty('miner') && network_info.miner) {
 					$new_row.find('.top-hd-td-badge-address-miner').show();
 					$new_row.find('.top-hd-td-addr-miner').html(network_info.miner);
+					$new_row.find('.top-hd-td-badge-address-miner').after('<br />');
 				}
 
 				// If the address is a ticket, display it
@@ -345,6 +356,7 @@ function pullTopNetworksFromApi(callback) {
 				if (network_info.hasOwnProperty('ticket') && network_info.ticket) {
 					$new_row.find('.top-hd-td-badge-address-ticket').show();
 					$new_row.find('.top-hd-td-addr-ticket').html(network_info.ticket);
+					$new_row.find('.top-hd-td-badge-address-ticket').after('<br />');
 				}
 
 				// If the address is actively staking, make note of it
