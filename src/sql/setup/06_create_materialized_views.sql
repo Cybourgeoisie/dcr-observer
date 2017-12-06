@@ -269,9 +269,9 @@ JOIN
 JOIN
   vout_address va ON va.vout_id = vin.vout_id
 UNION
-SELECT -- Get al
+SELECT -- Get some vout addresses from solo staking addresses
   sq.tx_id,
-  va.address_id
+  vout.address_id
 FROM ( -- get all tx<->[vout address] relationships ONLY for txes with a vout with stakesubmission to a Ds% address
   SELECT
     tx.tx_id
@@ -287,10 +287,57 @@ FROM ( -- get all tx<->[vout address] relationships ONLY for txes with a vout wi
     vout.type = 'stakesubmission' AND a.address LIKE 'Ds%'
 ) AS sq
 JOIN
-  vout ON vout.tx_id = sq.tx_id AND (vout.type = 'stakesubmission' OR vout.type = 'sstxcommitment')
-JOIN
-  vout_address va ON va.vout_id = vout.vout_id;
+  vout ON vout.tx_id = sq.tx_id AND (vout.type = 'stakesubmission' OR vout.type = 'sstxcommitment');
 
+--UNION
+--SELECT -- Get the Dc% ticket addresses and grant to the vins
+--  tx.tx_id,
+--  va.address_id
+--FROM
+--  tx
+--JOIN
+--  vout ON vout.tx_id = tx.tx_id
+--JOIN
+--  vout_address va ON va.vout_id = vout.vout_id
+--JOIN
+--  address a ON a.address_id = va.address_id
+--WHERE
+--  vout.type = 'stakesubmission' AND a.address LIKE 'Dc%'
+--UNION
+--SELECT
+--  tx_id,
+--  address_id
+--FROM (
+--  SELECT -- Get the highest sstxcommitment for Dc% tickets
+--    sq.tx_id,
+--    sq.address_id,
+--    ROW_NUMBER() OVER (PARTITION BY sq.tx_id ORDER BY sq.value DESC) AS rownum
+--  FROM (
+--    SELECT
+--      vout.tx_id,
+--      va.address_id,
+--      vout.value
+--    FROM (
+--      SELECT
+--        tx.tx_id
+--      FROM
+--        tx
+--      JOIN
+--        vout ON vout.tx_id = tx.tx_id
+--      JOIN
+--        vout_address va ON va.vout_id = vout.vout_id
+--      JOIN
+--        address a ON a.address_id = va.address_id
+--      WHERE
+--        vout.type = 'stakesubmission' AND a.address LIKE 'Dc%'
+--    ) AS sq
+--    JOIN
+--      vout ON vout.tx_id = sq.tx_id AND vout.type = 'sstxcommitment'
+--    JOIN
+--      vout_address va ON va.vout_id = vout.vout_id
+--  ) AS sq
+--) AS tmp
+--WHERE rownum = 1;
 
 -- Now get all tx / address pairs, set to lowest network, store to tx network
 CREATE MATERIALIZED VIEW tx_network_initial_view AS
