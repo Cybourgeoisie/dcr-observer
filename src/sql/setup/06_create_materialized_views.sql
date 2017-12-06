@@ -8,6 +8,7 @@ DROP VIEW IF EXISTS address_stx_view CASCADE;
 DROP VIEW IF EXISTS address_block_activity_view CASCADE;
 DROP VIEW IF EXISTS address_actively_staking_view CASCADE;
 DROP VIEW IF EXISTS address_stake_submissions_view CASCADE;
+DROP VIEW IF EXISTS hd_address_tx_logic_view CASCADE;
 DROP VIEW IF EXISTS tx_network_initial_view CASCADE;
 DROP VIEW IF EXISTS address_tx_network_initial_view CASCADE;
 DROP VIEW IF EXISTS tx_network_second_view CASCADE;
@@ -17,6 +18,7 @@ DROP MATERIALIZED VIEW IF EXISTS address_stx_view CASCADE;
 DROP MATERIALIZED VIEW IF EXISTS address_block_activity_view CASCADE;
 DROP MATERIALIZED VIEW IF EXISTS address_actively_staking_view CASCADE;
 DROP MATERIALIZED VIEW IF EXISTS address_stake_submissions_view CASCADE;
+DROP MATERIALIZED VIEW IF EXISTS hd_address_tx_logic_view CASCADE;
 DROP MATERIALIZED VIEW IF EXISTS tx_network_initial_view CASCADE;
 DROP MATERIALIZED VIEW IF EXISTS address_tx_network_initial_view CASCADE;
 DROP MATERIALIZED VIEW IF EXISTS tx_network_second_view CASCADE;
@@ -309,7 +311,7 @@ CREATE UNIQUE INDEX tx_network_initial_view_tx_id_idx ON tx_network_initial_view
 CREATE INDEX tx_network_initial_view_network_idx ON tx_network_initial_view (network);
 
 -- Now find the lowest networks from all of the transactions it belongs to
-CREATE MATERIALIZED VIEW address_tx_network_initial_view AS
+CREATE VIEW address_tx_network_initial_view AS
 SELECT
   hatlv.address_id,
   MIN(tniv.network) AS network
@@ -320,11 +322,11 @@ LEFT JOIN
 GROUP BY
   hatlv.address_id;
 
-CREATE UNIQUE INDEX address_tx_network_initial_view_address_id_idx ON address_tx_network_initial_view (address_id);
-CREATE INDEX address_tx_network_initial_view_network_idx ON address_tx_network_initial_view (network);
+--CREATE UNIQUE INDEX address_tx_network_initial_view_address_id_idx ON address_tx_network_initial_view (address_id);
+--CREATE INDEX address_tx_network_initial_view_network_idx ON address_tx_network_initial_view (network);
 
 -- Then go BACK and fill in the minimum addresses to the initial txes
-CREATE MATERIALIZED VIEW tx_network_second_view AS
+CREATE VIEW tx_network_second_view AS
 SELECT
   hatlv.tx_id,
   min(atnv.network) AS network
@@ -335,8 +337,8 @@ JOIN
 GROUP BY
   hatlv.tx_id;
 
-CREATE UNIQUE INDEX tx_network_second_view_tx_id_idx ON tx_network_second_view (tx_id);
-CREATE INDEX tx_network_second_view_network_idx ON tx_network_second_view (network);
+--CREATE UNIQUE INDEX tx_network_second_view_tx_id_idx ON tx_network_second_view (tx_id);
+--CREATE INDEX tx_network_second_view_network_idx ON tx_network_second_view (network);
 
 -- Now find the lowest networks from all of the transactions it belongs to
 CREATE MATERIALIZED VIEW address_tx_network_second_view AS

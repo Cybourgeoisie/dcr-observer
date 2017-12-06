@@ -477,8 +477,11 @@ class Address extends \Scrollio\Service\AbstractService
 	public function getAddressConnection(string $from, string $to) {
 		// Don't allow same address
 		if ($from == $to) {
-			throw new Exception("Same addresses provided.");
+			throw new \Exception("Same addresses provided.");
 		}
+
+		// Right now, just kill it
+		throw new \Exception('Disabled at the moment.');
 
 		// Validate the addresses
 		$to = preg_replace("/[^A-Za-z0-9]/", '', $to);
