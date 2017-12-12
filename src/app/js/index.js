@@ -381,12 +381,12 @@ function setAddressInfo(data) {
 		$('span.addr-identifier').html(addr_info.identifier);
 	}
 
-	// If the address is a miner, display it
-	$('.dcr-badge-address-miner').hide();
-	$('span.addr-miner').html('');
-	if (addr_info.hasOwnProperty('miner') && addr_info.miner) {
-		$('.dcr-badge-address-miner').show();
-		$('span.addr-miner').html(addr_info.miner);
+	// Display known origin
+	$('.dcr-badge-address-origin').hide();
+	$('span.addr-origin').html('');
+	if (addr_info.hasOwnProperty('origin') && addr_info.origin) {
+		$('.dcr-badge-address-origin').show();
+		$('span.addr-origin').html(addr_info.origin);
 	}
 
 	// If the address is a ticket, display it
@@ -673,13 +673,13 @@ function setHdAddressInfo(data, req_address) {
 		$identifier.find('span.hd-addr-identifier').html(identifier);
 	}
 
-	// If the top address is a miner, display it
-	var $miner = $('.dcr-badge-hd-address-miner');
-	$miner.hide();
-	$miner.find('span.hd-addr-miner').html('');
-	if (network.miner && network.miner.length > 0) {
-		$miner.show();
-		$miner.find('span.hd-addr-miner').html(network.miner);
+	// Display known origin
+	var $origin = $('.dcr-badge-hd-address-origin');
+	$origin.hide();
+	$origin.find('span.hd-addr-origin').html('');
+	if (network.origin && network.origin.length > 0) {
+		$origin.show();
+		$origin.find('span.hd-addr-origin').html(network.origin);
 	}
 
 	// If the top address is a ticket, display it
@@ -730,12 +730,12 @@ function addHdAddressRow($hd_address_tbody, $hd_address_row, hd_address, row_num
 		$new_row.find('.hd-addr-identifier').html(identifier);
 	}
 
-	// If the address is a miner, display it
-	$new_row.find('.hd-badge-address-miner').hide();
-	$new_row.find('.hd-addr-miner').html('');
-	if (hd_address.hasOwnProperty('miner') && hd_address.miner) {
-		$new_row.find('.hd-badge-address-miner').show();
-		$new_row.find('.hd-addr-miner').html(hd_address.miner);
+	// Display known origin
+	$new_row.find('.hd-badge-address-origin').hide();
+	$new_row.find('.hd-addr-origin').html('');
+	if (hd_address.hasOwnProperty('origin') && hd_address.origin) {
+		$new_row.find('.hd-badge-address-origin').show();
+		$new_row.find('.hd-addr-origin').html(hd_address.origin);
 	}
 
 	// If the address is a ticket, display it

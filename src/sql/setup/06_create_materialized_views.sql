@@ -633,14 +633,18 @@ FROM (
     anv.network = anv_this.network
   UNION
   SELECT
-    va.address_id,
-    'Genesis' AS origin
+    anv_c0_hd.address_id,
+    'Company 0' AS owner
   FROM
     vout
   JOIN
     vout_address va ON va.vout_id = vout.vout_id
+  JOIN
+    address_network_view anv_c0 ON anv_c0.address_id = va.address_id
+  JOIN
+    address_network_view anv_c0_hd ON anv_c0_hd.network = anv_c0.network
   WHERE
-    vout.tx_id = 1
+    vout.tx_id = 1 AND vout.value = 5000
 ) AS sq;
 
 CREATE VIEW address_origin_identifiers_view AS
@@ -662,7 +666,27 @@ FROM (
   WHERE
     -- We don't want to count the first block, which was an investor / developer distribution
     -- Nor do we count the developer fund
-    vin.coinbase != '' AND vin.tx_id > 1 AND a.address != 'Dcur2mcGjmENx4DhNqDctW5wJCVyT3Qeqkx'
+    vin.coinbase != '' AND vin.tx_id > 1 AND a.address != 'Dcur2mcGjmENx4DhNqDctW5wJCVyT3Qeqkx' AND
+    a.address_id NOT IN (
+      SELECT
+        va.address_id
+      FROM
+        vout
+      JOIN
+        vout_address va ON va.vout_id = vout.vout_id
+      WHERE
+        vout.tx_id = 1
+    )
+  UNION
+  SELECT
+    va.address_id,
+    'Genesis' AS origin
+  FROM
+    vout
+  JOIN
+    vout_address va ON va.vout_id = vout.vout_id
+  WHERE
+    vout.tx_id = 1
 ) AS sq;
 
 CREATE VIEW address_ticket_identifiers_view AS

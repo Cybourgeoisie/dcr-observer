@@ -1,0 +1,158 @@
+<!doctype html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+	<meta name="description" content="">
+	<meta name="author" content="">
+
+	<title>Decred - Decentralized Governance Monitor</title>
+
+	<!-- Bootstrap CSS -->
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.0.0-beta.2/css/bootstrap.min.css" integrity="sha256-QUyqZrt5vIjBumoqQV0jM8CgGqscFfdGhN+nVCqX0vc=" crossorigin="anonymous" />
+
+	<!-- Font Awesome -->
+	<link rel="stylesheet" href="css/font-awesome.min.css" integrity="sha256-eZrrJcwDc/3uDhsdt61sL2oOBY362qM3lon1gyExkL0=" crossorigin="anonymous" />
+
+	<!-- Bootstrap Slider -->
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-slider/10.0.0/css/bootstrap-slider.min.css" integrity="sha256-WfuSLYdzGvlsFU6ImYYSE277WsjfyU30QeGuNIjeJEI=" crossorigin="anonymous" />
+
+	<!-- Local stylesheet -->
+	<link href="css/style.css" rel="stylesheet">
+
+	<!-- Global site tag (gtag.js) - Google Analytics -->
+	<script async src="https://www.googletagmanager.com/gtag/js?id=UA-110503379-1"></script>
+	<script>
+		window.dataLayer = window.dataLayer || [];
+		function gtag(){dataLayer.push(arguments);}
+		gtag('js', new Date());
+		gtag('config', 'UA-110503379-1');
+	</script>
+</head>
+<body>
+
+	<!-- Popup Data Modal -->
+	<div class="modal fade data-modal" tabindex="-1" role="dialog">
+		<div class="modal-dialog modal-lg">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title"></h5>
+					<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+						<span aria-hidden="true">&times;</span>
+					</button>
+				</div>
+				<div id="modal-d3" class="modal-body" style="text-align:center;margin:auto;">
+					<div class="modal-data-loading" style="height:auto;text-align:center;">
+						<i class="fa fa-cog fa-spin fa-3x fa-fw"></i>
+						<p class="lead">Loading...</p>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<!-- Display connections within modal -->
+	<div class="modal-connection-table" style="display:none;">
+		<table class="table table-hover table-addr-connection table-responsive-sm">
+			<thead>
+				<tr>
+					<th>Address</th>
+					<th>Transaction</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr>
+					<td class="addr-connection-table-address">
+						<a class="page-toggle" href="#addr">X</a>
+					</td>
+					<td class="addr-connection-table-tx">
+						<a href="#" target="blank">X</a> 
+					</td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+
+	<!-- Navigation Bar -->
+	<nav class="navbar navbar-expand-md navbar-dark bg-dark fixed-top dcr-navbar-top">
+		<a class="navbar-brand page-toggle" href="#home">
+			<img src="./img/dcr.png" width=42 height=42 />
+		</a>
+		<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarTop" aria-controls="navbarTop" aria-expanded="false" aria-label="Toggle navigation">
+			<span class="navbar-toggler-icon"></span>
+		</button>
+
+		<div class="collapse navbar-collapse" id="navbarTop">
+			<ul class="navbar-nav mr-auto">
+				<li class="nav-item dropdown">
+					<a class="nav-link dropdown-toggle" href="#" id="dcr-top-dropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Top</a>
+					<div class="dropdown-menu" aria-labelledby="dcr-top-dropdown">
+						<a class="dropdown-item page-toggle" href="#home">Top Addresses</a>
+						<a class="dropdown-item page-toggle" href="#top-hd">Top HD Wallets</a>
+					</div>
+				</li>
+				<li class="nav-item dropdown">
+					<a class="nav-link dropdown-toggle" href="#" id="dcr-dist-dropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Distribution</a>
+					<div class="dropdown-menu" aria-labelledby="dcr-dist-dropdown">
+						<a class="dropdown-item page-toggle" href="#dist">Wealth By Address</a>
+						<a class="dropdown-item page-toggle" href="#dist-hd">Wealth By HD Wallet</a>
+					</div>
+				</li>
+				<li class="nav-item dropdown">
+					<a class="nav-link dropdown-toggle" href="#" id="dcr-voting-dropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Agendas</a>
+					<div class="dropdown-menu" aria-labelledby="dcr-voting-dropdown">
+						<a class="dropdown-item page-toggle" href="#vote-results">Vote Results</a>
+						<a class="dropdown-item page-toggle" href="#voting">Top Addresses by Votes</a>
+						<a class="dropdown-item page-toggle" href="#voting-hd">Top HD Wallets by Votes</a>
+						<a class="dropdown-item page-toggle" href="#voting-stakesubmission">Top Stake Addresses</a>
+					</div>
+				</li>
+			</ul>
+
+			<form id="dcr-address-search" class="form-inline my-2 my-lg-0">
+				<input id="dcr-address-input" class="form-control mr-sm-2" type="text" size="42" placeholder="Enter Address" aria-label="Search" style="font-size:90%">
+				<button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
+			</form>
+		</div>
+	</nav>
+
+	<!-- Primary Content -->
+	<main role="main" class="container">
+
+		<!-- Maintenace Page -->
+		<div class="dcr-page dcr-page-maintenance address-body">
+			<h1>Down For Maintenance</h1>
+
+			<p class="lead">
+				We are currently migrating our database. We will be back shortly, and we apologize for the inconvenience.
+			</p>
+		</div>
+
+	</main>
+
+	<footer class="footer">
+		<div class="container">
+			<span style="color:rgba(255,255,255,.75);">
+				<strong>Current Block:</strong> <span class="dcr-current-block-height"></span> &nbsp; &nbsp;
+				<strong>Supply:</strong> <span class="dcr-current-total-supply"></span> DCR &nbsp; &nbsp;
+				<span class="d-none d-md-inline d-l-inline d-xl-inline">
+					<strong>Price:</strong> $<span class="dcr-current-price"></span>
+				</span>
+			</span><br />
+		</div>
+	</footer>
+
+	<!-- jQuery -->
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
+
+	<!-- Popper -->
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.6/umd/popper.min.js" integrity="sha256-/GXjBGBWRx8/y1Be190w3hrUOFXNs9qPhthi0tbNnG8=" crossorigin="anonymous"></script>
+
+	<!-- Bootstrap -->
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.0.0-beta.2/js/bootstrap.min.js" integrity="sha256-GIa8Vh3sfESnVB2CN3rYGkD/MklvMq0lmITweQxE1qU=" crossorigin="anonymous"></script>
+
+	<!-- Bootstrap Slider -->
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-slider/10.0.0/bootstrap-slider.min.js" integrity="sha256-ssw743RfM8cbNhwou26tmmPhiNhq3buUbRG/RevtfG4=" crossorigin="anonymous"></script>
+
+</body>
+</html>

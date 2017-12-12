@@ -19,7 +19,7 @@ class Address extends \Scrollio\Service\AbstractService
 			SELECT
 				a.address,
 				aiv.owner AS identifier,
-				aiv.origin AS miner,
+				aiv.origin,
 				aiv.ticket,
 				asv.actively_staking,
 				--astxv.actively_staking,
@@ -286,7 +286,7 @@ class Address extends \Scrollio\Service\AbstractService
 			SELECT 
 				a.address,
 				aiv.owner AS identifier,
-				aiv.origin AS miner,
+				aiv.origin,
 				aiv.ticket,
 				nsv.actively_staking,
 				CASE WHEN COALESCE(nsv.balance, 0) < 0 THEN 0 ELSE COALESCE(nsv.balance, 0) END AS balance,
@@ -335,7 +335,7 @@ class Address extends \Scrollio\Service\AbstractService
 			SELECT 
 				a.address,
 				aiv.owner AS identifier,
-				aiv.origin AS miner,
+				aiv.origin,
 				aiv.ticket,
 				asv.actively_staking,
 				CASE WHEN COALESCE(asv.balance, 0) < 0 THEN 0 ELSE COALESCE(asv.balance, 0) END AS balance
@@ -723,7 +723,7 @@ class Address extends \Scrollio\Service\AbstractService
 				asv.actively_staking,
 				a.address,
 				aiv.owner AS identifier,
-				aiv.origin AS miner,
+				aiv.origin,
 				aiv.ticket AS ticket,
 				asv.balance,
 				COALESCE(asv.tx, 0) AS tx,
@@ -762,7 +762,7 @@ class Address extends \Scrollio\Service\AbstractService
 				nsv.num_addresses,
 				a.address,
 				aiv.owner AS identifier,
-				aiv.origin AS miner,
+				aiv.origin,
 				aiv.ticket AS ticket
 			FROM
 				network_summary_view nsv

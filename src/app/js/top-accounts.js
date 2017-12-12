@@ -60,7 +60,7 @@ function pullTopAddresses(callback) {
 			$new_row.find('td.top-td-pct-stx').html(pct_stx + '%');
 
 			// Hide unhandled items
-			$new_row.find('.top-td-badge-address-miner').hide();
+			$new_row.find('.top-td-badge-address-origin').hide();
 			$new_row.find('.top-td-badge-address-ticket').hide();
 			$new_row.find('.top-td-badge-address-actively-staking').hide();
 
@@ -153,12 +153,12 @@ function pullTopAddressesFromApi(callback) {
 				}
 
 				// If the address is mining, display it
-				$new_row.find('.top-td-badge-address-miner').hide();
-				$new_row.find('.top-td-addr-miner').html('');
-				if (address_info.hasOwnProperty('miner') && address_info.miner) {
-					$new_row.find('.top-td-badge-address-miner').show();
-					$new_row.find('.top-td-addr-miner').html(address_info.miner);
-					$new_row.find('.top-td-badge-address-miner').after('<br />');
+				$new_row.find('.top-td-badge-address-origin').hide();
+				$new_row.find('.top-td-addr-origin').html('');
+				if (address_info.hasOwnProperty('origin') && address_info.origin) {
+					$new_row.find('.top-td-badge-address-origin').show();
+					$new_row.find('.top-td-addr-origin').html(address_info.origin);
+					$new_row.find('.top-td-badge-address-origin').after('<br />');
 				}
 
 				// If the address is a ticket, display it
@@ -262,7 +262,7 @@ function pullTopNetworks(callback) {
 			$new_row.find('td.top-hd-td-num-addrs').html(num_addrs);
 
 			// Hide unhandled items
-			$new_row.find('.top-hd-td-badge-address-miner').hide();
+			$new_row.find('.top-hd-td-badge-address-origin').hide();
 			$new_row.find('.top-hd-td-badge-address-ticket').hide();
 			$new_row.find('.top-hd-td-badge-address-actively-staking').hide();
 
@@ -351,13 +351,13 @@ function pullTopNetworksFromApi(callback) {
 					$new_row.find('.top-hd-td-badge-address-identifier').after('<br />');
 				}
 
-				// If the address is mining, display it
-				$new_row.find('.top-hd-td-badge-address-miner').hide();
-				$new_row.find('.top-hd-td-addr-miner').html('');
-				if (network_info.hasOwnProperty('miner') && network_info.miner) {
-					$new_row.find('.top-hd-td-badge-address-miner').show();
-					$new_row.find('.top-hd-td-addr-miner').html(network_info.miner);
-					$new_row.find('.top-hd-td-badge-address-miner').after('<br />');
+				// Display known origin
+				$new_row.find('.top-hd-td-badge-address-origin').hide();
+				$new_row.find('.top-hd-td-addr-origin').html('');
+				if (network_info.hasOwnProperty('origin') && network_info.origin) {
+					$new_row.find('.top-hd-td-badge-address-origin').show();
+					$new_row.find('.top-hd-td-addr-origin').html(network_info.origin);
+					$new_row.find('.top-hd-td-badge-address-origin').after('<br />');
 				}
 
 				// If the address is a ticket, display it
